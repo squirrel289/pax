@@ -42,6 +42,46 @@ Returns a Markdown table with:
 | list-skills          | tools       | List all available skills in the PAX Agent Skills Library, with category, description, and usage reference.                                                                                                            | skills/tools/list-skills/SKILL.md              |
 | pull-request-tool    | tools       | Unified skill for managing GitHub pull requests and issues. Uses Copilot's native PR/issue APIs when available, and falls back to gh-pr-review CLI otherwise. Ensures maximum compatibility and agent-native features. | skills/tools/pull-request-tool/SKILL.md        |
 
+## Example Usage
+
+### Basic Listing
+
+```plaintext
+list-skills
+```
+
+```plaintext
+show skills
+```
+
+```plaintext
+show skill catalog
+```
+
+```plaintext
+display skill library
+```
+
+### List by Category
+
+```plaintext
+list-skills --category workflow
+```
+
+```plaintext
+show workflow skills
+```
+
+### Output as JSON
+
+```plaintext
+list-skills --format json
+```
+
+```plaintext
+show skills in json
+```
+
 ## Implementation Notes
 
 - This skill dynamically enumerates all SKILL.md files in the workspace.
