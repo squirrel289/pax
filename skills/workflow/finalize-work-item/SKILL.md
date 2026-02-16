@@ -1,6 +1,6 @@
 ---
 name: finalize-work-item
-description: "Complete and archive a finished work item, moving it from /backlog/ to /backlog/archive/. Use when work is tested, reviewed, and ready to close. Supports: (1) Verify completion (all acceptance criteria met), (2) Record final metrics (actual_hours, completed_date, test_results), (3) Archive to history, (4) Link successor work items if needed"
+description: "Complete and archive a finished work item, moving it from /backlog/ to /backlog/archive/. Use when work is tested, reviewed, merged, and ready to close. Supports: (1) Verify completion (all acceptance criteria met), (2) Record final metrics (actual_hours, completed_date, test_results), (3) Clean up feature branch, (4) Archive to history, (5) Link successor work items if needed"
 metadata: 
   category: project-management
 license: MIT
@@ -91,20 +91,23 @@ related_commit:
 test_results: "https://github.com/squirrel289/temple/actions/runs/98765432"
 dependencies: []
 related_backlog: []
-notes: |
-  Completed successfully. All 4 core filters implemented with type signatures.
-  
-  Test results:
-  - 102 tests pass
-  - 0 tests fail
-  - Coverage 95%
-  - CI complete
-  
-  Merged to main in commit c4d5e6f.
-  
-  Follow-up work:
-  - Custom filters via plugin interface (proposed #61)
-  - Filter documentation and examples (proposed #62)
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      Completed successfully. All 4 core filters implemented with type signatures.
+      
+      Test results:
+      - 102 tests pass
+      - 0 tests fail
+      - Coverage 95%
+      - CI complete
+      
+      Merged to main in commit c4d5e6f.
+      
+      Follow-up work:
+      - Custom filters via plugin interface (proposed #61)
+      - Filter documentation and examples (proposed #62)
 ---
 ```
 
@@ -133,32 +136,49 @@ Set `state_reason` to document why work is complete:
 Add final context in `notes`:
 
 ```yaml
-notes: |
-  ## Completion Summary
-  
-  Successfully implemented FilterAdapter SDK and core filters.
-  
-  ### Deliverables
-  - temple/sdk/adapter.py extended with FilterAdapter class
-  - temple/sdk/filters.py with selectattr, map, join, default
-  - tests/test_filters.py with 47 new tests
-  - docs/ADAPTER_SPEC.md with filter documentation
-  
-  ### Metrics
-  - Estimated: 20 hours
-  - Actual: 22 hours (slight scope expansion for validation layer)
-  - Test coverage: 95%
-  - Tests passing: 102/102
-  
-  ### Follow-ups
-  - Plugin architecture for custom filters (proposed #61)
-  - Advanced filter examples (proposed #62)
-  - Performance benchmarking (tracked in asv/)
-  
-  Ready for release in v1.0 milestone.
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      ## Completion Summary
+      
+      Successfully implemented FilterAdapter SDK and core filters.
+      
+      ### Deliverables
+      - temple/sdk/adapter.py extended with FilterAdapter class
+      - temple/sdk/filters.py with selectattr, map, join, default
+      - tests/test_filters.py with 47 new tests
+      - docs/ADAPTER_SPEC.md with filter documentation
+      
+      ### Metrics
+      - Estimated: 20 hours
+      - Actual: 22 hours (slight scope expansion for validation layer)
+      - Test coverage: 95%
+      - Tests passing: 102/102
+      
+      ### Follow-ups
+      - Plugin architecture for custom filters (proposed #61)
+      - Advanced filter examples (proposed #62)
+      - Performance benchmarking (tracked in asv/)
+      
+      Ready for release in v1.0 milestone.
 ```
 
-### 4. Archive the File
+### 4. Clean Up Feature Branch
+
+Before archiving, clean up the feature branch associated with this work item:
+
+```bash
+# Invoked automatically by finalize-work-item
+branch-management cleanup feature/60-filter-adapter --delete-remote=true
+```
+
+- Delete local feature branch (already merged to main)
+- Delete remote branch on origin
+- Prune remote tracking branches
+- Verify no dangling references
+
+### 5. Archive the File
 
 Move the file from `/backlog/` to `/backlog/archive/`:
 
@@ -172,7 +192,7 @@ Move the file from `/backlog/` to `/backlog/archive/`:
 /backlog/archive/60_implement_filter_adapter.md
 ```
 
-### 5. Update Index (if applicable)
+### 6. Update Index (if applicable)
 
 If the backlog has an index file (`template.md`, `README.md`), update it to move the item from active to completed section.
 
@@ -225,11 +245,14 @@ related_commit:
   - a1b2c3d
   - c4d5e6f
 dependencies: []
-notes: |
-  ✓ Completed successfully
-  
-  All 4 core filters implemented, tested, and merged.
-  Follow-up items #61 (custom filters) and #62 (examples) created.
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      ✓ Completed successfully
+      
+      All 4 core filters implemented, tested, and merged.
+      Follow-up items #61 (custom filters) and #62 (examples) created.
 ---
 ```
 
@@ -281,16 +304,19 @@ completed_date: 2026-02-12
 test_results: |
   Evaluation document: docs/expression_engine_evaluation.md
   Recommend: Custom parser (option 2)
-notes: |
-  ✓ Completed (spike, scope limited)
-  
-  Evaluated JMESPath and custom parser options in depth.
-  Deferred meval evaluation (low priority).
-  
-  Recommendation: Build custom recursive descent parser for type-aware expressions.
-  This decision will guide implementation in #62.
-  
-  Deliverable: Expression engine evaluation report (docs/expression_engine_evaluation.md)
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      ✓ Completed (spike, scope limited)
+      
+      Evaluated JMESPath and custom parser options in depth.
+      Deferred meval evaluation (low priority).
+      
+      Recommendation: Build custom recursive descent parser for type-aware expressions.
+      This decision will guide implementation in #62.
+      
+      Deliverable: Expression engine evaluation report (docs/expression_engine_evaluation.md)
 ---
 ```
 
@@ -310,21 +336,24 @@ test_results: "91 tests pass, 2 known failures in edge cases"
 related_commit:
   - abc1234  # feat(linter): integrate external base format linters
   - def5678  # test: add integration tests for JSON/YAML/Markdown
-notes: |
-  ✓ Completed with known limitations
-  
-  Core functionality implemented: JSON, YAML, Markdown linting integrated.
-  
-  Known issues (defer to follow-up):
-  - HTML linting incomplete (requires additional parser setup) → tracked in #58
-  - Performance: Large files (>10MB) slow (tracked in #63)
-  
-  Follow-up items:
-  - HTML linting completion (#58)
-  - Performance optimization (#63)
-  
-  Tests: 91 pass, 2 skip (HTML-related), 0 fail
-  Coverage: 87%
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      ✓ Completed with known limitations
+      
+      Core functionality implemented: JSON, YAML, Markdown linting integrated.
+      
+      Known issues (defer to follow-up):
+      - HTML linting incomplete (requires additional parser setup) → tracked in #58
+      - Performance: Large files (>10MB) slow (tracked in #63)
+      
+      Follow-up items:
+      - HTML linting completion (#58)
+      - Performance optimization (#63)
+      
+      Tests: 91 pass, 2 skip (HTML-related), 0 fail
+      Coverage: 87%
 ---
 ```
 
@@ -339,16 +368,19 @@ status: completed
 state_reason: obsolete
 completed_date: 2026-02-05
 actual_hours: 6
-notes: |
-  ✗ Marked obsolete
-  
-  Researched TOML schema support. Concluded that JSON Schema is sufficient
-  and TOML adds minimal value (most users prefer JSON).
-  
-  Decision: Defer TOML support indefinitely.
-  Superseded by: Decision in ADR-004 to focus on JSON Schema only.
-  
-  This work is archived for reference but no follow-up planned.
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      ✗ Marked obsolete
+      
+      Researched TOML schema support. Concluded that JSON Schema is sufficient
+      and TOML adds minimal value (most users prefer JSON).
+      
+      Decision: Defer TOML support indefinitely.
+      Superseded by: Decision in ADR-004 to focus on JSON Schema only.
+      
+      This work is archived for reference but no follow-up planned.
 ---
 ```
 
@@ -361,10 +393,13 @@ All acceptance criteria met, no follow-ups:
 ```yaml
 status: completed
 state_reason: success
-notes: |
-  ✓ Completed successfully
-  All acceptance criteria verified.
-  No follow-up work required.
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      ✓ Completed successfully
+      All acceptance criteria verified.
+      No follow-up work required.
 ```
 
 Move to archive.
@@ -376,12 +411,15 @@ Work complete, but identified future improvements:
 ```yaml
 status: completed
 state_reason: success
-notes: |
-  ✓ Completed successfully
-  
-  Follow-up work identified:
-  - Performance optimization #63
-  - HTML linting completion #58
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      ✓ Completed successfully
+      
+      Follow-up work identified:
+      - Performance optimization #63
+      - HTML linting completion #58
 ```
 
 Create the follow-up items (with dependencies linking back), then move to archive.
@@ -393,13 +431,16 @@ Market changed, approach outdated, or decision made to not pursue:
 ```yaml
 status: completed
 state_reason: obsolete
-notes: |
-  ✗ Marked obsolete
-  
-  Reason: Market moved away from this approach.
-  Decision in ADR-005 to focus on alternative solution.
-  
-  Related item: #72 (new approach)
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      ✗ Marked obsolete
+      
+      Reason: Market moved away from this approach.
+      Decision in ADR-005 to focus on alternative solution.
+      
+      Related item: #72 (new approach)
 ```
 
 Move to archive for historical reference.
@@ -411,14 +452,17 @@ Same work done elsewhere:
 ```yaml
 status: completed
 state_reason: redundant
-notes: |
-  ✗ Marked redundant
-  
-  Duplicate of: [[63_similar_feature_name.md]]
-  
-  This item identified same problem independently.
-  Resolution implemented in #63 instead.
-  Archiving to avoid confusion.
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      ✗ Marked redundant
+      
+      Duplicate of: [[63_similar_feature_name.md]]
+      
+      This item identified same problem independently.
+      Resolution implemented in #63 instead.
+      Archiving to avoid confusion.
 ```
 
 Move to archive with clear reference to canonical item.
@@ -430,14 +474,17 @@ Another item solves it better or more broadly:
 ```yaml
 status: completed
 state_reason: superseded
-notes: |
-  ✗ Marked superseded
-  
-  Original scope: Implement filter validation only
-  Superseded by: [[65_unified_expression_validation.md]]
-  
-  Item #65 provides validation for all expressions, making this
-  narrower approach unnecessary. Solution rolled up.
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      ✗ Marked superseded
+      
+      Original scope: Implement filter validation only
+      Superseded by: [[65_unified_expression_validation.md]]
+      
+      Item #65 provides validation for all expressions, making this
+      narrower approach unnecessary. Solution rolled up.
 ```
 
 Move to archive with reference to superseding item.
@@ -450,18 +497,21 @@ Work stopped before completion (may resume later):
 status: completed
 state_reason: cancelled
 actual_hours: 6  # Partial work
-notes: |
-  ✗ Cancelled
-  
-  Reason: Dependency on ADR-006 decision not made in time for release.
-  Can resume after ADR resolved.
-  
-  Blocker: Waiting for architecture decision on expression language.
-  Status: ADR-006 in draft, expected resolution by 2026-03-15.
-  
-  Work done:
-  - Requirements captured in docs/expression-requirements.md
-  - Proof-of-concept in branch feature/expressions-poc
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      ✗ Cancelled
+      
+      Reason: Dependency on ADR-006 decision not made in time for release.
+      Can resume after ADR resolved.
+      
+      Blocker: Waiting for architecture decision on expression language.
+      Status: ADR-006 in draft, expected resolution by 2026-03-15.
+      
+      Work done:
+      - Requirements captured in docs/expression-requirements.md
+      - Proof-of-concept in branch feature/expressions-poc
 ```
 
 Move to archive with clear context for anyone who needs to resume.
@@ -473,10 +523,13 @@ Move to archive with clear context for anyone who needs to resume.
 If this item enables follow-ups, create those items first and link them:
 
 ```yaml
-notes: |
-  Follow-up items created:
-  - [[61_advanced_filters.md]]
-  - [[62_filter_documentation.md]]
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      Follow-up items created:
+      - [[61_advanced_filters.md]]
+      - [[62_filter_documentation.md]]
 ```
 
 ### 2. Document Lessons Learned
@@ -484,13 +537,16 @@ notes: |
 In `notes`, capture insights for future similar work:
 
 ```yaml
-notes: |
-  ## Lessons Learned
-  
-  - Type annotation setup took longer than expected (3 extra hours)
-    → Future features should allocate more time for type validation
-  - Early integration with CI saved debugging time
-    → Recommend CI integration in design phase
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      ## Lessons Learned
+      
+      - Type annotation setup took longer than expected (3 extra hours)
+        → Future features should allocate more time for type validation
+      - Early integration with CI saved debugging time
+        → Recommend CI integration in design phase
 ```
 
 ### 3. Consistent Completed Dates
@@ -540,14 +596,25 @@ mv /backlog/<number>_<slug>.md /backlog/archive/<number>_<slug>.md
 # Edit /backlog/temple.md or similar
 ```
 
-### Git Commit
+### Push Finalized Changes and Create PR
 
-Optionally commit the archival as a housekeeping change:
+1. **Push all finalized changes to the remote repository**:
+   - Ensure all changes to the work item file, archive location, and index are staged and committed.
+   - Example:
+     ```bash
+     git add backlog/archive/<number>_<slug>.md backlog/temple.md
+     git commit -m "chore: archive completed backlog item #<number>"
+     git push origin <current-branch>
+     ```
 
-```bash
-git add backlog/archive/<number>_<slug>.md backlog/temple.md
-git commit -m "chore: archive completed backlog item #<number>"
-```
+2. **If the work was completed on a feature branch, create a Pull Request (PR) to merge the finalized changes into the main branch**:
+   - Open a PR via GitHub or CLI:
+     ```bash
+     gh pr create --base main --head <current-branch> --title "Finalize work item #<number>" --body "Finalization and archival of work item #<number>"
+     ```
+   - Ensure the PR includes all related work item changes and references the work item number in the description.
+
+3. **Merge the PR after review and CI pass** to complete the archival process.
 
 ## Quick Checklist
 
@@ -563,6 +630,7 @@ git commit -m "chore: archive completed backlog item #<number>"
 - [ ] `test_results` documented (if applicable)
 - [ ] `related_commit` lists all implementation commits (if applicable)
 - [ ] Code merged to main (if applicable)
+- [ ] Feature branch cleaned up (via feature-branch-management cleanup)
 - [ ] `notes` summarize outcome and explain state_reason
 - [ ] Follow-up items created (if applicable and linked in notes)
 - [ ] File moved to `/backlog/archive/`
@@ -573,4 +641,7 @@ git commit -m "chore: archive completed backlog item #<number>"
 
 - **`create-work-item`**: For creating new work items
 - **`update-work-item`**: For tracking progress during implementation
+- **`feature-branch-management`**: For cleaning up feature branch during archival
+- **`merge-pr`**: For merging PR before finalization
+- **`process-pr`**: For end-to-end PR workflow before finalization
 - **`git-commit`**: For recording commits that link to work items

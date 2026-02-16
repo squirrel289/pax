@@ -172,9 +172,13 @@ Interact with GitHub pull requests for review, comment management, and merge ope
 "Get all unresolved comments on PR #42"
 ```
 
-### Interaction Skills
+### Interaction Modes
 
-#### [yolo](skills/interaction/yolo/SKILL.md)
+**Guide**: [Interaction Modes Usage Guide](skills/aspects/interaction-modes/USAGE_GUIDE.md)
+
+Two execution modes provided by the interaction-modes aspect:
+
+#### YOLO Mode
 
 Autonomous "just do it" mode - execute actions without confirmation.
 
@@ -186,7 +190,7 @@ Autonomous "just do it" mode - execute actions without confirmation.
 "Process all approved PRs in YOLO mode"
 ```
 
-#### [collaborative](skills/interaction/collaborative/SKILL.md)
+#### Collaborative Mode
 
 Human-in-the-loop interaction with confirmations and feedback.
 

@@ -81,14 +81,18 @@ Quick reference index of all available skills.
 
 ---
 
-## Interaction Skills
+## Interaction Modes
 
-### [yolo](../skills/interaction/yolo/SKILL.md)
+**Usage Guide**: [USAGE_GUIDE.md](../skills/aspects/interaction-modes/USAGE_GUIDE.md)  
+**Aspect**: [interaction-modes](../skills/aspects/interaction-modes/ASPECT.md)
 
-**Category**: Interaction  
+Interaction modes are implemented as an aspect rather than standalone skills. Skills declare decision points and use the aspect to handle YOLO (autonomous) or Collaborative (interactive) behavior.
+
+### YOLO Mode
+
 **Purpose**: Autonomous execution without confirmations  
 **Key Use**: Well-defined, low-risk automation  
-**Composes**: N/A (atomic skill, injected into workflows)
+**Implementation**: [yolo.sh](../skills/aspects/interaction-modes/yolo.sh)
 
 **Example**:
 
@@ -96,12 +100,11 @@ Quick reference index of all available skills.
 "Process all PRs in YOLO mode"
 ```
 
-### [collaborative](../skills/interaction/collaborative/SKILL.md)
+### Collaborative Mode
 
-**Category**: Interaction  
 **Purpose**: Interactive execution with human oversight  
 **Key Use**: High-risk operations, learning, ambiguous requirements  
-**Composes**: N/A (atomic skill, injected into workflows)
+**Implementation**: [collaborative.sh](../skills/aspects/interaction-modes/collaborative.sh)
 
 **Example**:
 

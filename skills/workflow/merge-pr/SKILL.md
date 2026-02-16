@@ -1,12 +1,34 @@
 ---
 name: merge-pr
 description: Workflow skill for safely merging pull requests after verification
-category: workflow
 license: MIT
-composed-from:
-  - pull-request-tool
-  - sequential-execution
-  - yolo OR collaborative
+metadata:
+   category: workflow
+   composed-from:
+   - pull-request-tool
+   - sequential-execution
+   aspects:
+      - interaction-modes
+   decisions:
+      - id: merge_readiness
+         trigger: after-verification
+         yolo: [proceed_if_checks_pass]
+         collaborative:
+            prompt: "Merge readiness decision"
+            options:
+               - id: merge_squash
+                  label: "Merge with squash"
+                  action: merge --squash
+               - id: merge_rebase
+                  label: "Merge with rebase"
+                  action: merge --rebase
+               - id: create_draft
+                  label: "Mark as draft"
+                  action: mark-draft
+               - id: custom
+                  label: "Other action..."
+                  allow_freeform: true
+            resume: "Proceed with selected action"
 ---
 
 # Merge PR
@@ -110,9 +132,10 @@ This workflow composes:
    - Execute after approval
 
 2. **Post-merge cleanup**
-   - Delete branch if requested
+   - Invoke `feature-branch-management cleanup` to delete feature branch (local and remote)
    - Verify merge succeeded
    - Check main branch updated
+   - Prune remote tracking branches
 
 ### Phase 4: Finalization
 
@@ -126,69 +149,13 @@ This workflow composes:
     - Report any issues
     - Provide next steps if needed
 
-## Interaction Modes
+## Interaction Modes (Aspect)
 
-### YOLO Mode (Autonomous)
+This skill uses the interaction-modes aspect for decision handling.
 
-```markdown
-When interaction-mode = yolo:
-- Automatically merge if all checks pass
-- Use default merge method (or specified)
-- Delete branch automatically
-- Report only final status
-```
-
-Example:
-
-```markdown
-User: "Merge PR #42 in YOLO mode"
-
-Agent:
-- Verifies all checks pass
-- Verifies approvals present
-- Merges using squash (repo default)
-- Deletes feature branch
-- Reports: "PR #42 merged successfully to main, branch deleted"
-```
-
-### Collaborative Mode (Interactive)
-
-```markdown
-When interaction-mode = collaborative:
-- Show merge readiness status
-- Display all checks and approvals
-- Request confirmation before merging
-- Confirm branch deletion
-```
-
-Example:
-
-```markdown
-User: "Merge PR #42"
-
-Agent: "Checking merge readiness for PR #42...
-
-PR Status:
-✅ Mergeable: Yes (no conflicts)
-✅ Reviews: 2 approvals (reviewer1, reviewer2)
-✅ Status Checks: All passing (8/8)
-  ✅ CI Tests
-  ✅ Linter
-  ✅ Security Scan
-  ✅ Build
-  ✅ Integration Tests (x4)
-✅ Branch Protection: Satisfied
-✅ Unresolved Threads: 0
-
-Ready to merge using squash method.
-Delete branch 'feature-xyz' after merge? (yes/no)"
-
-User: "yes"
-
-Agent: "Merging PR #42..."
-[executes merge]
-"✅ PR #42 merged successfully and branch deleted"
-```
+- Aspect: [interaction-modes](../../aspects/interaction-modes/ASPECT.md)
+- Decision point: `merge_readiness`
+- Parameter: `interaction-mode` = yolo | collaborative
 
 ## Merge Methods
 
@@ -352,6 +319,14 @@ C) Cancel merge operation
    
 Done: PR fully processed and merged
 ```
+
+## Related Skills
+
+- **`pull-request-tool`**: Backend for PR operations (fetch, merge, verify)
+- **`feature-branch-management`**: Invoked after merge to clean up feature branch
+- **`process-pr`**: Orchestrates full PR workflow (includes merge-pr in Stage 5)
+- **`handle-pr-feedback`**: Addresses PR review feedback before merge
+- **`update-work-item`**: Updates work item status after PR merged
 
 ## Quick Reference
 

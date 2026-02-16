@@ -507,3 +507,13 @@ SAFETY:
   - Skip approvals
   - Override protection
 ```
+
+## Related Skills
+
+- **pull-request-tool**: For PR interaction, checks, and merge operations
+- **resolve-pr-comments**: For handling review feedback during PR processing
+- **merge-pr**: For executing merge with proper verification and cleanup
+- **handle-pr-feedback**: For triaging feedback severity and routing decisions
+- **update-work-item**: For updating work item status when PR is merged
+- **parallel-execution**: For concurrent assessment of PR readiness
+- **sequential-execution**: For ordered workflow phases (assess → resolve → merge)

@@ -159,16 +159,16 @@ Composes:
     └── sequential-execution
 ```
 
-### Pattern 5: Mode Injection
+### Pattern 5: Mode Injection (Aspect-Driven)
 
 Inject interaction mode into workflows:
 
 ```markdown
-Workflow + Mode → Behavior
+Workflow + Aspect + Mode → Behavior
 
 Example:
-- process-pr + yolo → Fully autonomous
-- process-pr + collaborative → Interactive
+- process-pr + interaction-modes + yolo → Fully autonomous
+- process-pr + interaction-modes + collaborative → Interactive
 ```
 
 **Implementation**:
@@ -179,8 +179,206 @@ Parameters:
   - interaction-mode: yolo | collaborative
 
 Logic:
-  All sub-workflows inherit the mode
-  Behavior adapts automatically
+  Interaction handled by the interaction-modes aspect
+  Decision points prompt or auto-execute based on mode
+```
+
+## Aspects and Decision Points
+
+Aspects are reusable behavior patterns (for example, interaction-modes) that can be composed into any skill without duplicating logic.
+
+- Aspect reference: [docs/ASPECTS.md](docs/ASPECTS.md)
+- Decision point encoding: [docs/DECISION_POINT_ENCODING.md](docs/DECISION_POINT_ENCODING.md)
+
+Decision points define where a workflow pauses for user input or auto-executes based on heuristics. Each decision point must:
+
+- Present discrete options
+- Always include a custom response option
+- Resume the workflow with a recorded decision result
+
+### Scripting Boundary
+
+Favor scripts when deterministic behavior is desired and practical. Use skill composition for interactive or multi-skill orchestration.
+
+- Guidance: [docs/SCRIPTING_BOUNDARY.md](docs/SCRIPTING_BOUNDARY.md)
+
+## Case Study: Work Management Skill Suite
+
+The work management skills demonstrate advanced composition patterns across a complete lifecycle: item creation → implementation → review → merge → finalization.
+
+### 5-Layer Architecture
+
+```tree
+Layer 1: Foundations (External Services & Modes)
+├── GitHub API (pull-request-tool facade)
+├── Git CLI (branch operations)
+└── interaction-modes aspect (yolo, collaborative)
+
+Layer 2: Atomic Skills (Single Responsibility)
+├── pull-request-tool (GitHub PR operations)
+├── feature-branch-management (Git branch lifecycle)
+└── parallel-execution / sequential-execution (execution orchestration)
+
+Layer 3: Specialized Workflows (Single Domain)
+├── resolve-pr-comments (address review feedback)
+├── create-pr (generate PR from branch)
+└── handle-pr-feedback (triage feedback severity)
+
+Layer 4: Merge/Cleanup Workflows (Intermediate Orchestration)
+├── merge-pr (merge with verification + branch cleanup)
+└── finalize-work-item (archive item + branch cleanup)
+
+Layer 5: Work Item Orchestration (Full Lifecycle)
+├── create-work-item (initialize)
+├── update-work-item (progress tracking + auto-invocation of branch/PR ops)
+└── process-pr (full PR lifecycle: review → merge)
+```
+
+### Skill Dependency Matrix
+
+| Skill | Depends On | Called By |
+| ----- | ---------- | --------- |
+| `feature-branch-management` | Git CLI | update-work-item, merge-pr, finalize-work-item, handle-pr-feedback |
+| `create-pr` | pull-request-tool, feature-branch-management | update-work-item (auto on testing), user (manual) |
+| `pull-request-tool` | GitHub API | create-pr, merge-pr, handle-pr-feedback, resolve-pr-comments, process-pr |
+| `resolve-pr-comments` | pull-request-tool | handle-pr-feedback, process-pr (manual) |
+| `handle-pr-feedback` | pull-request-tool, resolve-pr-comments, update-work-item | process-pr, user (manual) |
+| `merge-pr` | pull-request-tool, feature-branch-management | process-pr, user (manual) |
+| `update-work-item` | feature-branch-management, create-pr | user (manual), handle-pr-feedback (on revert) |
+| `create-work-item` | — | user (manual) |
+| `finalize-work-item` | feature-branch-management | user (manual) |
+| `process-pr` | handle-pr-feedback, merge-pr | user (manual) |
+
+### Full Lifecycle Example
+
+**Scenario**: Work item #60 "Implement FilterAdapter" from creation to merged
+
+```ascii-tree
+Phase 1: Create Item
+  User invokes: create-work-item
+    ├─ Work item status: not_started
+    ├─ Metadata created (id=60, title, effort)
+    └─ Related skills documented
+
+Phase 2: Start Implementation
+  User invokes: update-work-item status=in_progress
+    ├─ Auto-invokes: feature-branch-management create feature/60-filter-adapter
+    ├─ Feature branch checked out locally
+    ├─ Work item.feature_branch = "feature/60-filter-adapter"
+    └─ Related skills documented
+
+Phase 3: Implement & Commit
+  User makes git commits
+    ├─ Work item.related_commits += <latest-sha>
+    └─ (update-work-item tracks progress)
+
+Phase 4: Ready for Review
+  User invokes: update-work-item status=testing
+    ├─ Auto-invokes: feature-branch-management sync --base=main
+    │   ├─ Fetches origin/main
+    │   └─ Rebases local branch on main
+    ├─ Auto-invokes: create-pr work_item=60
+    │   ├─ Title: "60: Implement FilterAdapter"
+    │   ├─ Description auto-populated from notes + commits
+    │   ├─ PR created on GitHub
+    │   └─ Work item.pr_number = 123, .pr_url = "https://..."
+    └─ Related skills documented
+
+Phase 5A: Good Feedback (Minor Changes)
+  Reviewer comments requesting docs
+    ├─ Author invokes: resolve-pr-comments pr_number=123
+    │   ├─ Reviews comments
+    │   ├─ Commits fixes
+    │   └─ Updates PR
+    └─ Reviewer approves
+
+Phase 5B: Major Feedback (Rework)
+  Reviewer requests design change
+    ├─ Author invokes: handle-pr-feedback pr_number=123
+    │   ├─ Classifies as "Major"
+    │   ├─ Invokes: update-work-item status=in_progress (revert)
+    │   │   └─ Back to implementation phase (Phase 3)
+    │   ├─ Work item status reverted
+    │   └─ Branch still exists for rework
+    └─ Author re-implements...
+
+Phase 6: Merge
+  After approval:
+    ├─ User invokes: merge-pr pr_number=123
+    │   ├─ Verifies all checks pass
+    │   ├─ Executes merge (default: squash)
+    │   ├─ Auto-invokes: feature-branch-management cleanup
+    │   │   ├─ Deletes local branch
+    │   │   └─ Deletes remote branch (origin/<branch>)
+    │   └─ Work item.status → completed
+    └─ Related skills documented
+
+Phase 7: Finalize
+  User invokes: finalize-work-item work_item=60
+    ├─ Archives work item
+    ├─ Auto-invokes: feature-branch-management cleanup (if not cleaned)
+    ├─ Records completion date
+    ├─ Work item.status → archived
+    └─ Related skills documented
+```
+
+### Key Composition Patterns Used
+
+1. **Mode Injection** (Layer 5 → Layers 1-4):
+   - Work item orchestration doesn't know if merge-pr will run in `yolo` or `collaborative` mode
+   - Mode parameter flows through all composed skills automatically
+
+2. **Auto-Invocation** (Status Transitions):
+   - `update-work-item` auto-invokes `feature-branch-management create` on `not_started` → `in_progress`
+   - `update-work-item` auto-invokes `feature-branch-management sync` + `create-pr` on `in_progress` → `testing`
+   - `merge-pr` auto-invokes `feature-branch-management cleanup` on successful merge
+   - Eliminates manual coordination steps
+
+3. **Feedback Loops** (Error Handling):
+   - `handle-pr-feedback` classifies severity dynamically
+   - Routes to: `resolve-pr-comments` (minor), `update-work-item` revert (major), escalate (blocker)
+   - Decision logic encapsulated in single skill
+
+4. **Layered Delegation** (Separation of Concerns):
+   - Layer 5 (update-work-item) doesn't know git details; delegates to Layer 2 (branch-management)
+   - Layer 4 (merge-pr) doesn't know PR details; delegates to Layer 2 (pull-request-tool)
+   - Each layer has single responsibility
+
+5. **Parallel Assessment** (Where Applicable):
+   - `process-pr` can use `parallel-execution` for simultaneous assessment (ci checks, approval status, comment count)
+   - Once parallel assessment done, sequential execution (resolve → merge)
+
+### DRY Principle: Branch Operations
+
+All skills needing branch operations use **single** `feature-branch-management` skill:
+
+```ascii-tree
+update-work-item    ──┐
+merge-pr            ──┤──→ feature-branch-management (single source of truth)
+finalize-work-item  ──┘
+handle-pr-feedback  
+```
+
+Benefits:
+
+- Bug fix in branch sync logic fixes all 4 consumers
+- New branch operation added once; used everywhere
+- Consistent branch naming and cleanup logic
+
+### When NOT to Compose
+
+Sometimes simpler is better:
+
+```markdown
+DON'T do this:
+  update-work-item
+    ├─ create-work-item
+    └─ create-pr
+  (Items can't update if not created)
+
+DO this instead:
+  Each skill is independent + focused
+  Users choose which to invoke when
 ```
 
 ## Building a New Workflow

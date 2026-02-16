@@ -1,0 +1,91 @@
+# Schema for metadata.decisions field in skill files using interaction-modes aspect
+
+type: array
+items:
+  type: object
+  required:
+    - id
+    - trigger
+  properties:
+    id:
+      type: string
+      description: Unique identifier for this decision point
+      pattern: "^[a-z_]+$"
+
+    trigger:
+      type: string
+      description: Phase or condition when this decision is evaluated
+      examples:
+        - before-pr-create
+        - after-verification
+        - after-triage
+
+    yolo:
+      description: Autonomous mode behavior (heuristic or default action)
+      oneOf:
+        - type: array
+          items:
+            type: string
+        - type: string
+      examples:
+        - "[proceed_if_checks_pass]"
+        - "[use_triage]"
+        - "[create_pr]"
+
+    collaborative:
+      type: object
+      required:
+        - prompt
+        - options
+      properties:
+        prompt:
+          type: string
+          description: User-facing prompt text
+
+        options:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required:
+              - id
+              - label
+              - action
+            properties:
+              id:
+                type: string
+                pattern: "^[a-z_]+$"
+
+              label:
+                type: string
+                description: User-visible option label
+
+              action:
+                type: string
+                description: Action to execute when selected
+
+              allow_freeform:
+                type: boolean
+                description: If true, this option accepts custom user input
+
+        resume:
+          type: string
+          description: Instructions for resuming workflow after decision
+
+examples:
+  - id: merge_readiness
+    trigger: after-verification
+    yolo: "[proceed_if_checks_pass]"
+    collaborative:
+      prompt: "Merge readiness decision"
+      options:
+        - id: merge_squash
+          label: "Merge with squash"
+          action: "merge --squash"
+        - id: merge_rebase
+          label: "Merge with rebase"
+          action: "merge --rebase"
+        - id: custom
+          label: "Other action..."
+          allow_freeform: true
+      resume: "Proceed with selected action"

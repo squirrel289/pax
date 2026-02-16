@@ -300,3 +300,12 @@ PARAMETERS:
 OUTPUT:
     Summary of comments addressed, files changed, status
 ```
+
+## Related Skills
+
+- **pull-request-tool**: For fetching PR details, posting replies, resolving threads
+- **handle-pr-feedback**: For triage and decision routing based on feedback severity
+- **update-work-item**: For reverting work item status when major feedback is detected
+- **process-pr**: Orchestrates full PR workflow including feedback resolution
+- **sequential-execution**: For ordered comment processing
+- **parallel-execution**: For concurrent comment addressing

@@ -78,8 +78,11 @@ related_backlog:
   - "archive/<number>_<slug>.md"
 related_spike:
   - "archive/<number>_<slug>.md"
-notes: |
-  Optional additional context or implementation notes
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      Optional additional context or implementation notes
 ---
 ```
 
@@ -150,8 +153,10 @@ dependencies:
   - "[[54_complete_temple_native.md]]"  # Links to other work items
 related_backlog:
   - "archive/06_rendering_engine.md"  # If refining prior work
-notes: |
-  Any additional context or decision points
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: Any additional context or decision points
 ---
 ```
 
@@ -283,9 +288,12 @@ status: not_started
 priority: medium
 complexity: medium
 estimated_hours: 16
-notes: |
-  Spike to evaluate JMESPath vs. custom expression engine for advanced filters.
-  Decision will inform ADR-006 (expression language).
+notes:
+  - timestamp: 2024-06-01T12:00:00Z
+    user: @john
+    note: |
+      Spike to evaluate JMESPath vs. custom expression engine for advanced filters.
+      Decision will inform ADR-006 (expression language).
 ---
 
 ## Goal
@@ -385,5 +393,8 @@ Example: After completing #57, move `57_implement_json_schema_validation.md` to 
 ## Related Skills
 
 - **`update-work-item`**: For changing status, effort, and adding test results during work
-- **`finalize-work-item`**: For completing and archiving items
+- **`feature-branch-management`**: Automatically invoked by `update-work-item` to create feature branches
+- **`create-pr`**: Automatically invoked to create pull requests when item status → testing
+- **`handle-pr-feedback`**: For addressing PR review feedback
+- **`finalize-work-item`**: For completing and archiving items after PR merged
 - **`git-commit`**: For recording implementation commits that reference work items
