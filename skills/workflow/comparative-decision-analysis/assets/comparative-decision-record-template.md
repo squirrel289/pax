@@ -1,11 +1,11 @@
-# Hybrid Decision Record
+# Comparative Decision Record
 
 - Date: `<yyyy-mm-dd>`
 - Reviewer: `<name>`
 - Decision statement: `<one-sentence decision>`
 - Current platform: `<platform>`
 - Major platforms: `<comma-separated>`
-- Evaluation mode: `<static|bakeoff|hybrid>`
+- Evaluation mode: `<static|bakeoff|comparative>`
 
 ## Intended Use
 

@@ -6,6 +6,7 @@ Starter fixture:
 
 - Scenario and rubric baseline: `../assets/bakeoff-fixture.v1.json`
 - Empty score sheet: `../assets/bakeoff-results-template.v1.json`
+- Skill-specific empirical scenario sets: keep under `test/skills/workflow/comparative-decision-analysis/fixtures/`, not under skill `assets/`.
 
 ## When Bakeoff Is Required
 
@@ -25,6 +26,7 @@ Starter fixture:
 
 - Run each option on all scenarios.
 - Do not change rubric or prompts between options.
+- Prefer deterministic execution with `scripts/run_comparative_decision_harness.py`.
 - Capture raw outputs and key metadata:
   - runtime notes
   - failure modes

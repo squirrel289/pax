@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pax.local/skills/workflow/comparative-decision-analysis/input-schema.json",
+  "title": "Comparative Decision Analysis Input",
+  "description": "Canonical input contract for score_with_guardrails.py.",
+  "type": "object",
+  "required": [
+    "decision",
+    "criteria_confirmed",
+    "current_platform",
+    "criteria",
+    "alternatives",
+    "independent_evaluations"
+  ],
+  "properties": {
+    "decision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "criteria_confirmed": {
+      "type": "boolean"
+    },
+    "criteria_confirmation_source": {
+      "type": "string",
+      "enum": [
+        "user-confirmed",
+        "provided-input",
+        "yolo-mode"
+      ]
+    },
+    "current_platform": {
+      "type": "string",
+      "minLength": 1
+    },
+    "major_platforms": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "score_scale": {
+      "type": "string",
+      "enum": [
+        "0-100",
+        "1-5"
+      ]
+    },
+    "weights": {
+      "type": "object",
+      "properties": {
+        "major_platform_average": {
+          "type": "number"
+        },
+        "current_platform": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": true
+    },
+    "recommendation_rules": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "weight",
+          "metric",
+          "data_source",
+          "scoring_rule"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "weight": {
+            "type": "number",
+            "minimum": 0
+          },
+          "metric": {
+            "type": "string",
+            "minLength": 1
+          },
+          "data_source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scoring_rule": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "alternatives": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "effort",
+          "risk",
+          "feasible",
+          "scores",
+          "justification"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "effort": {
+            "type": "string",
+            "enum": [
+              "S",
+              "M",
+              "L"
+            ]
+          },
+          "risk": {
+            "type": "string",
+            "enum": [
+              "Low",
+              "Med",
+              "Medium",
+              "High"
+            ]
+          },
+          "feasible": {
+            "type": "boolean"
+          },
+          "scores": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            }
+          },
+          "justification": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "independent_evaluations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "alternative_id",
+          "evaluator_id",
+          "isolation_confirmed",
+          "summary"
+        ],
+        "properties": {
+          "alternative_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evaluator_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "isolation_confirmed": {
+            "type": "boolean",
+            "const": true
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "criteria_confirmed": {
+            "const": true
+          }
+        },
+        "required": [
+          "criteria_confirmed"
+        ]
+      },
+      "then": {
+        "required": [
+          "criteria_confirmation_source"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": true
+}

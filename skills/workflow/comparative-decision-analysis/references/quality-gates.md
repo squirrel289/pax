@@ -5,10 +5,16 @@ Apply these gates on every run.
 ## Pre-Scoring Gates
 
 - Criteria are confirmed.
+- `criteria_confirmation_source` is present and valid when criteria are confirmed.
 - Criteria include `metric`, `data_source`, and `scoring_rule`.
 - One rubric only per run.
 - At least 2 alternatives for scoring.
 - Discovery includes at least 1 external option, or a documented blocker.
+- Input matches `references/input-schema.json` (or equivalent script validation).
+- Independent evaluator evidence is complete:
+  - one evaluator record per alternative
+  - unique `evaluator_id` per alternative
+  - `isolation_confirmed=true` on each evaluator record
 
 ## Scoring Gates
 
@@ -29,7 +35,7 @@ Apply these gates on every run.
 Run:
 
 ```bash
-python3 skills/hybrid-decision-analysis/scripts/test_score_with_guardrails.py
+python3 test/skills/workflow/comparative-decision-analysis/test_score_with_guardrails.py
 ```
 
 Required test coverage in this suite:

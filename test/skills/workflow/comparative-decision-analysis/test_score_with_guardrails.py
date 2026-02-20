@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression tests for hybrid guardrail scoring."""
+"""Regression tests for comparative-decision-analysis guardrail scoring."""
 
 from __future__ import annotations
 
@@ -11,7 +11,11 @@ from pathlib import Path
 from typing import Any
 
 
-SCRIPT = Path(__file__).with_name("score_with_guardrails.py")
+REPO_ROOT = Path(__file__).resolve().parents[4]
+SCRIPT = (
+    REPO_ROOT
+    / "skills/workflow/comparative-decision-analysis/scripts/score_with_guardrails.py"
+)
 
 
 def _run(input_data: dict[str, Any], extra_args: list[str] | None = None) -> tuple[subprocess.CompletedProcess[str], dict[str, Any] | None]:
@@ -45,6 +49,7 @@ def _base_input() -> dict[str, Any]:
     return {
         "decision": "test",
         "criteria_confirmed": True,
+        "criteria_confirmation_source": "user-confirmed",
         "current_platform": "chatgpt",
         "major_platforms": ["chatgpt"],
         "score_scale": "0-100",
@@ -67,7 +72,22 @@ def _base_input() -> dict[str, Any]:
             },
         ],
         "alternatives": [],
+        "independent_evaluations": [],
     }
+
+
+def _independent_records(*alternative_ids: str) -> list[dict[str, Any]]:
+    records = []
+    for alt_id in alternative_ids:
+        records.append(
+            {
+                "alternative_id": alt_id,
+                "evaluator_id": f"eval-{alt_id}",
+                "isolation_confirmed": True,
+                "summary": f"Independent evaluation for {alt_id}",
+            }
+        )
+    return records
 
 
 class GuardrailScoreTests(unittest.TestCase):
@@ -93,6 +113,7 @@ class GuardrailScoreTests(unittest.TestCase):
                 "scores": {"chatgpt": {"fit": 80, "risk": 80}},
             },
         ]
+        data["independent_evaluations"] = _independent_records("a", "b")
 
         proc, result = _run(data)
         self.assertEqual(proc.returncode, 0, proc.stderr)
@@ -116,6 +137,7 @@ class GuardrailScoreTests(unittest.TestCase):
                 "scores": {"chatgpt": {"fit": 99, "risk": 99}},
             }
         ]
+        data["independent_evaluations"] = _independent_records("a")
 
         proc, result = _run(data)
         self.assertNotEqual(proc.returncode, 0)
@@ -148,6 +170,7 @@ class GuardrailScoreTests(unittest.TestCase):
                 "scores": {"chatgpt": {"fit": 90, "risk": 90}},
             },
         ]
+        data["independent_evaluations"] = _independent_records("slow", "fast")
 
         proc, result = _run(data)
         self.assertEqual(proc.returncode, 0, proc.stderr)
@@ -177,11 +200,115 @@ class GuardrailScoreTests(unittest.TestCase):
                 "scores": {"chatgpt": {"fit": 80, "risk": 80}},
             },
         ]
+        data["independent_evaluations"] = _independent_records("a", "b")
 
         proc, result = _run(data)
         self.assertEqual(proc.returncode, 0, proc.stderr)
         assert result is not None
         self.assertNotEqual(result["recommendation"]["action"], "select")
+
+    def test_confirmation_source_is_required_when_confirmed(self) -> None:
+        data = _base_input()
+        data.pop("criteria_confirmation_source")
+        data["alternatives"] = [
+            {
+                "id": "a",
+                "name": "A",
+                "effort": "S",
+                "risk": "Low",
+                "feasible": True,
+                "justification": "baseline",
+                "scores": {"chatgpt": {"fit": 80, "risk": 80}},
+            },
+            {
+                "id": "b",
+                "name": "B",
+                "effort": "M",
+                "risk": "Med",
+                "feasible": True,
+                "justification": "baseline",
+                "scores": {"chatgpt": {"fit": 79, "risk": 79}},
+            },
+        ]
+        data["independent_evaluations"] = _independent_records("a", "b")
+
+        proc, result = _run(data)
+        self.assertNotEqual(proc.returncode, 0)
+        self.assertIsNone(result)
+
+    def test_independent_evaluations_require_unique_evaluators(self) -> None:
+        data = _base_input()
+        data["alternatives"] = [
+            {
+                "id": "a",
+                "name": "A",
+                "effort": "S",
+                "risk": "Low",
+                "feasible": True,
+                "justification": "baseline",
+                "scores": {"chatgpt": {"fit": 80, "risk": 80}},
+            },
+            {
+                "id": "b",
+                "name": "B",
+                "effort": "M",
+                "risk": "Med",
+                "feasible": True,
+                "justification": "baseline",
+                "scores": {"chatgpt": {"fit": 79, "risk": 79}},
+            },
+        ]
+        data["independent_evaluations"] = [
+            {
+                "alternative_id": "a",
+                "evaluator_id": "eval-shared",
+                "isolation_confirmed": True,
+                "summary": "Independent evaluation for a",
+            },
+            {
+                "alternative_id": "b",
+                "evaluator_id": "eval-shared",
+                "isolation_confirmed": True,
+                "summary": "Independent evaluation for b",
+            },
+        ]
+
+        proc, result = _run(data)
+        self.assertNotEqual(proc.returncode, 0)
+        self.assertIsNone(result)
+
+    def test_nonisolated_override_allows_missing_records(self) -> None:
+        data = _base_input()
+        data["alternatives"] = [
+            {
+                "id": "a",
+                "name": "A",
+                "effort": "S",
+                "risk": "Low",
+                "feasible": True,
+                "justification": "baseline",
+                "scores": {"chatgpt": {"fit": 81, "risk": 81}},
+            },
+            {
+                "id": "b",
+                "name": "B",
+                "effort": "M",
+                "risk": "Med",
+                "feasible": True,
+                "justification": "baseline",
+                "scores": {"chatgpt": {"fit": 80, "risk": 80}},
+            },
+        ]
+        data["independent_evaluations"] = None
+
+        proc, result = _run(data)
+        self.assertNotEqual(proc.returncode, 0)
+        self.assertIsNone(result)
+
+        proc, result = _run(data, ["--allow-nonisolated-evaluations"])
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        assert result is not None
+        self.assertEqual(result["independent_evaluations"], [])
 
 
 if __name__ == "__main__":

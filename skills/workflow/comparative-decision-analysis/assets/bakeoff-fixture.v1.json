@@ -1,5 +1,5 @@
 {
-  "fixture_id": "hybrid-decision-bakeoff-v1",
+  "fixture_id": "comparative-decision-bakeoff-v1",
   "version": "1.0.0",
   "description": "Reusable bakeoff fixture for comparing decision workflows with fixed scenarios and a fixed judge rubric.",
   "current_platform": "chatgpt",

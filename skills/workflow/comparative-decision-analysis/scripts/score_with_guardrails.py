@@ -21,6 +21,11 @@ DEFAULT_RULES = {
     "extend_gap": 10.0,
     "min_coverage": 0.8,
 }
+ALLOWED_CONFIRMATION_SOURCES = {
+    "user-confirmed",
+    "provided-input",
+    "yolo-mode",
+}
 EFFORT_ORDER = {"s": 0, "m": 1, "l": 2}
 RISK_ORDER = {"low": 0, "med": 1, "medium": 1, "high": 2}
 
@@ -80,6 +85,31 @@ def _normalize_rules(rules: dict[str, Any] | None) -> dict[str, float]:
     min_coverage = normalized["min_coverage"]
     if min_coverage < 0 or min_coverage > 1:
         raise ValueError("recommendation_rules.min_coverage must be between 0 and 1")
+    return normalized
+
+
+def _normalize_confirmation_source(
+    *,
+    criteria_confirmed: Any,
+    source: Any,
+    allow_unconfirmed: bool,
+) -> str:
+    if criteria_confirmed is not True:
+        if not allow_unconfirmed:
+            raise ValueError("criteria_confirmed must be true before scoring")
+        return "simulation-unconfirmed"
+
+    normalized = str(source or "").strip().lower()
+    if not normalized:
+        raise ValueError(
+            "criteria_confirmation_source is required when criteria_confirmed is true"
+        )
+    if normalized not in ALLOWED_CONFIRMATION_SOURCES:
+        allowed = ", ".join(sorted(ALLOWED_CONFIRMATION_SOURCES))
+        raise ValueError(
+            "criteria_confirmation_source must be one of: "
+            f"{allowed}"
+        )
     return normalized
 
 
@@ -190,6 +220,88 @@ def _normalize_alternatives(
         )
 
     return normalized
+
+
+def _normalize_independent_evaluations(
+    records: Any,
+    alternatives: list[dict[str, Any]],
+    *,
+    allow_nonisolated_evaluations: bool,
+) -> list[dict[str, Any]]:
+    alternative_ids = [alt["id"] for alt in alternatives]
+    alternative_id_set = set(alternative_ids)
+
+    if records is None and allow_nonisolated_evaluations:
+        return []
+
+    if not isinstance(records, list) or not records:
+        raise ValueError(
+            "independent_evaluations must be a non-empty array with one record per alternative"
+        )
+
+    by_alternative: dict[str, dict[str, Any]] = {}
+    evaluator_ids: set[str] = set()
+
+    for index, record in enumerate(records):
+        if not isinstance(record, dict):
+            raise ValueError(f"independent_evaluations[{index}] must be an object")
+
+        alternative_id = str(record.get("alternative_id", "")).strip()
+        evaluator_id = str(record.get("evaluator_id", "")).strip()
+        summary = str(record.get("summary", "")).strip()
+        isolation_confirmed = record.get("isolation_confirmed")
+
+        if not alternative_id:
+            raise ValueError(f"independent_evaluations[{index}].alternative_id is required")
+        if alternative_id not in alternative_id_set:
+            raise ValueError(
+                f"independent_evaluations[{index}] references unknown alternative '{alternative_id}'"
+            )
+        if alternative_id in by_alternative:
+            raise ValueError(
+                f"independent_evaluations has duplicate record for alternative '{alternative_id}'"
+            )
+
+        if not evaluator_id:
+            raise ValueError(f"independent_evaluations[{index}].evaluator_id is required")
+        if evaluator_id in evaluator_ids:
+            raise ValueError(
+                "independent_evaluations evaluator_id values must be unique; "
+                f"duplicate '{evaluator_id}'"
+            )
+        evaluator_ids.add(evaluator_id)
+
+        if isolation_confirmed is not True:
+            raise ValueError(
+                f"independent_evaluations[{index}].isolation_confirmed must be true"
+            )
+        if not summary:
+            raise ValueError(f"independent_evaluations[{index}].summary is required")
+
+        evidence_refs = record.get("evidence_refs", [])
+        if evidence_refs is None:
+            evidence_refs = []
+        if not isinstance(evidence_refs, list):
+            raise ValueError(
+                f"independent_evaluations[{index}].evidence_refs must be an array when provided"
+            )
+
+        by_alternative[alternative_id] = {
+            "alternative_id": alternative_id,
+            "evaluator_id": evaluator_id,
+            "isolation_confirmed": True,
+            "summary": summary,
+            "evidence_refs": [str(ref).strip() for ref in evidence_refs if str(ref).strip()],
+        }
+
+    missing = [alt_id for alt_id in alternative_ids if alt_id not in by_alternative]
+    if missing:
+        raise ValueError(
+            "independent_evaluations must include every alternative; missing: "
+            + ", ".join(missing)
+        )
+
+    return [by_alternative[alt_id] for alt_id in alternative_ids]
 
 
 def _effort_rank(value: Any) -> int:
@@ -356,11 +468,23 @@ def _recommend(
     }
 
 
-def _evaluate(data: dict[str, Any], *, allow_unconfirmed: bool, allow_single_option: bool) -> dict[str, Any]:
-    decision = str(data.get("decision", "Hybrid decision analysis")).strip() or "Hybrid decision analysis"
+def _evaluate(
+    data: dict[str, Any],
+    *,
+    allow_unconfirmed: bool,
+    allow_single_option: bool,
+    allow_nonisolated_evaluations: bool,
+) -> dict[str, Any]:
+    decision = (
+        str(data.get("decision", "Comparative decision analysis")).strip()
+        or "Comparative decision analysis"
+    )
     criteria_confirmed = data.get("criteria_confirmed")
-    if not allow_unconfirmed and criteria_confirmed is not True:
-        raise ValueError("criteria_confirmed must be true before scoring")
+    criteria_confirmation_source = _normalize_confirmation_source(
+        criteria_confirmed=criteria_confirmed,
+        source=data.get("criteria_confirmation_source"),
+        allow_unconfirmed=allow_unconfirmed,
+    )
 
     current_platform = str(data.get("current_platform", "")).strip()
     if not current_platform:
@@ -378,6 +502,11 @@ def _evaluate(data: dict[str, Any], *, allow_unconfirmed: bool, allow_single_opt
     alternatives = _normalize_alternatives(
         data.get("alternatives"),
         allow_single_option=allow_single_option,
+    )
+    independent_evaluations = _normalize_independent_evaluations(
+        data.get("independent_evaluations"),
+        alternatives,
+        allow_nonisolated_evaluations=allow_nonisolated_evaluations,
     )
     blend = _normalize_blend(data.get("weights"))
     rules = _normalize_rules(data.get("recommendation_rules"))
@@ -447,10 +576,12 @@ def _evaluate(data: dict[str, Any], *, allow_unconfirmed: bool, allow_single_opt
     return {
         "decision": decision,
         "criteria_confirmed": bool(criteria_confirmed),
+        "criteria_confirmation_source": criteria_confirmation_source,
         "score_scale": score_scale,
         "current_platform": current_platform,
         "major_platforms": major_platforms,
         "criteria": criteria,
+        "independent_evaluations": independent_evaluations,
         "weights": blend,
         "ranked_alternatives": ranked,
         "recommendation": recommendation,
@@ -459,14 +590,21 @@ def _evaluate(data: dict[str, Any], *, allow_unconfirmed: bool, allow_single_opt
 
 def _markdown_report(result: dict[str, Any]) -> str:
     lines = []
-    lines.append(f"# Hybrid Decision Analysis: {result['decision']}")
+    lines.append(f"# Comparative Decision Analysis: {result['decision']}")
     lines.append("")
     lines.append("## Inputs")
     lines.append("")
     lines.append(f"- Criteria confirmed: `{result['criteria_confirmed']}`")
+    lines.append(
+        f"- Criteria confirmation source: `{result['criteria_confirmation_source']}`"
+    )
     lines.append(f"- Score scale: `{result['score_scale']}`")
     lines.append(f"- Current platform: `{result['current_platform']}`")
     lines.append("- Major platforms: " + ", ".join(result["major_platforms"]))
+    lines.append(
+        "- Independent evaluations recorded: "
+        f"`{len(result['independent_evaluations'])}`"
+    )
     lines.append("")
     lines.append("## Criteria")
     lines.append("")
@@ -494,6 +632,19 @@ def _markdown_report(result: dict[str, Any]) -> str:
             f"{item['justification']} |"
         )
     lines.append("")
+    lines.append("## Independent Evaluations")
+    lines.append("")
+    if result["independent_evaluations"]:
+        lines.append("| Alternative | Evaluator | Isolation Confirmed | Summary |")
+        lines.append("|---|---|---|---|")
+        for record in result["independent_evaluations"]:
+            lines.append(
+                f"| `{record['alternative_id']}` | `{record['evaluator_id']}` | "
+                f"{'yes' if record['isolation_confirmed'] else 'no'} | {record['summary']} |"
+            )
+    else:
+        lines.append("- Not provided (simulation override).")
+    lines.append("")
     lines.append("## Recommendation")
     lines.append("")
     rec = result["recommendation"]
@@ -515,7 +666,9 @@ def _markdown_report(result: dict[str, Any]) -> str:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Score alternatives with hybrid guardrails.")
+    parser = argparse.ArgumentParser(
+        description="Score alternatives with comparative decision guardrails."
+    )
     parser.add_argument("--input", required=True, help="Path to input JSON")
     parser.add_argument("--output", help="Path to markdown report output")
     parser.add_argument("--json-output", help="Path to JSON report output")
@@ -528,6 +681,14 @@ def parse_args() -> argparse.Namespace:
         "--allow-single-option",
         action="store_true",
         help="Allow scoring one alternative (simulation only).",
+    )
+    parser.add_argument(
+        "--allow-nonisolated-evaluations",
+        action="store_true",
+        help=(
+            "Allow scoring without independent evaluator records "
+            "(simulation only)."
+        ),
     )
     return parser.parse_args()
 
@@ -545,6 +706,7 @@ def main() -> int:
         data,
         allow_unconfirmed=args.allow_unconfirmed,
         allow_single_option=args.allow_single_option,
+        allow_nonisolated_evaluations=args.allow_nonisolated_evaluations,
     )
     report = _markdown_report(result)
 

@@ -1,5 +1,5 @@
 {
-  "fixture_id": "hybrid-decision-bakeoff-v1",
+  "fixture_id": "comparative-decision-bakeoff-v1",
   "run_id": "<yyyy-mm-dd>-<label>",
   "judge_rubric": {
     "criteria": [

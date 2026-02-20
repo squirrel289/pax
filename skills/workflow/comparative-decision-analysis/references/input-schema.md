@@ -1,6 +1,7 @@
-# Hybrid Input Schema
+# Comparative Decision Analysis Input Schema
 
 Use this schema with `scripts/score_with_guardrails.py`.
+Use `input-schema.json` in this directory as the machine-readable source of truth.
 
 ## Required Fields
 
@@ -8,9 +9,11 @@ Use this schema with `scripts/score_with_guardrails.py`.
 | --- | --- | --- |
 | `decision` | string | Decision statement. |
 | `criteria_confirmed` | boolean | Must be `true` unless running a one-shot simulation. |
+| `criteria_confirmation_source` | enum | Required when `criteria_confirmed=true`; one of `user-confirmed`, `provided-input`, `yolo-mode`. |
 | `current_platform` | string | Current platform to optimize. |
 | `criteria` | array | Must include full criterion contract fields. |
 | `alternatives` | array | Must include at least 2 alternatives for scoring. |
+| `independent_evaluations` | array | One isolated evaluator record per alternative. |
 
 ## Optional Fields
 
@@ -22,6 +25,7 @@ Use this schema with `scripts/score_with_guardrails.py`.
 | `weights.current_platform` | number | `0.4` |
 | `recommendation_rules.*` | number | Script defaults |
 | `recommendation_rules.min_coverage` | number | `0.8` |
+| `independent_evaluations[].evidence_refs` | string[] | `[]` |
 
 ## Criterion Contract
 
@@ -41,10 +45,20 @@ Each alternative must include:
 - `id`
 - `name`
 - `effort` (`S|M|L`)
-- `risk` (`Low|Med|High`)
+- `risk` (`Low|Med|Medium|High`)
 - `feasible` (`true|false`)
 - `scores` (platform -> criterion -> numeric score or `null`)
 - `justification` (explicit option-level rationale)
+
+## Independent Evaluation Contract
+
+Each independent evaluation record must include:
+
+- `alternative_id` (must match exactly one alternative `id`)
+- `evaluator_id` (must be unique across all alternatives)
+- `isolation_confirmed` (must be `true`)
+- `summary` (concise isolated finding summary)
+- `evidence_refs` (optional array of evidence pointers)
 
 ## Missing Evidence
 

@@ -1,0 +1,139 @@
+{
+  "run_id": "2026-02-20-skill-wording-ab",
+  "source_scenarios": "/tmp/skill_option_empirical_scenarios.json",
+  "scenarios": [
+    "S1_normal_confirmed",
+    "S2_confirmation_missing",
+    "S3_forced_tie"
+  ],
+  "variants": {
+    "pre_edit_head": {
+      "skill_path": "HEAD:skills/workflow/hybrid-decision-analysis/SKILL.md",
+      "policy_flags": {
+        "requires_confirmation": true,
+        "skip_on_yolo": false,
+        "skip_on_explicit_input": false,
+        "cross_skill_refs": true
+      },
+      "summary": {
+        "scenarios_total": 3,
+        "scenarios_succeeded": 2,
+        "completion_rate": 0.667,
+        "avg_top_score_successful": 82.22,
+        "avg_top_coverage_successful": 1.0,
+        "autonomy_blocked_scenarios": [
+          "S2_confirmation_missing"
+        ]
+      },
+      "scenario_results": [
+        {
+          "scenario": "S1_normal_confirmed",
+          "criteria_confirmed_input": true,
+          "effective_criteria_confirmed": true,
+          "auto_confirmed_from_explicit_input": false,
+          "status": "ok",
+          "top_option": "aurora",
+          "top_score": 84.45,
+          "top_coverage": 1.0,
+          "recommendation": "compose",
+          "margin_vs_second": 4.95
+        },
+        {
+          "scenario": "S2_confirmation_missing",
+          "criteria_confirmed_input": false,
+          "effective_criteria_confirmed": false,
+          "auto_confirmed_from_explicit_input": false,
+          "status": "failed",
+          "error": "Traceback (most recent call last):\n  File \"/Users/macos/dev/pax/skills/workflow/hybrid-decision-analysis/scripts/score_with_guardrails.py\", line 567, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"/Users/macos/dev/pax/skills/workflow/hybrid-decision-analysis/scripts/score_with_guardrails.py\", line 544, in main\n    result = _evaluate(\n        data,\n        allow_unconfirmed=args.allow_unconfirmed,\n        allow_single_option=args.allow_single_option,\n    )\n  File \"/Users/macos/dev/pax/skills/workflow/hybrid-decision-analysis/scripts/score_with_guardrails.py\", line 363, in _evaluate\n    raise ValueError(\"criteria_confirmed must be true before scoring\")\nValueError: criteria_confirmed must be true before scoring"
+        },
+        {
+          "scenario": "S3_forced_tie",
+          "criteria_confirmed_input": true,
+          "effective_criteria_confirmed": true,
+          "auto_confirmed_from_explicit_input": false,
+          "status": "ok",
+          "top_option": "borealis",
+          "top_score": 80.0,
+          "top_coverage": 1.0,
+          "recommendation": "compose",
+          "margin_vs_second": 0.0
+        }
+      ]
+    },
+    "post_edit_worktree": {
+      "skill_path": "skills/workflow/hybrid-decision-analysis/SKILL.md",
+      "policy_flags": {
+        "requires_confirmation": true,
+        "skip_on_yolo": true,
+        "skip_on_explicit_input": true,
+        "cross_skill_refs": false
+      },
+      "summary": {
+        "scenarios_total": 3,
+        "scenarios_succeeded": 3,
+        "completion_rate": 1.0,
+        "avg_top_score_successful": 82.97,
+        "avg_top_coverage_successful": 1.0,
+        "autonomy_blocked_scenarios": []
+      },
+      "scenario_results": [
+        {
+          "scenario": "S1_normal_confirmed",
+          "criteria_confirmed_input": true,
+          "effective_criteria_confirmed": true,
+          "auto_confirmed_from_explicit_input": false,
+          "status": "ok",
+          "top_option": "aurora",
+          "top_score": 84.45,
+          "top_coverage": 1.0,
+          "recommendation": "compose",
+          "margin_vs_second": 4.95
+        },
+        {
+          "scenario": "S2_confirmation_missing",
+          "criteria_confirmed_input": false,
+          "effective_criteria_confirmed": true,
+          "auto_confirmed_from_explicit_input": true,
+          "status": "ok",
+          "top_option": "aurora",
+          "top_score": 84.45,
+          "top_coverage": 1.0,
+          "recommendation": "compose",
+          "margin_vs_second": 4.95
+        },
+        {
+          "scenario": "S3_forced_tie",
+          "criteria_confirmed_input": true,
+          "effective_criteria_confirmed": true,
+          "auto_confirmed_from_explicit_input": false,
+          "status": "ok",
+          "top_option": "borealis",
+          "top_score": 80.0,
+          "top_coverage": 1.0,
+          "recommendation": "compose",
+          "margin_vs_second": 0.0
+        }
+      ]
+    }
+  },
+  "comparison": [
+    {
+      "scenario": "S1_normal_confirmed",
+      "same_top_option": true,
+      "same_recommendation": true,
+      "top_score_delta_post_minus_pre": 0.0
+    },
+    {
+      "scenario": "S2_confirmation_missing",
+      "comparison": "not_applicable_due_to_failure",
+      "pre_status": "failed",
+      "post_status": "ok"
+    },
+    {
+      "scenario": "S3_forced_tie",
+      "same_top_option": true,
+      "same_recommendation": true,
+      "top_score_delta_post_minus_pre": 0.0
+    }
+  ]
+}

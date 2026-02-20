@@ -1,0 +1,100 @@
+{
+  "meta": {
+    "intended_use": "Select the best workflow for comparing AI skills in a repeatable and evidence-based way.",
+    "current_platform": "Codex",
+    "major_platforms": ["Codex", "GitHub Copilot", "Claude Code", "Gemini"],
+    "criteria": [
+      {"id": "use_case_coverage", "weight": 25},
+      {"id": "workflow_rigor_repeatability", "weight": 20},
+      {"id": "objective_measurability", "weight": 15},
+      {"id": "trigger_precision_discoverability", "weight": 10},
+      {"id": "platform_portability", "weight": 10},
+      {"id": "maintainability_extensibility", "weight": 10},
+      {"id": "adoption_cost_time_to_value", "weight": 10}
+    ],
+    "scale": "1-5 where 1=poor and 5=excellent",
+    "notes_for_comparative_analysis": "If a workflow expects 0-100 criterion scores, convert 1-5 scores by multiplying by 20."
+  },
+  "alternatives": [
+    {"name": "aurora", "effort": "M", "risk": "Medium"},
+    {"name": "borealis", "effort": "S", "risk": "Low"},
+    {"name": "cirrus", "effort": "S", "risk": "Medium"}
+  ],
+  "scenarios": [
+    {
+      "id": "S1_normal_confirmed",
+      "description": "Normal scoring path with criteria confirmation provided and differentiated option quality.",
+      "criteria_confirmed": true,
+      "scores_1_to_5": {
+        "aurora": {
+          "Codex": [5,4,4,5,4,4,4],
+          "GitHub Copilot": [4,4,4,5,4,4,4],
+          "Claude Code": [5,4,3,4,4,4,4],
+          "Gemini": [4,4,4,4,4,4,4]
+        },
+        "borealis": {
+          "Codex": [4,4,3,4,5,4,5],
+          "GitHub Copilot": [4,4,3,4,5,4,4],
+          "Claude Code": [4,3,3,4,5,4,4],
+          "Gemini": [4,4,3,4,4,4,5]
+        },
+        "cirrus": {
+          "Codex": [3,3,4,3,3,3,3],
+          "GitHub Copilot": [3,3,4,3,3,3,3],
+          "Claude Code": [3,3,3,3,3,3,3],
+          "Gemini": [3,3,4,3,3,2,3]
+        }
+      }
+    },
+    {
+      "id": "S2_confirmation_missing",
+      "description": "Criteria and weights are proposed but not confirmed. This tests quality gate enforcement.",
+      "criteria_confirmed": false,
+      "scores_1_to_5": {
+        "aurora": {
+          "Codex": [5,4,4,5,4,4,4],
+          "GitHub Copilot": [4,4,4,5,4,4,4],
+          "Claude Code": [5,4,3,4,4,4,4],
+          "Gemini": [4,4,4,4,4,4,4]
+        },
+        "borealis": {
+          "Codex": [4,4,3,4,5,4,5],
+          "GitHub Copilot": [4,4,3,4,5,4,4],
+          "Claude Code": [4,3,3,4,5,4,4],
+          "Gemini": [4,4,3,4,4,4,5]
+        },
+        "cirrus": {
+          "Codex": [3,3,4,3,3,3,3],
+          "GitHub Copilot": [3,3,4,3,3,3,3],
+          "Claude Code": [3,3,3,3,3,3,3],
+          "Gemini": [3,3,4,3,3,2,3]
+        }
+      }
+    },
+    {
+      "id": "S3_forced_tie",
+      "description": "Top two alternatives are tied on score to test tie-break behavior.",
+      "criteria_confirmed": true,
+      "scores_1_to_5": {
+        "aurora": {
+          "Codex": [4,4,4,4,4,4,4],
+          "GitHub Copilot": [4,4,4,4,4,4,4],
+          "Claude Code": [4,4,4,4,4,4,4],
+          "Gemini": [4,4,4,4,4,4,4]
+        },
+        "borealis": {
+          "Codex": [4,4,4,4,4,4,4],
+          "GitHub Copilot": [4,4,4,4,4,4,4],
+          "Claude Code": [4,4,4,4,4,4,4],
+          "Gemini": [4,4,4,4,4,4,4]
+        },
+        "cirrus": {
+          "Codex": [3,4,4,4,4,4,4],
+          "GitHub Copilot": [3,4,4,4,4,4,4],
+          "Claude Code": [3,4,4,4,4,4,4],
+          "Gemini": [3,4,4,4,4,4,4]
+        }
+      }
+    }
+  ]
+}
