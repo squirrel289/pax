@@ -1,0 +1,53 @@
+# Hybrid Input Schema
+
+Use this schema with `scripts/score_with_guardrails.py`.
+
+## Required Fields
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| `decision` | string | Decision statement. |
+| `criteria_confirmed` | boolean | Must be `true` unless running a one-shot simulation. |
+| `current_platform` | string | Current platform to optimize. |
+| `criteria` | array | Must include full criterion contract fields. |
+| `alternatives` | array | Must include at least 2 alternatives for scoring. |
+
+## Optional Fields
+
+| Field | Type | Default |
+| --- | --- | --- |
+| `score_scale` | string | `0-100` (`1-5` supported) |
+| `major_platforms` | string[] | `["chatgpt","claude","gemini","copilot"]` |
+| `weights.major_platform_average` | number | `0.6` |
+| `weights.current_platform` | number | `0.4` |
+| `recommendation_rules.*` | number | Script defaults |
+| `recommendation_rules.min_coverage` | number | `0.8` |
+
+## Criterion Contract
+
+Each criterion must include:
+
+- `id`
+- `name`
+- `weight`
+- `metric`
+- `data_source`
+- `scoring_rule`
+
+## Alternative Contract
+
+Each alternative must include:
+
+- `id`
+- `name`
+- `effort` (`S|M|L`)
+- `risk` (`Low|Med|High`)
+- `feasible` (`true|false`)
+- `scores` (platform -> criterion -> numeric score or `null`)
+- `justification` (explicit option-level rationale)
+
+## Missing Evidence
+
+- Use `null` for missing criterion scores.
+- Missing values are excluded from weighted averages.
+- Coverage is computed and used for recommendation gating.

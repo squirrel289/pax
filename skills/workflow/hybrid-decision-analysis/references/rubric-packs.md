@@ -1,8 +1,9 @@
 # Rubric Packs
 
-Use one pack per decision run. Weights must sum to `100`.
+Use one pack as a starting baseline, then derive final criteria from intended use.
+Final weights must sum to `100`.
 
-For each criterion, define `metric`, `data_source`, and `scoring_rule` in your run input.
+For each final criterion, define `metric`, `data_source`, and `scoring_rule` in your run input.
 
 ## Skill Selection Pack
 

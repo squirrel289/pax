@@ -22,9 +22,17 @@
 
 ## Alternatives
 
-| Rank | Option | Feasible | Major Platform Avg | Current Platform Score | Overall Success | Action Hint |
-| ---: | --- | --- | ---: | ---: | ---: | --- |
-| 1 | `<option>` | `<yes/no>` | `<score>` | `<score>` | `<score>` | `<select/improve/extend/compose/build-new>` |
+Record every discovered alternative in this table (do not omit lower-ranked options).
+
+| Rank | Option | Feasible | Major Platform Avg | Current Platform Score | Overall Success | Action Hint | Justification |
+| ---: | --- | --- | ---: | ---: | ---: | --- | --- |
+| 1 | `<option>` | `<yes/no>` | `<score>` | `<score>` | `<score>` | `<select/improve/extend/compose/build-new>` | `<explicit option-level rationale>` |
+
+## Discovery Log
+
+- Internal options reviewed: `<ids>`
+- External options reviewed: `<ids and links>`
+- Rejected options and reasons: `<concise list>`
 
 ## Recommendation
 
