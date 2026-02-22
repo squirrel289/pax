@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Technical RFC"
+  short_description: "Author and revise IETF-style RFC specifications"
+  default_prompt: "Use $write-technical-rfc to draft or revise an IETF-style RFC with complete normative language, Security Considerations, IANA Considerations, and references."

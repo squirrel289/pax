@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pax.local/docs/rfcs/session-state.v1.schema.json",
+  "title": "RFC Interaction Session State v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "session_active",
+    "rfc_name",
+    "mode",
+    "current_point",
+    "last_point_conclusion",
+    "last_rebaseline",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1"
+    },
+    "session_active": {
+      "type": "boolean"
+    },
+    "rfc_name": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "mode": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "POINT_REVIEW",
+            "SIDEBAR"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "current_point": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "last_point_conclusion": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "OPEN",
+            "CLOSED"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "last_rebaseline": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "session_active": {
+            "const": false
+          }
+        },
+        "required": [
+          "session_active"
+        ]
+      },
+      "then": {
+        "properties": {
+          "rfc_name": {
+            "type": "null"
+          },
+          "mode": {
+            "type": "null"
+          },
+          "current_point": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "POINT_REVIEW"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "session_active": {
+            "const": true
+          },
+          "rfc_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "current_point": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "SIDEBAR"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "session_active": {
+            "const": true
+          },
+          "rfc_name": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}
