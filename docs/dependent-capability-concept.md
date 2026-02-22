@@ -11,19 +11,66 @@
 
 #### Well-defined
 
-- skills MAY declare a machine-readable `metadata.contract` string using the DCI grammar.
+- skills MAY declare a machine-readable `metadata.contract` string using the [DCI grammar](#dependent-capability-interface-dci-grammar).
 - well-defined contracts improve matching precision, policy enforcement, and reproducibility.
 
 ### Discovery and Selection Protocol (Applies to Fuzzy and Well-defined)
 
-This protocol is weighted, not sequentially required. Exact capability matching is not mandatory, but higher-confidence signals are weighted more heavily.
+> [!NOTE]
+> This protocol is weighted, not sequentially required. Exact capability matching is not mandatory, but higher-confidence signals are weighted more heavily.
+
+#### Protocol Summary
+
+1. Discover candidates from deterministic sources.
+2. Parse and validate contract clauses when present.
+3. Score candidates (`S_contract`, `S_desc`, `S_namepath`, `S_runtime`), then apply penalties and history multiplier.
+4. Apply effective policy gates and selection mode (`single` or `cover`).
+5. Resolve ties deterministically.
+6. Apply `on-missing-required` behavior when coverage is insufficient.
+7. Emit `capability_resolution_report`.
+
+#### Specification Language and Conformance
+
+- Normative keywords (`MUST`, `SHOULD`, `MAY`) are interpreted per RFC 2119 / RFC 8174.
+- Grammar is expressed in EBNF for readability; a future revision MAY publish ABNF for stricter parser interoperability.
 
 #### Definitions
 
-- `query capabilities`: capability identifiers the consumer requires for the current run.
-- `contract token`: an atomic value from `P(...)`, `E(...)`, `A(...)`, `R(...)`, `O(...)`, or `Pol(...)`.
-- `candidate`: one installed and accessible skill under evaluation.
-- `host runtime`: current execution runtime identifier (for example `copilot`, `cli`, `opencode`).
+- **`query capabilities`**: capability identifiers the consumer requires for the current run.
+- **`contract token`**: an atomic value from `P(...)`, `E(...)`, `A(...)`, `R(...)`, `O(...)`, `Rt(...)`, `M(...)`, or `Pol(...)`.
+- **`candidate`**: one installed and accessible skill under evaluation.
+- **`host runtime`**: current execution runtime identifier (for example `copilot`, `cli`, `opencode`).
+
+#### Accepted Clause Tokens
+
+- `P(...)` / `Provides(...)`: capabilities a provider offers.
+- `E(...)` / `Expects(...)`: required input assumptions from caller/context.
+- `A(...)` / `Accepts(...)`: accepted key/value configuration parameters.
+- `R(...)` / `Required(...)`: required dependent capabilities to fulfill behavior.
+- `O(...)` / `Optional(...)`: optional dependent capabilities.
+- `Rt(...)` / `Runtime(...)`: structured runtime compatibility declarations.
+- `M(...)` / `Model(...)`: structured model compatibility declarations.
+- `Pol(...)` / `Policy(...)`: policy override hints and thresholds.
+
+#### Token Navigation Map
+
+- Capability tokens (`P/E/R/O`):
+  - [Capability Token Validation](#capability-token-validation-and-normalization)
+  - [Scoring Components](#scoring-components-00-to-10)
+  - [Deterministic Tie-Breakers](#deterministic-tie-breakers-ordered)
+- Accepts token (`A`):
+  - [Dependent Capability Interface (DCI) Grammar](#dependent-capability-interface-dci-grammar)
+  - [Allowed override keys in `Pol(...)`](#allowed-override-keys-in-pol)
+- Runtime token (`Rt`):
+  - [Runtime Compatibility Determination](#runtime-compatibility-determination)
+  - [Dependent Capability Interface (DCI) Grammar](#dependent-capability-interface-dci-grammar)
+- Model token (`M`):
+  - [Model Compatibility Determination](#model-compatibility-determination)
+  - [Dependent Capability Interface (DCI) Grammar](#dependent-capability-interface-dci-grammar)
+- Policy token (`Pol`):
+  - [DependentPolicy Defaults and Overrides](#dependentpolicy-defaults-and-overrides)
+  - [On-Missing-Required Semantics](#on-missing-required-semantics)
+  - [Provider policy hints](#provider-policy-hints)
 
 #### Discovery Scope (Deterministic)
 
@@ -40,22 +87,29 @@ Inclusion/exclusion rules:
 - exclude unreadable/unparseable skills and record rejection reason.
 - deduplicate by canonical candidate id `skill-name::skill-path` (first occurrence by source order wins).
 
-#### Capability Token Validation (No Lossy Normalization)
+#### Capability Token Validation and Normalization
 
-Capability identifiers in `P/E/R/O` clauses MUST already conform to Agent Skill `name`-field constraints:
+Identifier tokens in `P/E/R/O/Rt` clauses MUST conform to Agent Skill `name`-field constraints:
 
 - length 1..64
 - lowercase alphanumeric plus hyphen only
 - no leading or trailing hyphen
 - no consecutive hyphens
 
-Reference: https://agentskills.io/specification#name-field
+Reference: [Agent Skill name field specification](https://agentskills.io/specification#name-field)
 
 Validation behavior:
 
-- parser MUST decode DCI escapes and trim surrounding whitespace.
-- parser MUST NOT remove characters, rewrite characters, or collapse content beyond escape decoding.
-- if a capability token fails validation:
+- parser MUST decode DCI escapes and trim surrounding whitespace for all clause tokens.
+- parser MUST normalize accepted long-form clause identifiers to short forms before validation/matching.
+- mode-specific value normalization:
+  - `strict`:
+    - token-value comparison is case-sensitive.
+    - parser MUST NOT lowercase or otherwise rewrite token values.
+  - `best-effort`:
+    - parser SHOULD lowercase identifier token values in `P/E/R/O/Rt/M` and keys in `A/Pol` after trimming.
+    - parser MUST preserve `A/Pol` values as-is (no lowercasing).
+- if an identifier token fails validation:
   - `strict`: treat as unresolved.
   - `best-effort`: keep candidate and apply `invalid_token_penalty`.
 
@@ -63,12 +117,33 @@ Penalty definition:
 
 - `invalid_token_penalty = min(0.20, 0.02 * invalid_token_count_per_candidate)`.
 
+Invalid token definitions:
+
+- invalid capability token:
+  - any value in `P/E/R/O/Rt` that violates capability-token constraints.
+- invalid model token:
+  - any value in `M` that violates model-pattern constraints.
+- invalid key token:
+  - any key in `A/Pol` that violates `key := 1*(ALPHA | DIGIT | "-" | "_")`.
+- unknown clause identifier:
+  - any clause with an unknown identifier, for example `X(...)`, not recognized by the grammar (or accepted long-form aliases).
+
+Unknown clause identifier behavior:
+
+- `strict`: candidate contract parsing fails; candidate is treated as unresolved for contract-based matching.
+- `best-effort`: unknown clause identifiers are ignored and `unknown_clause_penalty` is applied.
+- `unknown_clause_penalty = min(0.20, 0.05 * unknown_clause_identifier_count_per_candidate)`.
+
 #### Alias Table Governance
 
-Alias resolution supports interoperability without lossy normalization.
+Alias resolution supports interoperability without special-case normalization.
 
 - alias table format: `canonical-token -> aliases[]`.
 - canonical and alias tokens MUST each pass capability-token validation.
+- alias matching MUST follow the same mode-specific value normalization rules defined in
+  [Capability Token Validation and Normalization](#capability-token-validation-and-normalization).
+  - `strict`: exact value comparison after escape decoding + trim.
+  - `best-effort`: lowercase identifier-token values before lookup and comparison.
 - alias resolution precedence:
   1. runtime/user-provided alias table
   2. workspace alias table (`.dci/aliases.v1.json`)
@@ -76,29 +151,82 @@ Alias resolution supports interoperability without lossy normalization.
 - within a single table, canonical exact match wins before alias match.
 - alias tables MUST declare `alias_table_version`; this version MUST be part of cache keys.
 - alias cycles MUST be flattened to canonical key at load time.
+- trust and integrity:
+  - runtime/workspace alias tables can influence ranking and MUST be treated as trusted configuration only.
+  - `strict` mode SHOULD default to built-in aliases unless runtime/user explicitly opts in external alias tables.
+  - report MUST include alias source and alias table version used for the run.
 
-Schema:
+##### Schema
 
 - `docs/schemas/dci/aliases.v1.schema.json`
 
 #### Runtime Compatibility Determination
 
-Runtime compatibility is determined from top-level `compatibility` in skill frontmatter.
+##### Runtime compatibility uses a hybrid model
 
-Rules:
+- legacy/prose source: top-level `compatibility` in skill frontmatter.
+- structured complement: optional `Rt(...)` / `Runtime(...)` contract clause.
 
-- parse `compatibility` as comma-delimited tokens.
-- normalize runtime tokens by lowercasing and trimming surrounding whitespace.
-- if field is absent or empty, candidate is runtime-agnostic.
-- token `all` means runtime-agnostic.
+This preserves low-friction adoption: legacy skills do not need to add new fields, and structured declaration remains opt-in.
+
+##### Semantics
+
+- `Rt(...)` declares an admissible runtime set (disjunctive OR semantics).
+- runtime compatibility is satisfied when host runtime matches any declared runtime identifier.
+
+##### Rules
+
+- parse `Rt(...)` as structured runtime identifiers using the same name-token constraints as capability tokens.
+- parse `compatibility` as comma-delimited runtime prose identifiers.
+- precedence for provider runtime declaration:
+  1. `Rt(...)` / `Runtime(...)` (structured)
+  2. top-level `compatibility` (legacy prose)
+  3. runtime-agnostic default (when neither is present)
+- if both `Rt(...)` and `compatibility` are present and differ:
+  - `strict`: use `Rt(...)` and record mismatch warning in run artifact.
+  - `best-effort`: use `Rt(...)` and record mismatch warning in run artifact.
+- if `Rt(...)` is absent or invalid in `best-effort`, use top-level `compatibility`.
+- token `*` means runtime-agnostic in either source.
+- token `all` MUST be accepted as an alias of `*`.
 - unknown compatibility tokens MUST be ignored and logged in the run artifact.
-- `S_runtime = 1.0` when candidate is runtime-agnostic or host runtime is listed; otherwise `0.0`.
+- `S_rt = 1.0` when candidate is runtime-agnostic or host runtime is listed; otherwise `0.0`.
 - in `strict` mode, runtime-incompatible candidates MUST be filtered out before final selection.
+
+#### Model Compatibility Determination
+
+##### Model compatibility uses a structured model clause
+
+- source: optional `M(...)` / `Model(...)` contract clause.
+
+##### Semantics
+
+- `M(...)` declares an admissible model set (disjunctive OR semantics).
+- model compatibility is satisfied when host model identifier matches any declared model pattern.
+- `M` supports exact model identifiers and prefix wildcard patterns using a trailing `*`.
+  - example exact: `M(openai/gpt-5.1)`
+  - example prefix wildcard: `M(openai/gpt-5*)`
+- wildcard scope:
+  - only suffix `*` is valid.
+  - interior `*` and `?` are invalid model tokens.
+  - bare `all` is reserved as an alias of `*` (model-agnostic).
+
+##### Rules
+
+- parse `M(...)` values using this model-pattern grammar:
+  - `model-pattern := model-token ["*"]`
+  - `model-token := 1*(ALPHA | DIGIT | "-" | "_" | "." | "/" | ":" | "@")`
+- comparisons MUST follow mode-specific normalization rules defined above.
+- if `M(...)` is absent, candidate is model-agnostic.
+- token `*` in `M(...)` means model-agnostic.
+- token `all` in `M(...)` MUST be accepted as an alias of `*`.
+- unknown model patterns MUST be ignored and logged in run artifact in `best-effort`.
+- in `strict` mode, model-incompatible candidates MUST be filtered out before final selection.
+- `S_model = 1.0` when candidate is model-agnostic or host model matches any `M(...)` pattern; otherwise `0.0`.
 
 #### Scoring Components (`0.0` to `1.0`)
 
 - `S_contract`: capability fit between query capabilities and candidate contract capabilities.
-  - for candidates without `metadata.contract`:
+  - for candidates without `metadata.contract` (see [Fuzzy Declaration Mode]):
     - derive provisional capabilities from `(name + description)` using the same tokenizer as `S_desc`.
     - provisional capabilities MAY contribute only to fuzzy matching.
     - provisional capability matches are capped at `0.25` (below explicit fuzzy token match `0.33`).
@@ -117,40 +245,44 @@ Rules:
   - tokenizer:
     - lowercase
     - split on non-alphanumeric, hyphen, underscore, and slash boundaries
-    - remove fixed english stopword set from `docs/schemas/dci/english-stopwords.v1.txt`
+      - this is NOT equivalent to a single regex word-boundary (`\\w`) split because `_`, `-`, and `/` are explicit segment boundaries here
+    - remove fixed english stopword set from `docs/schemas/dci/english-stopwords.v1.txt` by exact-token match after tokenization/lowercasing
     - Porter stemming
   - scorer:
-    - BM25 with `k1=1.2`, `b=0.75`
+    - BM25 with `k1=1.2`, `b=0.75` (chosen to align with common IR defaults, maximizing portability)
     - normalize: `S_desc = bm25_i / max_bm25`
-    - if `max_bm25 = 0`, set `S_desc = 0.0`.
+    - if `max_bm25 = 0`, set `S_desc = 0.0` (for example: empty candidate corpus, or all scores are zero due to no lexical overlap).
 
 - `S_namepath`: lexical overlap between query tokens and `(skill-name + skill-path)` tokens.
   - same tokenizer as `S_desc`.
   - `S_namepath = |Q ∩ N| / |Q ∪ N|` (Jaccard).
   - if `|Q ∪ N| = 0`, set `S_namepath = 0.0`.
 
-- `S_runtime`: runtime compatibility score defined above.
+- `S_runtime`: environment compatibility score.
+  - `S_runtime = min(S_rt, S_model)`.
+  - `S_rt` and `S_model` are defined in runtime/model sections above.
 
-Composite:
+##### Composite
 
 ```text
 S_total = 0.60*S_contract + 0.20*S_desc + 0.10*S_namepath + 0.10*S_runtime
 ```
 
-Penalty and final score:
+##### Penalty and final score
 
 1. Compute `S_total`.
 2. Compute penalties:
    - `invalid_token_penalty`
+   - `unknown_clause_penalty`
    - `overclaim_penalty`
    - `inflation_penalty` (if applicable)
-3. `penalties = invalid_token_penalty + overclaim_penalty + inflation_penalty`.
+3. `penalties = invalid_token_penalty + unknown_clause_penalty + overclaim_penalty + inflation_penalty`.
 4. `S_total_penalized = max(0.0, S_total - penalties)`.
 5. `S_total_final = S_total_penalized * history_multiplier`.
 
 #### DependentPolicy Defaults and Overrides
 
-Defaults:
+##### Defaults
 
 - `MinTotalScore=0.45`
 - `MinContractScore=0.30`
@@ -160,7 +292,7 @@ Defaults:
 - `MaxProviders=3` (used only when `SelectionMode=cover`)
 - `OnMissingRequired=hard-fail` in `strict`, `offer-emulation` in `best-effort`
 
-Allowed override keys in `Pol(...)`:
+##### Allowed override keys in `Pol(...)`
 
 - `min-total-score`
 - `min-contract-score`
@@ -170,13 +302,31 @@ Allowed override keys in `Pol(...)`:
 - `max-providers` (integer >= 1)
 - `on-missing-required` (`hard-fail | offer-emulation | auto-emulate`)
 
-Precedence:
+##### Override key definitions
+
+- `min-total-score`:
+  - numeric `[0.0, 1.0]`; minimum `S_total_final` allowed after penalties/history.
+- `min-contract-score`:
+  - numeric `[0.0, 1.0]`; minimum `S_contract` before candidate is rejected.
+- `min-required-coverage`:
+  - numeric `[0.0, 1.0]`; minimum resolved required-capability ratio.
+- `max-candidates`:
+  - integer `>= 1`; maximum number of ranked candidates retained before final selection.
+- `selection-mode`:
+  - `single | cover`; single-provider pick or multi-provider set cover.
+- `max-providers`:
+  - integer `>= 1`; max selected providers when `selection-mode=cover`.
+- `on-missing-required`:
+  - `hard-fail | offer-emulation | auto-emulate`; behavior when unresolved required capabilities remain.
+
+##### Precedence
 
 1. runtime/user override
 2. consumer `Pol(...)`
-3. defaults
+3. provider hints (tightening-only)
+4. defaults
 
-Provider policy hints:
+##### Provider policy hints
 
 - provider hints are advisory and MUST NOT relax effective policy.
 - provider hints MAY only tighten policy:
@@ -185,14 +335,14 @@ Provider policy hints:
   - move `on-missing-required` to stricter values only
 - strictness ordering: `hard-fail > offer-emulation > auto-emulate`.
 
-Selection gates:
+##### Selection gates
 
 - reject candidate when `S_total_final < MinTotalScore`.
 - reject candidate when `S_contract < MinContractScore`.
 - reject candidate when required coverage `< MinRequiredCoverage`.
 - retain top `MaxCandidates` by `S_total_final` before final tie-break.
 
-Selection cardinality:
+##### Selection cardinality
 
 - `SelectionMode=single`: choose one top-ranked candidate.
 - `SelectionMode=cover`: choose a provider set that covers required capabilities.
@@ -215,8 +365,8 @@ Selection cardinality:
 #### Deterministic Tie-Breakers (Ordered)
 
 1. higher `S_contract`
-2. higher required-capability coverage
-3. fewer unresolved required capabilities
+2. higher weighted required-capability coverage quality (`exact > alias > fuzzy`)
+3. fewer hard-unresolved required capabilities (`match_score = 0.0`)
 4. higher capability specificity:
    - `S_specificity = required_resolved / max(1, provides_capability_count)`
    - this prefers exact/smaller-capability providers over broad supersets
@@ -299,8 +449,13 @@ if selected is empty or required_capabilities_not_fully_satisfied(selected):
   3. current working directory
 - path MUST be workspace-relative and MUST NOT be skill-directory-relative.
 - persistence fallback: in-memory state is allowed, but report MUST include `history_state=ephemeral`.
+- report linkage:
+  - report and reliability state remain separate artifacts; linkage is by source metadata + candidate snapshots.
+  - report MUST include top-level reliability source metadata (`mode`, `path`, `schema_version`, `updated_at`).
+  - report MUST include per-candidate reliability snapshot used for scoring.
+  - per-candidate snapshot MUST include `success_rate_last_20`, `sample_size`, and `outcomes_last_20`.
 
-Schema:
+##### Schema
 
 - `docs/schemas/dci/reliability.v1.schema.json`
 
@@ -308,39 +463,49 @@ Schema:
 
 consumer MUST emit `capability_resolution_report` for each run.
 
-minimum fields per candidate:
+##### Minimum fields per candidate
 
-- `S_contract`, `S_desc`, `S_namepath`, `S_runtime`
-- `S_total`, penalties, `history_multiplier`, `S_total_final`
-- tie-breaker details and applied step (if used)
+- `S_contract`, `S_desc`, `S_namepath`, `S_runtime`, `S_total`, penalties (including `unknown_clause_penalty`), `history_multiplier`, `S_total_final`, tie-breaker details and applied step (if used), plus reliability snapshot (`sample_size`, `success_rate_last_20`, `outcomes_last_20`)
 
-required top-level fields:
+##### Required top-level fields
 
 - discovery sources scanned and inclusion/exclusion counts
+- alias table source and alias table version used
 - effective `selection-mode` and provider count limit
+- reliability source metadata (`mode`, `path`, `schema_version`, `updated_at`)
 - unresolved required capabilities (if any)
 - `on-missing-required` action taken
 - `degraded_mode` flag and emulated capabilities (when applicable)
 - user decision record for `offer-emulation` (when applicable)
 
-Schema:
+##### Schema
 
 - `docs/schemas/dci/capability-resolution-report.v1.schema.json`
 
-### Well-defined Contract Grammar
+### Dependent Capability Interface (DCI) Grammar
 
 ```ebnf
 contract := "DCI/" version [ "^" mode ] SP clauses
 version := 1*DIGIT
 clauses := clause *(SP clause)
-clause := provides | expects | accepts | required | optional | policy
+clause := provides | expects | accepts | required | optional | runtime | model | policy
 
 provides := "P(" capability-values ")"
 expects := "E(" capability-values ")"
 required := "R(" capability-values ")"
 optional := "O(" capability-values ")"
 accepts := "A(" kvpairs ")"
+runtime := "Rt(" runtime-values ")"
+model := "M(" model-values ")"
 policy := "Pol(" kvpairs ")"
+
+runtime-values := runtime-value *("," runtime-value)
+runtime-value := name-token | "*"
+
+model-values := model-value *("," model-value)
+model-value := model-pattern
+model-pattern := model-token ["*"] | "*"
+model-token := 1*(ALPHA | DIGIT | "-" | "_" | "." | "/" | ":" | "@")
 
 capability-values := capability-value *("," capability-value)
 capability-value := name-token
@@ -366,13 +531,13 @@ Escaping rules:
 - literal parentheses -> `\(` and `\)`
 - literal equals -> `\=`
 - literal backslash -> `\\`
-- literal space SHOULD be escaped as `\ `.
+- literal space SHOULD be escaped as `\`.
 - parsers MUST split `A(...)` and `Pol(...)` key/value at first unescaped `=`.
 
 Token form policy:
 
-- canonical serialization MUST use short forms: `P E A R O Pol`
-- parsers MAY accept long forms (`Provides Expects Accepts Required Optional Policy`) for migration
+- canonical serialization MUST use short forms: `P E A R O Rt M Pol`
+- parsers MAY accept long forms (`Provides Expects Accepts Required Optional Runtime Model Policy`)
 - accepted long forms MUST be normalized to short forms before validation/matching
 
 Example:
@@ -380,7 +545,7 @@ Example:
 ```yaml
 compatibility: "copilot,cli"
 metadata:
-  contract: "DCI/1^strict P(option-evaluation) E(evaluation-criteria) A(output-format=json,output-template=raw) R(web-search) O(critical-thinking) Pol(min-total-score=0.45,on-missing-required=offer-emulation)"
+  contract: "DCI/1^strict P(option-evaluation) E(evaluation-criteria) A(output-format=json,output-template=raw) R(web-search) O(critical-thinking) Rt(copilot,cli) M(openai/gpt-5*) Pol(min-total-score=0.45,on-missing-required=offer-emulation)"
 ```
 
 ## Schema Index
@@ -402,3 +567,5 @@ metadata:
 - consumer skills still own discovery, enforcement, and policy decisions
 - fuzzy mode remains inherently probabilistic
 - high-quality behavior depends on provider honesty plus probe/penalty safeguards
+
+[Fuzzy Declaration Mode]: #fuzzy "Fuzzy Declaration Mode"

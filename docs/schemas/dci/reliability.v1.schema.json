@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pax.local/docs/schemas/dci/reliability.v1.schema.json",
+  "title": "DCI Reliability State v1",
+  "type": "object",
+  "required": ["schema_version", "updated_at", "candidates"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "candidates": {
+      "type": "object",
+      "patternProperties": {
+        "^.+::.+$": {
+          "type": "object",
+          "required": [
+            "outcomes_last_20",
+            "success_rate_last_20",
+            "last_used_at",
+            "sample_size"
+          ],
+          "properties": {
+            "outcomes_last_20": {
+              "type": "array",
+              "maxItems": 20,
+              "items": {
+                "type": "integer",
+                "enum": [0, 1]
+              }
+            },
+            "success_rate_last_20": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            "last_used_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "sample_size": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
