@@ -1,67 +1,72 @@
-# Dependent Capability Contract Findings (Ordered By Severity)
+# Dependent Capability Contract Findings (Rebaselined, Ordered By Severity)
 
-1. **High: Your optional “well-defined contract” currently conflicts with the Agent Skills core spec.** [**POINT_CONCLUSION: CLOSED**]
-`docs/dependent-capability-concept.md:10` and `docs/dependent-capability-concept.md:13` define nested arrays/objects under `metadata`, but Agent Skills spec defines `metadata` as a string→string map, and validation is tied to `skills-ref validate`.  
-Impact: breaks interoperability and undermines your “low-friction migration” claim.  
-Refs: <https://agentskills.io/specification>, <https://agentskills.io/integrate-skills>
+1. **High (resolved): Capability semantics are codified in the RFC draft.** [**POINT_CONCLUSION: CLOSED**]  
+Codified in `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:101`, `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:375`, and `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:642`: open capability domain, canonical `D(...)` deny clause, deterministic `require_deny_conflicts` semantics (`require_deny_conflicts = R_eff ∩ D_eff`) including transitive dependency contexts with bounded traversal, and explicit v1 out-of-scope for external agreement attestations.
 
-2. **High: “SEO-style discovery” is underspecified and therefore unreliable at runtime.** [**POINT_CONCLUSION: CLOSED**]
-`docs/dependent-capability-concept.md:6` has no normative scoring function, tokenization rules, conflict resolution, or deterministic tie-breakers.  
-Impact: high false positives/negatives, prompt-stuffing vulnerability, inconsistent provider selection between runs.
+2. **Medium: Malicious-skill risk mitigation is not yet specified as a first-class model.** [**POINT_CONCLUSION: OPEN**]  
+`docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:533` to `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:559` include manipulation resistance and probes, but there is no normative threat model, trust boundary language, or mandatory runtime controls (allowlists/provenance/sandbox constraints).  
+Impact: `D(...)`/scoring/probes can mitigate declared conflicts, but undeclared malicious behavior remains insufficiently addressed.
 
-3. **High: Capability semantics are not operationally testable.**  
-`docs/dependent-capability-concept.md:25`, `docs/dependent-capability-concept.md:27`, `docs/dependent-capability-concept.md:29` use ambiguous capabilities (`<reasoning level>`, `critical thinking`) with no probes or conformance tests.  
-Impact: “dependency satisfied” can’t be verified; quality gating becomes subjective.
+3. **Medium: Transitive dependency resolution requires implementation-grade validation.** [**POINT_CONCLUSION: OPEN**]  
+`docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:414` to `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:470` now specify deterministic traversal, context-scoped provider instances, and cache-key requirements, but there is no reference resolver or conformance corpus proving cross-runtime consistency.  
+Impact: different runtimes may still diverge on deep dependency resolution and cache reuse behavior.
 
-4. **Medium: Failure-policy semantics are incomplete and can silently degrade outcomes.**  
-`docs/dependent-capability-concept.md:31` and `docs/dependent-capability-concept.md:47` mention emulation/hard-fail but do not define default behavior, user consent requirements, or audit trace requirements.  
-Impact: hidden fail-open behavior and hard-to-debug regressions.
+4. **Low: Canonical long-form clause naming is defined, but parser conformance remains unproven.** [**POINT_CONCLUSION: OPEN**]  
+`docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:44` to `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:63` and `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:689` to `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:691` define canonical long-form identifiers and mandatory normalization, but runtime parser conformance is still unproven.  
+Impact: implementations may diverge on canonical long-form parsing behavior without explicit conformance fixtures.
 
-5. **Medium: The YAML example is syntactically/structurally ambiguous for machine parsing.**  
-`docs/dependent-capability-concept.md:20` through `docs/dependent-capability-concept.md:24` (`accepts`) mixes list and keyed defaults in a way most parsers won’t interpret as intended.  
-Impact: implementation divergence and incompatible parsers.
+5. **Medium: Adoption claims remain ahead of implementation/governance evidence.** [**POINT_CONCLUSION: OPEN**]  
+`docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:710` to `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:715` assert strong compatibility/adoption outcomes, but the spec still lacks a reference resolver implementation, conformance suite, and proposal governance workflow in-repo.  
+Impact: maintainers and integrators may treat the spec as promising but not yet production-verifiable.
 
-6. **Medium: Adoption claims are overstated without compatibility profile + reference implementation.**  
-`docs/dependent-capability-concept.md:40` and `docs/dependent-capability-concept.md:42` claim ecosystem compatibility and dependency-management resolution, but no conformance suite, resolver reference, or governance path is defined.  
-Impact: low trust from maintainers/platform integrators.
+6. **Low: Versioning exists, but compatibility negotiation is still undefined.** [**POINT_CONCLUSION: OPEN**]  
+`docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:637` defines a versioned contract (`DCI/<version>`), but there is no sender/consumer negotiation or downgrade behavior for incompatible versions.  
+Impact: future version drift risks fragmented behavior across runtimes.
 
-7. **Low: No versioning or compatibility negotiation model.**  
-No contract version field or negotiation protocol exists.  
-Impact: breaking changes likely as capability vocabulary evolves.
+7. **Resolved: Core Agent Skills metadata compatibility conflict has been removed.** [**POINT_CONCLUSION: CLOSED**]  
+`docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:14` uses a string-valued `metadata.contract`, which is consistent with string-string metadata constraints.
 
----
+8. **Resolved: Discovery and selection are now normatively specified and deterministic.** [**POINT_CONCLUSION: CLOSED**]  
+Deterministic discovery scope and inclusion rules are defined at `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:84` to `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:97`; scoring and tie-breakers are defined at `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:236` and `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:479`.
 
-## Scorecard
+9. **Resolved: Failure-policy semantics now include explicit defaults, consent, and audit artifacts.** [**POINT_CONCLUSION: CLOSED**]  
+Defaults and policy behavior are defined at `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:296` to `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:305`; missing-required behaviors and user consent are specified at `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:467` to `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:477`; report requirements are specified at `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:587` to `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:626`.
 
-1. **Feasibility:** **6/10** (prototype feasible, standardization not yet).  
-2. **Reliability:** **3/10** as written (too much semantic ambiguity).  
-3. **Determinism:** **2/10** as written (explicitly non-deterministic, no strict mode).  
-4. **Community adoption likelihood:** **4/10** now; **7/10** if you add a compatibility profile, resolver reference, and conformance tests.
+10. **Resolved: Machine parsing ambiguity in the old YAML-style example has been removed.** [**POINT_CONCLUSION: CLOSED**]  
+The example is now a single canonical contract string at `docs/rfcs/dependent-capability-interface/dependent-capability-concept.md:691`, avoiding mixed list/map structures.
 
 ---
 
-## Key Considerations Missing For Success
+## Rebaselined Scorecard
 
-1. A **two-mode contract**: `best-effort` (fuzzy) vs `strict` (deterministic, fail-closed).  
-2. A **controlled capability vocabulary** (canonical ids + aliases + deprecations).  
-3. **Capability verification probes** (self-test tasks per capability).  
-4. **Resolver transparency artifact** (`capability_resolution_report.json`) per run.  
-5. **Security model** for provider trust, allowlists, and provenance.  
-6. **Drift controls** (pin selected provider and resolver version per run).  
-7. **Benchmark dataset** for discovery precision/recall and routing quality.  
-8. **Governance path** (proposal lifecycle, compatibility guarantees, migration policy).
+1. **Feasibility:** **8/10** (spec is implementable with clear deterministic core).  
+2. **Reliability:** **6/10** (good resolver mechanics; capability verification still underdefined).  
+3. **Determinism:** **6/10** (selection path is deterministic; conformance/probe semantics remain partial).  
+4. **Community adoption likelihood:** **5/10** now; **8/10** with reference resolver + conformance suite + governance path.
 
 ---
 
-## Concrete Next Steps To Reach Agent Skill Spec-Level Rigor
+## Critical Gaps Remaining For Success
 
-1. Publish a v0.1 RFC with normative language (`MUST/SHOULD/MAY`) and explicit non-goals.  
-2. Define a **spec-compatible metadata profile** (string-only keys/values) plus optional sidecar contract file for richer structure.  
-3. Release a reference resolver CLI/library with deterministic mode, seeded ranking, and full trace output.  
-4. Create a conformance test suite: discovery accuracy, fallback behavior, hard-fail behavior, and adversarial metadata cases.  
-5. Add telemetry KPIs: match precision, fallback rate, emulation success rate, user override rate.  
-6. Pilot with 3-5 real consumer/provider skill pairs and publish failure analyses.  
-7. Draft a formal extension proposal for Agent Skills after pilot evidence, not before.
+1. **Malicious-skill mitigation model:** threat model, trust boundaries, and mandatory runtime controls.  
+2. **Probe conformance layer:** normative schema for probes and pass/fail recording per capability.  
+3. **Transitive resolver conformance:** deterministic graph expansion, context-scoped cache behavior, and conflict handling fixtures.  
+4. **Long-form clause conformance:** canonical long-form clause parsing and normalization behavior across runtimes.  
+5. **Reference resolver + fixtures:** reproducible implementation and adversarial test corpus.  
+6. **Version negotiation model:** compatible/incompatible behavior across DCI versions.  
+7. **Governance path:** proposal lifecycle, compatibility guarantees, and migration policy.
+
+---
+
+## Concrete Next Steps
+
+1. Add a security section for malicious-skill threat model and trust boundaries (`D(...)` is policy, not a security boundary).  
+2. Add `probes.v1.schema.json` and require probe result reporting per required capability in strict mode.  
+3. Add transitive dependency test fixtures (shared provider, divergent parent deny sets, depth limits, cycles, cache-key isolation).  
+4. Add clause-name conformance fixtures for canonical long-form identifiers and normalization behavior.  
+5. Publish a minimal reference resolver CLI/library aligned with the current scoring/tie-break spec.  
+6. Create a conformance test suite (positive, negative, adversarial metadata, and version-compat cases).  
+7. Define explicit DCI version negotiation and downgrade/fail behavior.
 
 ---
 
@@ -70,19 +75,3 @@ Impact: breaking changes likely as capability vocabulary evolves.
 - <https://agentskills.io/specification>  
 - <https://agentskills.io/integrate-skills>  
 - <https://github.com/agentskills/agentskills>
-
-__
-
-## Resolution Conversation Protocol
-
-1. I present one point only: claim, evidence, risk, and concrete fix.
-2. You respond with one of:
-   - `ACCEPT`
-   - `CHALLENGE: <reason>`
-   - `REVISE: <change you want>`
-3. I either revise or defend once.
-4. I emit a definitive marker:
-   - `POINT_CONCLUSION: CLOSED` (we move to next point)
-   - `POINT_CONCLUSION: OPEN` (we stay on this point)
-
-Advance rule: we only move forward after `POINT_CONCLUSION: CLOSED`.

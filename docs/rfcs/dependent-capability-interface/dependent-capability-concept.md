@@ -37,7 +37,7 @@
 #### Definitions
 
 - **`query capabilities`**: capability identifiers the consumer requires for the current run.
-- **`contract token`**: an atomic value from `P(...)`, `E(...)`, `A(...)`, `R(...)`, `O(...)`, `Rt(...)`, `M(...)`, or `Pol(...)`.
+- **`contract token`**: an atomic value from `P(...)`, `E(...)`, `A(...)`, `R(...)`, `O(...)`, `D(...)`, `Rt(...)`, `M(...)`, or `Pol(...)`.
 - **`candidate`**: one installed and accessible skill under evaluation.
 - **`host runtime`**: current execution runtime identifier (for example `copilot`, `cli`, `opencode`).
 
@@ -46,15 +46,22 @@
 - `P(...)` / `Provides(...)`: capabilities a provider offers.
 - `E(...)` / `Expects(...)`: required input assumptions from caller/context.
 - `A(...)` / `Accepts(...)`: accepted key/value configuration parameters.
-- `R(...)` / `Required(...)`: required dependent capabilities to fulfill behavior.
+- `R(...)` / `Requires(...)`: required dependent capabilities to fulfill behavior.
 - `O(...)` / `Optional(...)`: optional dependent capabilities.
+- `D(...)` / `Denies(...)`: denied dependent capabilities that MUST NOT be introduced by selected providers.
 - `Rt(...)` / `Runtime(...)`: structured runtime compatibility declarations.
 - `M(...)` / `Model(...)`: structured model compatibility declarations.
 - `Pol(...)` / `Policy(...)`: policy override hints and thresholds.
 
+Long-form naming policy:
+
+- canonical long-form identifiers MUST use standardized forms:
+  - `Provides`, `Expects`, `Accepts`, `Requires`, `Optional`, `Denies`, `Runtime`, `Model`, `Policy`.
+- all accepted long forms MUST normalize to short forms before validation/matching.
+
 #### Token Navigation Map
 
-- Capability tokens (`P/E/R/O`):
+- Capability tokens (`P/E/R/O/D`):
   - [Capability Token Validation](#capability-token-validation-and-normalization)
   - [Scoring Components](#scoring-components-00-to-10)
   - [Deterministic Tie-Breakers](#deterministic-tie-breakers-ordered)
@@ -89,14 +96,22 @@ Inclusion/exclusion rules:
 
 #### Capability Token Validation and Normalization
 
-Identifier tokens in `P/E/R/O/Rt` clauses MUST conform to Agent Skill `name`-field constraints:
+Capability vocabulary is intentionally open in DCI/1. There is no global closed enum for capability values.
+Interoperability is achieved by local convention, alias tables, and deterministic scoring/probing.
 
-- length 1..64
-- lowercase alphanumeric plus hyphen only
-- no leading or trailing hyphen
-- no consecutive hyphens
+Agent Skill naming convention alignment:
 
-Reference: [Agent Skill name field specification](https://agentskills.io/specification#name-field)
+- provider capability tokens SHOULD align with the Agent Skill `name`-field style
+  (`lowercase`, `kebab-case`, no whitespace) to improve cross-skill discoverability.
+- consumers MUST treat this as an interoperability preference, not a hard validity boundary, unless explicitly overridden by runtime policy.
+- reference: [Agent Skill `name` field](https://agentskills.io/specification#name-field)
+
+Capability tokens in `P/E/R/O/D` MUST conform to this syntactic profile:
+
+- length 1..128
+- allowed characters: alphanumeric, hyphen, underscore, dot, slash, colon
+- MUST start and end with an alphanumeric character
+- MUST NOT contain whitespace
 
 Validation behavior:
 
@@ -107,7 +122,7 @@ Validation behavior:
     - token-value comparison is case-sensitive.
     - parser MUST NOT lowercase or otherwise rewrite token values.
   - `best-effort`:
-    - parser SHOULD lowercase identifier token values in `P/E/R/O/Rt/M` and keys in `A/Pol` after trimming.
+    - parser SHOULD lowercase identifier token values in `P/E/R/O/D/Rt/M` and keys in `A/Pol` after trimming.
     - parser MUST preserve `A/Pol` values as-is (no lowercasing).
 - if an identifier token fails validation:
   - `strict`: treat as unresolved.
@@ -120,7 +135,7 @@ Penalty definition:
 Invalid token definitions:
 
 - invalid capability token:
-  - any value in `P/E/R/O/Rt` that violates capability-token constraints.
+  - any value in `P/E/R/O/D/Rt` that violates capability-token constraints.
 - invalid model token:
   - any value in `M` that violates model-pattern constraints.
 - invalid key token:
@@ -158,7 +173,7 @@ Alias resolution supports interoperability without special-case normalization.
 
 ##### Schema
 
-- `docs/schemas/dci/aliases.v1.schema.json`
+- `docs/rfcs/dependent-capability-interface/schemas/dci/aliases.v1.schema.json`
 
 #### Runtime Compatibility Determination
 
@@ -176,7 +191,7 @@ This preserves low-friction adoption: legacy skills do not need to add new field
 
 ##### Rules
 
-- parse `Rt(...)` as structured runtime identifiers using the same name-token constraints as capability tokens.
+- parse `Rt(...)` as structured runtime identifiers using the same capability-token constraints.
 - parse `compatibility` as comma-delimited runtime prose identifiers.
 - precedence for provider runtime declaration:
   1. `Rt(...)` / `Runtime(...)` (structured)
@@ -246,7 +261,7 @@ This preserves low-friction adoption: legacy skills do not need to add new field
     - lowercase
     - split on non-alphanumeric, hyphen, underscore, and slash boundaries
       - this is NOT equivalent to a single regex word-boundary (`\\w`) split because `_`, `-`, and `/` are explicit segment boundaries here
-    - remove fixed english stopword set from `docs/schemas/dci/english-stopwords.v1.txt` by exact-token match after tokenization/lowercasing
+    - remove fixed english stopword set from `docs/rfcs/dependent-capability-interface/schemas/dci/english-stopwords.v1.txt` by exact-token match after tokenization/lowercasing
     - Porter stemming
   - scorer:
     - BM25 with `k1=1.2`, `b=0.75` (chosen to align with common IR defaults, maximizing portability)
@@ -276,7 +291,8 @@ S_total = 0.60*S_contract + 0.20*S_desc + 0.10*S_namepath + 0.10*S_runtime
    - `unknown_clause_penalty`
    - `overclaim_penalty`
    - `inflation_penalty` (if applicable)
-3. `penalties = invalid_token_penalty + unknown_clause_penalty + overclaim_penalty + inflation_penalty`.
+   - `require_deny_penalty` (if applicable)
+3. `penalties = invalid_token_penalty + unknown_clause_penalty + overclaim_penalty + inflation_penalty + require_deny_penalty`.
 4. `S_total_penalized = max(0.0, S_total - penalties)`.
 5. `S_total_final = S_total_penalized * history_multiplier`.
 
@@ -290,6 +306,7 @@ S_total = 0.60*S_contract + 0.20*S_desc + 0.10*S_namepath + 0.10*S_runtime
 - `MaxCandidates=5`
 - `SelectionMode=single` (`single | cover`)
 - `MaxProviders=3` (used only when `SelectionMode=cover`)
+- `MaxDependencyDepth=2`
 - `OnMissingRequired=hard-fail` in `strict`, `offer-emulation` in `best-effort`
 
 ##### Allowed override keys in `Pol(...)`
@@ -300,6 +317,7 @@ S_total = 0.60*S_contract + 0.20*S_desc + 0.10*S_namepath + 0.10*S_runtime
 - `max-candidates`
 - `selection-mode` (`single | cover`)
 - `max-providers` (integer >= 1)
+- `max-dependency-depth` (integer >= 0)
 - `on-missing-required` (`hard-fail | offer-emulation | auto-emulate`)
 
 ##### Override key definitions
@@ -316,6 +334,8 @@ S_total = 0.60*S_contract + 0.20*S_desc + 0.10*S_namepath + 0.10*S_runtime
   - `single | cover`; single-provider pick or multi-provider set cover.
 - `max-providers`:
   - integer `>= 1`; max selected providers when `selection-mode=cover`.
+- `max-dependency-depth`:
+  - integer `>= 0`; dependency traversal bound used for transitive require-deny conflict detection.
 - `on-missing-required`:
   - `hard-fail | offer-emulation | auto-emulate`; behavior when unresolved required capabilities remain.
 
@@ -349,6 +369,105 @@ S_total = 0.60*S_contract + 0.20*S_desc + 0.10*S_namepath + 0.10*S_runtime
   - use greedy set-cover tie-broken by `S_total_final`.
   - stop when all required capabilities are covered or `MaxProviders` reached.
   - if uncovered capabilities remain, apply `on-missing-required` policy.
+
+#### Require-Deny Conflict Semantics
+
+`D(...)` provides explicit denylist behavior for dependency compatibility checks.
+
+- `R_eff`: effective required capability set across the traversed dependency graph.
+- `D_eff`: effective denied capability set across the traversed dependency graph.
+- `require_deny_conflicts = R_eff ∩ D_eff`.
+
+Traversal and determinism rules:
+
+- traversal MUST use the selected dependency graph (consumer root plus selected providers).
+- traversal MUST be breadth-first and deterministic by canonical candidate id order.
+- traversal depth MUST be bounded by `MaxDependencyDepth`.
+  - depth `0`: consumer
+  - depth `1`: directly selected providers
+  - depth `N`: providers selected to satisfy depth `N-1` provider requirements
+- resolver MUST stop revisiting nodes already seen (cycle-safe).
+
+Evaluation rules:
+
+- `strict`:
+  - if `require_deny_conflicts` is non-empty, selection MUST fail with `on-missing-required=hard-fail` behavior.
+- `best-effort`:
+  - candidate set MAY continue, but each require-deny conflict MUST be treated as unresolved required.
+  - apply `require_deny_penalty = min(0.25, 0.05 * count(require_deny_conflicts))`.
+
+Example (direct conflict):
+
+- consumer requires `R(web-search)`.
+- selected provider declares `D(web-search)`.
+- result: `require_deny_conflicts={web-search}`.
+
+Example (transitive conflict):
+
+- consumer `c1` requires `R(tool-x,tool-y)`
+- `c1` selects provider `p1` for `P(tool-y)`
+- `p1` requires `R(tool-z)`.
+- `p1` selects provider `p2` for `P(tool-z)`.
+- `p2` denies `D(tool-x)`.
+- result: `require_deny_conflicts={tool-x}` because conflict is detected within bounded transitive traversal.
+
+#### Transitive Dependency Resolution, Caching, and Context Mutation Policy
+
+Transitive dependency resolution MUST be deterministic and context-scoped.
+
+##### Normative algorithm
+
+1. Initialize BFS queue with selected depth-1 providers and root context:
+   - `context.required = consumer.R`
+   - `context.denied = consumer.D`
+2. For each queue item `(provider_instance, depth, context)`:
+   - parse provider contract (`R_local`, `D_local`, `P_local`).
+   - compute:
+     - `R_path = context.required ∪ R_local`
+     - `D_path = context.denied ∪ D_local`
+     - `require_deny_conflicts_path = R_path ∩ D_path`
+   - record path conflicts to run artifact.
+   - if `depth == MaxDependencyDepth`, stop expansion for this path.
+   - otherwise, resolve provider-local requirements (`R_local`) using the same candidate scoring/gating pipeline and current effective policy.
+   - enqueue selected child providers with `depth+1` and inherited context:
+     - `context.required = R_path`
+     - `context.denied = D_path`
+3. Aggregate across all traversed paths:
+   - `R_eff = union(all R_path)`
+   - `D_eff = union(all D_path)`
+   - `require_deny_conflicts = R_eff ∩ D_eff`
+4. Apply strict/best-effort handling from [Require-Deny Conflict Semantics](#require-deny-conflict-semantics).
+
+##### Context-scoped dependency mutation policy
+
+- dependency selection is immutable within a single resolved provider instance.
+- provider instances are context-scoped, not globally singleton by provider id.
+- the same provider candidate MAY appear multiple times in one run with different child graphs when parent contexts differ.
+- context identity MUST include at least:
+  - provider candidate id
+  - mode (`strict` or `best-effort`)
+  - effective policy hash
+  - inherited required-set hash
+  - inherited deny-set hash
+  - host runtime/model signatures
+
+##### Resolved dependency caching
+
+- caching SHOULD be used and MUST preserve semantic equivalence.
+- cache entries MUST be keyed by context identity; reusing cache across different context hashes is forbidden.
+- minimum transitive cache key fields:
+  - `dci_version`
+  - `provider_candidate_id`
+  - `mode`
+  - `effective_policy_hash`
+  - `required_set_hash`
+  - `deny_set_hash`
+  - `host_runtime`
+  - `host_model`
+  - `max_dependency_depth`
+  - `alias_table_version`
+- cached value MUST include selected child provider ids and path conflict summary.
+- cache invalidation MUST occur when any key component changes.
 
 #### On-Missing-Required Semantics
 
@@ -395,6 +514,17 @@ if effective_policy.selection_mode == "single":
   selected = take_top(ranked, 1)
 else:
   selected = greedy_cover(ranked, required_capabilities, effective_policy.max_providers)
+
+R_eff, D_eff = collect_effective_requirements_and_denies(
+  consumer, selected, effective_policy.max_dependency_depth
+)
+require_deny_conflicts = intersect(R_eff, D_eff)
+if require_deny_conflicts is not empty:
+  if mode == "strict":
+    fail_with_require_deny_conflicts(require_deny_conflicts)
+  else:
+    mark_unresolved_required(require_deny_conflicts)
+    apply require_deny_penalty
 
 if selected is empty or required_capabilities_not_fully_satisfied(selected):
   apply on-missing-required policy
@@ -457,7 +587,7 @@ if selected is empty or required_capabilities_not_fully_satisfied(selected):
 
 ##### Schema
 
-- `docs/schemas/dci/reliability.v1.schema.json`
+- `docs/rfcs/dependent-capability-interface/schemas/dci/reliability.v1.schema.json`
 
 #### Required Run Artifact
 
@@ -465,22 +595,41 @@ consumer MUST emit `capability_resolution_report` for each run.
 
 ##### Minimum fields per candidate
 
-- `S_contract`, `S_desc`, `S_namepath`, `S_runtime`, `S_total`, penalties (including `unknown_clause_penalty`), `history_multiplier`, `S_total_final`, tie-breaker details and applied step (if used), plus reliability snapshot (`sample_size`, `success_rate_last_20`, `outcomes_last_20`)
+- `S_contract`
+- `S_desc`
+- `S_namepath`
+- `S_runtime`
+- `S_total`
+- penalties.`unknown_clause_penalty` (when applicable)
+- penalties.`require_deny_penalty` (when applicable)
+- `history_multiplier`
+- `S_total_final`
+- tie-breaker details and applied step (if used)
+- reliability_snapshot.`sample_size`
+- reliability_snapshot.`success_rate_last_20`
+- reliability_snapshot.`outcomes_last_20`
+- require_deny_conflicts.`capability` (when present)
+- require_deny_conflicts.`required_by_candidate_id` (when present)
+- require_deny_conflicts.`denied_by_candidate_id` (when present)
+- require_deny_conflicts.`required_depth` (when present)
+- require_deny_conflicts.`denied_depth` (when present)
 
 ##### Required top-level fields
 
 - discovery sources scanned and inclusion/exclusion counts
 - alias table source and alias table version used
 - effective `selection-mode` and provider count limit
+- effective `max-dependency-depth`
 - reliability source metadata (`mode`, `path`, `schema_version`, `updated_at`)
 - unresolved required capabilities (if any)
+- unresolved require-deny conflicts (if any)
 - `on-missing-required` action taken
 - `degraded_mode` flag and emulated capabilities (when applicable)
 - user decision record for `offer-emulation` (when applicable)
 
 ##### Schema
 
-- `docs/schemas/dci/capability-resolution-report.v1.schema.json`
+- `docs/rfcs/dependent-capability-interface/schemas/dci/capability-resolution-report.v1.schema.json`
 
 ### Dependent Capability Interface (DCI) Grammar
 
@@ -488,19 +637,20 @@ consumer MUST emit `capability_resolution_report` for each run.
 contract := "DCI/" version [ "^" mode ] SP clauses
 version := 1*DIGIT
 clauses := clause *(SP clause)
-clause := provides | expects | accepts | required | optional | runtime | model | policy
+clause := provide | expect | accept | require | optional | deny | runtime | model | policy
 
-provides := "P(" capability-values ")"
-expects := "E(" capability-values ")"
-required := "R(" capability-values ")"
+provide := "P(" capability-values ")"
+expect := "E(" capability-values ")"
+require := "R(" capability-values ")"
 optional := "O(" capability-values ")"
-accepts := "A(" kvpairs ")"
+deny := "D(" capability-values ")"
+accept := "A(" kvpairs ")"
 runtime := "Rt(" runtime-values ")"
 model := "M(" model-values ")"
 policy := "Pol(" kvpairs ")"
 
 runtime-values := runtime-value *("," runtime-value)
-runtime-value := name-token | "*"
+runtime-value := capability-token | "*"
 
 model-values := model-value *("," model-value)
 model-value := model-pattern
@@ -508,8 +658,10 @@ model-pattern := model-token ["*"] | "*"
 model-token := 1*(ALPHA | DIGIT | "-" | "_" | "." | "/" | ":" | "@")
 
 capability-values := capability-value *("," capability-value)
-capability-value := name-token
-name-token := 1..64 chars of [a-z0-9-], no edge hyphen, no consecutive hyphen
+capability-value := capability-token
+capability-token := capability-part *(capability-sep capability-part)
+capability-part := 1*(ALPHA | DIGIT)
+capability-sep := "-" | "_" | "." | "/" | ":"
 
 kvpairs := kv *("," kv)
 kv := key "=" value
@@ -536,8 +688,8 @@ Escaping rules:
 
 Token form policy:
 
-- canonical serialization MUST use short forms: `P E A R O Rt M Pol`
-- parsers MAY accept long forms (`Provides Expects Accepts Required Optional Runtime Model Policy`)
+- canonical serialization MUST use short forms: `P E A R O D Rt M Pol`
+- parsers MUST accept canonical long forms (`Provides Expects Accepts Requires Optional Denies Runtime Model Policy`)
 - accepted long forms MUST be normalized to short forms before validation/matching
 
 Example:
@@ -550,10 +702,10 @@ metadata:
 
 ## Schema Index
 
-- Alias table: `docs/schemas/dci/aliases.v1.schema.json`
-- Reliability state: `docs/schemas/dci/reliability.v1.schema.json`
-- Resolution report: `docs/schemas/dci/capability-resolution-report.v1.schema.json`
-- Stopword artifact: `docs/schemas/dci/english-stopwords.v1.txt`
+- Alias table: `docs/rfcs/dependent-capability-interface/schemas/dci/aliases.v1.schema.json`
+- Reliability state: `docs/rfcs/dependent-capability-interface/schemas/dci/reliability.v1.schema.json`
+- Resolution report: `docs/rfcs/dependent-capability-interface/schemas/dci/capability-resolution-report.v1.schema.json`
+- Stopword artifact: `docs/rfcs/dependent-capability-interface/schemas/dci/english-stopwords.v1.txt`
 
 ## Key Advantages
 
@@ -567,5 +719,6 @@ metadata:
 - consumer skills still own discovery, enforcement, and policy decisions
 - fuzzy mode remains inherently probabilistic
 - high-quality behavior depends on provider honesty plus probe/penalty safeguards
+- external agreement attestation mechanisms (for example `agreement_ref`, `published_doc`, third-party compliance assertions) are intentionally out of scope for DCI/1
 
 [Fuzzy Declaration Mode]: #fuzzy "Fuzzy Declaration Mode"

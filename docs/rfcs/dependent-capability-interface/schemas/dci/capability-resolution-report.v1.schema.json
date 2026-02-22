@@ -17,6 +17,7 @@
     "candidates",
     "selected_candidates",
     "unresolved_required_capabilities",
+    "unresolved_require_deny_conflicts",
     "on_missing_required_action",
     "degraded_mode",
     "emulated_capabilities",
@@ -121,7 +122,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^(?=.{1,64}$)[a-z0-9]+(?:-[a-z0-9]+)*$"
+        "pattern": "^(?=.{1,128}$)[A-Za-z0-9](?:[A-Za-z0-9._:/-]*[A-Za-z0-9])?$"
       },
       "uniqueItems": true
     },
@@ -196,6 +197,7 @@
       "required": [
         "mode",
         "max_providers",
+        "max_dependency_depth",
         "selected_count"
       ],
       "properties": {
@@ -209,6 +211,10 @@
         "max_providers": {
           "type": "integer",
           "minimum": 1
+        },
+        "max_dependency_depth": {
+          "type": "integer",
+          "minimum": 0
         },
         "selected_count": {
           "type": "integer",
@@ -235,7 +241,15 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^(?=.{1,64}$)[a-z0-9]+(?:-[a-z0-9]+)*$"
+        "pattern": "^(?=.{1,128}$)[A-Za-z0-9](?:[A-Za-z0-9._:/-]*[A-Za-z0-9])?$"
+      },
+      "uniqueItems": true
+    },
+    "unresolved_require_deny_conflicts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(?=.{1,128}$)[A-Za-z0-9](?:[A-Za-z0-9._:/-]*[A-Za-z0-9])?$"
       },
       "uniqueItems": true
     },
@@ -282,7 +296,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "pattern": "^(?=.{1,64}$)[a-z0-9]+(?:-[a-z0-9]+)*$"
+        "pattern": "^(?=.{1,128}$)[A-Za-z0-9](?:[A-Za-z0-9._:/-]*[A-Za-z0-9])?$"
       },
       "uniqueItems": true
     },
@@ -322,6 +336,7 @@
         "max-candidates",
         "selection-mode",
         "max-providers",
+        "max-dependency-depth",
         "on-missing-required"
       ],
       "properties": {
@@ -354,6 +369,10 @@
         "max-providers": {
           "type": "integer",
           "minimum": 1
+        },
+        "max-dependency-depth": {
+          "type": "integer",
+          "minimum": 0
         },
         "on-missing-required": {
           "type": "string",
@@ -512,6 +531,7 @@
             "unknown_clause_penalty",
             "overclaim_penalty",
             "inflation_penalty",
+            "require_deny_penalty",
             "total_penalty"
           ],
           "properties": {
@@ -531,6 +551,11 @@
               "maximum": 1.0
             },
             "inflation_penalty": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            "require_deny_penalty": {
               "type": "number",
               "minimum": 0.0,
               "maximum": 1.0
@@ -592,6 +617,42 @@
           "items": {
             "type": "string",
             "minLength": 1
+          }
+        },
+        "require_deny_conflicts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "capability",
+              "required_by_candidate_id",
+              "denied_by_candidate_id",
+              "required_depth",
+              "denied_depth"
+            ],
+            "properties": {
+              "capability": {
+                "type": "string",
+                "pattern": "^(?=.{1,128}$)[A-Za-z0-9](?:[A-Za-z0-9._:/-]*[A-Za-z0-9])?$"
+              },
+              "required_by_candidate_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "denied_by_candidate_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "required_depth": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "denied_depth": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "additionalProperties": false
           }
         }
       },
