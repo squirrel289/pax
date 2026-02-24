@@ -1,7 +1,6 @@
 ---
 name: parallel-execution
 description: CRITICAL skill for executing multiple runSubagent calls in a SINGLE function_calls block for true parallelism. Essential for efficient multi-task workflows, subagent coordination, and maximizing throughput.
-category: execution
 license: MIT
 compatibility: opencode
 metadata:
@@ -95,6 +94,7 @@ When you have N independent tasks, spawn N subagents:
 
 ```markdown
 Implementation Plan:
+
 1. Implement auth module
 2. Create API endpoints
 3. Add database schema
@@ -135,6 +135,7 @@ Review from multiple angles at once:
 
 ```markdown
 Code Review Perspectives:
+
 - Security vulnerabilities
 - Performance bottlenecks
 - Test coverage gaps
@@ -176,10 +177,26 @@ When using parallel execution, mark ALL parallel tasks as `in_progress` simultan
 ```json
 {
   "todos": [
-    { "content": "Analyze auth module", "status": "in_progress", "activeForm": "Analyzing auth module" },
-    { "content": "Analyze API layer", "status": "in_progress", "activeForm": "Analyzing API layer" },
-    { "content": "Analyze database layer", "status": "in_progress", "activeForm": "Analyzing database layer" },
-    { "content": "Synthesize findings", "status": "pending", "activeForm": "Synthesizing findings" }
+    {
+      "content": "Analyze auth module",
+      "status": "in_progress",
+      "activeForm": "Analyzing auth module"
+    },
+    {
+      "content": "Analyze API layer",
+      "status": "in_progress",
+      "activeForm": "Analyzing API layer"
+    },
+    {
+      "content": "Analyze database layer",
+      "status": "in_progress",
+      "activeForm": "Analyzing database layer"
+    },
+    {
+      "content": "Synthesize findings",
+      "status": "pending",
+      "activeForm": "Synthesizing findings"
+    }
   ]
 }
 ```
@@ -191,10 +208,26 @@ Mark as completed as results come in:
 ```json
 {
   "todos": [
-    { "content": "Analyze auth module", "status": "completed", "activeForm": "Analyzing auth module" },
-    { "content": "Analyze API layer", "status": "completed", "activeForm": "Analyzing API layer" },
-    { "content": "Analyze database layer", "status": "in_progress", "activeForm": "Analyzing database layer" },
-    { "content": "Synthesize findings", "status": "pending", "activeForm": "Synthesizing findings" }
+    {
+      "content": "Analyze auth module",
+      "status": "completed",
+      "activeForm": "Analyzing auth module"
+    },
+    {
+      "content": "Analyze API layer",
+      "status": "completed",
+      "activeForm": "Analyzing API layer"
+    },
+    {
+      "content": "Analyze database layer",
+      "status": "in_progress",
+      "activeForm": "Analyzing database layer"
+    },
+    {
+      "content": "Synthesize findings",
+      "status": "pending",
+      "activeForm": "Synthesizing findings"
+    }
   ]
 }
 ```
@@ -206,7 +239,7 @@ Mark as completed as results come in:
 ### Good Candidates
 
 | Scenario                      | Parallel Approach               |
-|-------------------------------|---------------------------------|
+| ----------------------------- | ------------------------------- |
 | Multiple independent analyses | One subagent per analysis       |
 | Multi-file processing         | One subagent per file/directory |
 | Different review perspectives | One subagent per perspective    |
@@ -216,7 +249,7 @@ Mark as completed as results come in:
 ### When NOT to Parallelize
 
 | Scenario                | Why Sequential                     |
-|-------------------------|------------------------------------|
+| ----------------------- | ---------------------------------- |
 | Tasks with dependencies | B needs A's output                 |
 | Same file modifications | Risk of conflicts                  |
 | Sequential workflows    | Order matters (commit → push → PR) |
@@ -228,7 +261,7 @@ Mark as completed as results come in:
 ## Performance Impact
 
 | # Parallel Tasks | Sequential Time | Parallel Time | Speedup |
-|------------------|-----------------|---------------|---------|
+| ---------------- | --------------- | ------------- | ------- |
 | 2                | 60s             | 30s           | 2x      |
 | 3                | 90s             | 30s           | 3x      |
 | 5                | 150s            | 30s           | 5x      |
@@ -245,17 +278,17 @@ Assuming each task takes ~30 seconds
 ```markdown
 WRONG (Sequential):
 Message 1: "I'll start analyzing the auth module..."
-           <invoke name="runSubagent">Analyze auth</invoke>
+<invoke name="runSubagent">Analyze auth</invoke>
 Message 2: "Now let me analyze the API..."
-           <invoke name="runSubagent">Analyze API</invoke>
+<invoke name="runSubagent">Analyze API</invoke>
 
 RIGHT (Parallel):
 Message 1: "I'll analyze all modules in parallel..."
-           <function_calls>
-           <invoke name="runSubagent">Analyze auth</invoke>
-           <invoke name="runSubagent">Analyze API</invoke>
-           <invoke name="runSubagent">Analyze DB</invoke>
-           </function_calls>
+<function_calls>
+<invoke name="runSubagent">Analyze auth</invoke>
+<invoke name="runSubagent">Analyze API</invoke>
+<invoke name="runSubagent">Analyze DB</invoke>
+</function_calls>
 ```
 
 ### Mistake 2: Announcing Before Acting
@@ -283,6 +316,7 @@ Just dump all task outputs without integration
 
 RIGHT:
 After receiving all results, synthesize:
+
 - Identify common themes
 - Resolve contradictions
 - Prioritize findings
@@ -317,10 +351,11 @@ I'm analyzing this codebase from multiple perspectives simultaneously.
 <invoke name="runSubagent">
 <parameter name="description">Security Review</parameter>
 <parameter name="prompt">Analyze for security vulnerabilities, focusing on:
+
 - Authentication/authorization
 - Input validation
 - Secrets handling</parameter>
-</invoke>
+  </invoke>
 
 <invoke name="runSubagent">
 <parameter name="description">Performance Review</parameter>
@@ -350,27 +385,27 @@ I'm analyzing this codebase from multiple perspectives simultaneously.
 
 ```markdown
 RULE #1:
-  ALL runSubagent calls in SINGLE function_calls block = PARALLEL
-  runSubagent calls in SEPARATE messages = SEQUENTIAL
+ALL runSubagent calls in SINGLE function_calls block = PARALLEL
+runSubagent calls in SEPARATE messages = SEQUENTIAL
 
 PATTERNS:
-  Task-based:       One subagent per task
-  Directory-based:  One subagent per directory
-  Perspective-based: One subagent per viewpoint
-  Adversarial:      Multiple competing reviewers
+Task-based: One subagent per task
+Directory-based: One subagent per directory
+Perspective-based: One subagent per viewpoint
+Adversarial: Multiple competing reviewers
 
 TODOLIST:
-  Mark ALL parallel tasks as in_progress BEFORE launching
-  Mark each as completed AFTER receiving results
+Mark ALL parallel tasks as in_progress BEFORE launching
+Mark each as completed AFTER receiving results
 
 SPEEDUP:
-  N parallel tasks ≈ Nx faster
-  (5 tasks @ 30s each: 150s → 30s)
+N parallel tasks ≈ Nx faster
+(5 tasks @ 30s each: 150s → 30s)
 
 CHECKLIST:
-  ☐ Tasks independent?
-  ☐ No shared files?
-  ☐ No dependencies?
-  ☐ All in ONE function_calls block?
-  ☐ Synthesis planned?
+☐ Tasks independent?
+☐ No shared files?
+☐ No dependencies?
+☐ All in ONE function_calls block?
+☐ Synthesis planned?
 ```

@@ -1,7 +1,6 @@
 ---
 name: sequential-execution
 description: Execute dependent tasks in order where each task relies on previous results
-category: execution
 license: MIT
 ---
 
@@ -82,7 +81,7 @@ Start with initial state, each task transforms and passes to next:
 ## When to Use Sequential vs Parallel
 
 | Scenario                      | Execution Type | Reason               |
-|-------------------------------|----------------|----------------------|
+| ----------------------------- | -------------- | -------------------- |
 | B needs A's output            | Sequential     | Dependency           |
 | Multiple independent analyses | Parallel       | No dependencies      |
 | Commit → Push → PR            | Sequential     | Order matters        |
@@ -147,25 +146,27 @@ In sequential execution:
 
 ```markdown
 WHEN TO USE:
-  ✓ Tasks have dependencies
-  ✓ Order matters
-  ✓ Shared state modifications
-  ✓ Must wait for previous results
+✓ Tasks have dependencies
+✓ Order matters
+✓ Shared state modifications
+✓ Must wait for previous results
 
 PATTERNS:
-  Linear:      A → B → C → D
-  Staged:      Setup → Process → Cleanup
-  Conditional: A → (check) → B or C
-  Accumulator: Transform state through stages
+Linear: A → B → C → D
+Staged: Setup → Process → Cleanup
+Conditional: A → (check) → B or C
+Accumulator: Transform state through stages
 
 TODOLIST:
-  - Mark current step as in-progress
-  - Keep future steps as not-started
-  - Mark completed steps as completed
+
+- Mark current step as in-progress
+- Keep future steps as not-started
+- Mark completed steps as completed
 
 ERROR HANDLING:
-  - Stop on failure
-  - Retry step
-  - Fallback flow
-  - Abort sequence
+
+- Stop on failure
+- Retry step
+- Fallback flow
+- Abort sequence
 ```

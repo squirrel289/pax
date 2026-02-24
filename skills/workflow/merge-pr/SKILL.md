@@ -4,6 +4,7 @@ description: Workflow skill for safely merging pull requests after verification
 license: MIT
 metadata:
    category: workflow
+   audience: agents, scripts, CI
    composed-from:
    - pull-request-tool
    - sequential-execution

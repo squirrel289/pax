@@ -1,7 +1,6 @@
 ---
 name: gh-pr-review
 description: Interact with GitHub pull requests for review, comment management, and merge operations
-category: tools
 license: MIT
 ---
 
@@ -117,27 +116,48 @@ This skill is fully composable with other PAX skills, including parallel and seq
 
 ## Quick Reference
 
-```markdown
+````markdown
 FETCH PR:
-  gh pr view <number> --json <fields>
+
+```bash
+gh pr view <number> --json <fields>
+```
 
 LIST COMMENTS:
-  gh pr-review review view -R owner/repo --pr <number> [--unresolved]
+
+```bash
+gh pr-review review view -R owner/repo --pr <number> [--unresolved]
+```
 
 REPLY TO COMMENT:
-  gh pr-review comments reply <number> -R owner/repo \
-    --thread-id <id> --body "message"
+
+```bash
+gh pr-review comments reply <number> -R owner/repo \
+ --thread-id <id> --body "message"
+```
 
 RESOLVE THREAD:
-  gh pr-review threads resolve -R owner/repo <number> \
-    --thread-id <id>
+
+```bash
+gh pr-review threads resolve -R owner/repo <number> \
+ --thread-id <id>
+```
 
 CHECK MERGEABLE:
-  gh pr view <number> --json mergeable,mergeStateStatus,statusCheckRollup
+
+```bash
+gh pr view <number> --json mergeable,mergeStateStatus,statusCheckRollup
+```
 
 MERGE PR:
-  gh pr merge <number> --squash --delete-branch
+
+```bash
+gh pr merge <number> --squash --delete-branch
+```
 
 LIST UNRESOLVED:
-  gh pr-review threads list -R owner/repo <number> --unresolved
+
+```bash
+gh pr-review threads list -R owner/repo <number> --unresolved
 ```
+````

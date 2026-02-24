@@ -68,7 +68,7 @@ metadata:
 
 ### 2. Execution Flow
 
-```
+```ascii-tree
 Decision Point Execution:
 ├─ YOLO Mode
 │  ├─ Evaluate heuristics (IF all-checks-pass THEN merge)

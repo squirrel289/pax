@@ -1,13 +1,11 @@
 ---
 name: pull-request-tool
 description: Unified skill for managing GitHub pull requests and issues. Uses Copilot's native PR/issue APIs when available, and falls back to gh-pr-review CLI otherwise. Ensures maximum compatibility and agent-native features.
-category: tools
 license: MIT
 compatibility: copilot, cli
-aliases: [pr-tool]
-keywords: [pull request, pr, github, management, merge, review, comment]
 metadata:
   audience: agents, scripts, CI
+  tags: pull-request, pr, github, management, merge, review, comment
 ---
 
 # Pull Request Tool
@@ -85,44 +83,44 @@ This skill is fully composable with other PAX skills, including parallel and seq
 
 ```markdown
 FETCH PR:
-  operation: fetch-pr-details
-  pr-number: <number>
-  repository: <owner/repo>
+operation: fetch-pr-details
+pr-number: <number>
+repository: <owner/repo>
 
 LIST COMMENTS:
-  operation: list-comments
-  pr-number: <number>
-  repository: <owner/repo>
+operation: list-comments
+pr-number: <number>
+repository: <owner/repo>
 
 LIST UNRESOLVED COMMENTS:
-  operation: list-comments
-  pr-number: 42
-  repository: owner/repo
-  filters:
-    unresolved: true
+operation: list-comments
+pr-number: 42
+repository: owner/repo
+filters:
+unresolved: true
 
 REPLY TO COMMENT:
-  operation: reply-comment
-  pr-number: <number>
-  thread-id: <id>
-  body: "message"
-  repository: <owner/repo>
+operation: reply-comment
+pr-number: <number>
+thread-id: <id>
+body: "message"
+repository: <owner/repo>
 
 RESOLVE THREAD:
-  operation: resolve-thread
-  pr-number: <number>
-  thread-id: <id>
-  repository: <owner/repo>
+operation: resolve-thread
+pr-number: <number>
+thread-id: <id>
+repository: <owner/repo>
 
 CHECK MERGEABLE:
-  peration: check-status
-  r-number: 42
-  epository: owner/repo
+peration: check-status
+r-number: 42
+epository: owner/repo
 
 MERGE PR:
-  operation: merge-pr
-  pr-number: <number>
-  repository: <owner/repo>
-  merge-method: squash|merge|rebase
-  delete-branch: true|false
+operation: merge-pr
+pr-number: <number>
+repository: <owner/repo>
+merge-method: squash|merge|rebase
+delete-branch: true|false
 ```
