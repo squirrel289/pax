@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pax.local/skills/workflow/isolated-evaluator/output-schema.json",
+  "title": "Isolated Evaluator Output",
+  "description": "Output contract for single-option isolated evaluation.",
+  "type": "object",
+  "required": [
+    "evaluated_alternative",
+    "independent_evaluation"
+  ],
+  "properties": {
+    "evaluated_alternative": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "effort",
+        "risk",
+        "feasible",
+        "scores",
+        "justification"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "effort": {
+          "type": "string",
+          "enum": [
+            "S",
+            "M",
+            "L"
+          ]
+        },
+        "risk": {
+          "type": "string",
+          "enum": [
+            "Low",
+            "Med",
+            "Medium",
+            "High"
+          ]
+        },
+        "feasible": {
+          "type": "boolean"
+        },
+        "scores": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
+        },
+        "justification": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "independent_evaluation": {
+      "type": "object",
+      "required": [
+        "alternative_id",
+        "evaluator_id",
+        "isolation_confirmed",
+        "summary"
+      ],
+      "properties": {
+        "alternative_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evaluator_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "isolation_confirmed": {
+          "type": "boolean",
+          "const": true
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "quality_notes": {
+      "type": "object",
+      "properties": {
+        "evidence_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "follow_up_actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "allOf": [
+    {
+      "not": {
+        "required": [
+          "rank"
+        ]
+      }
+    },
+    {
+      "not": {
+        "required": [
+          "recommendation"
+        ]
+      }
+    },
+    {
+      "not": {
+        "required": [
+          "winner"
+        ]
+      }
+    },
+    {
+      "not": {
+        "required": [
+          "recommended_action"
+        ]
+      }
+    }
+  ],
+  "additionalProperties": true
+}

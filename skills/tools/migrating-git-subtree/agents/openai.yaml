@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Subtree Migration"
+  short_description: "Move folders across repos with history using git subtree"
+  default_prompt: "Migrate one or more folders from a source repository to a target repository with git subtree while preserving history."

@@ -1,0 +1,41 @@
+{
+  "evaluated_alternative": {
+    "id": "alt-1",
+    "name": "Example Alternative",
+    "effort": "M",
+    "risk": "Medium",
+    "feasible": true,
+    "scores": {
+      "chatgpt": {
+        "criterion-1": 78,
+        "criterion-2": null
+      },
+      "claude": {
+        "criterion-1": 74,
+        "criterion-2": 69
+      }
+    },
+    "justification": "Example single-option rationale with explicit evidence gaps."
+  },
+  "independent_evaluation": {
+    "alternative_id": "alt-1",
+    "evaluator_id": "eval-alt-1",
+    "isolation_confirmed": true,
+    "summary": "Feasible with medium implementation effort; limited evidence on criterion-2 for chatgpt.",
+    "evidence_refs": [
+      "doc://vendor/benchmarks",
+      "note://interview-2026-02-12"
+    ]
+  },
+  "quality_notes": {
+    "evidence_gaps": [
+      "Missing benchmark coverage for criterion-2 on chatgpt."
+    ],
+    "assumptions": [
+      "Scoring used default 0-100 scale."
+    ],
+    "follow_up_actions": [
+      "Collect criterion-2 evidence for chatgpt before final recommendation."
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 ---
 name: update-work-item
-description: "Update an existing work item with status changes, effort tracking, test results, and related commits. Use when progressing work, recording test results, or adjusting estimates. Supports: (1) Status transitions (not_started → in_progress → testing → completed), (2) Feature branch creation and sync, (3) Automatic PR creation on testing transition, (4) Effort tracking (estimated_hours → actual_hours), (5) Test and commit tracking, (6) Dependency updates and notes"
-metadata: 
+description: 'Update an existing work item with status changes, effort tracking, test results, and related commits. Use when progressing work, recording test results, or adjusting estimates. Supports: (1) Status transitions (proposed → ready → in-progress → ready-for-review → closed), (2) Feature branch creation and sync, (3) Automatic PR creation on ready-for-review transition, (4) Effort tracking (estimated → actual), (5) Test and commit tracking, (6) Dependency validation (all depends_on items must be closed before closing), (7) Notes with timestamps'
+metadata:
   category: project-management
 license: MIT
 ---
@@ -10,19 +10,20 @@ license: MIT
 
 ## Overview
 
-Update progress on an existing work item: change status, record actual effort, add test results, mark related commits, update dependencies, and add implementation notes as work progresses.
+Update progress on an existing work item: change status, record actual effort, add test results, mark related commits, validate dependencies, and add implementation notes as work progresses.
 
 ## When to Use
 
 Update a work item when:
 
-- Starting work (change status to `in_progress`)
-- Completing implementation (change status to `testing`)
+- Starting work (change status to `in-progress`)
+- Completing implementation (change status to `ready-for-review`)
 - Recording actual hours spent
 - Adding related commit hashes
 - Logging test results or CI status
 - Adjusting estimates based on new information
 - Adding implementation notes or blockers
+- Validating dependencies before closing
 
 ## When NOT to Use
 
@@ -34,278 +35,299 @@ Skip updates for:
 
 ## Frontmatter Fields
 
-### Status and State Reason Fields
+### Status and Status Reason Fields
 
 ```yaml
-status: not_started | in_progress | testing | completed
-state_reason: null | success | obsolete | redundant | superseded | cancelled
+status: proposed | ready | in-progress | ready-for-review | closed
+status_reason: null | success | obsolete | redundant | superseded | cancelled
 ```
 
-| Status | state_reason | Meaning | When to Use |
-|--------|--------------|---------|-------------|
-| `not_started` | (none) | Ready to begin | Initial creation |
-| `in_progress` | (none) | Active development | Actively working |
-| `testing` | (none) | Impl done, awaiting results | Tests running, review pending |
-| `completed` | `success` | Finished successfully | All criteria met, merged |
-| `completed` | `obsolete` | No longer relevant | Market changed, approach outdated |
-| `completed` | `redundant` | Duplicate item | Same work in another item |
-| `completed` | `superseded` | Made moot by other item | Different item solves it better |
-| `completed` | `cancelled` | Work stopped | Stopped, won't implement |
+| Status             | status_reason | Meaning                              | When to Use                       |
+| ------------------ | ------------- | ------------------------------------ | --------------------------------- |
+| `proposed`         | (none)        | Work item proposed but not yet ready | Initial creation                  |
+| `ready`            | (none)        | Work item ready to start             | Prior to in-progress              |
+| `in-progress`      | (none)        | Active development                   | Actively working                  |
+| `ready-for-review` | (none)        | Impl done, awaiting review/tests     | Tests running, PR submitted       |
+| `closed`           | `success`     | Finished successfully                | All criteria met, merged          |
+| `closed`           | `obsolete`    | No longer relevant                   | Market changed, approach outdated |
+| `closed`           | `redundant`   | Duplicate item                       | Same work in another item         |
+| `closed`           | `superseded`  | Made moot by other item              | Different item solves it better   |
+| `closed`           | `cancelled`   | Work stopped                         | Stopped, won't implement          |
+
+**Important**: Before transitioning to `closed`, validate that all items in `links.depends_on` are already in `closed` status.
 
 ### Effort Tracking
 
 ```yaml
-estimated_hours: 20          # Set when created
-actual_hours: 18             # Update as work progresses, finalize when complete
-completed_date: null         # Set when status = completed (YYYY-MM-DD)
+estimated: 20 # Set when created (hours as decimal)
+actual: 18 # Update as work progresses, finalize when complete
+completed_date: null # Set when status = closed (YYYY-MM-DD format)
 ```
 
 **Guidelines**:
-- `estimated_hours`: Set once, don't change unless scope significantly shifts
-- `actual_hours`: Start as `null`, update when complete
-- `completed_date`: Set only when moving to completed status
+
+- `estimated`: Set once, don't change unless scope significantly shifts
+- `actual`: Start as `null`, update when complete
+- `completed_date`: Set only when moving to closed status
 
 ### Commit Tracking
 
 ```yaml
-related_commit:
-  - 6d8c044  # Short hash or fully qualified ref
-  - f00459b  # Add commits as they're implemented
+commits:
+  6d8c044: 'feat(sdk): initial FilterAdapter interface'
+  f00459b: 'feat(filters): implement selectattr and map'
+  a1b2c3d: 'docs: add filter usage examples'
 ```
 
-Record commit hashes and their summary messages as work is merged. Helps trace implementation back to work items.
+Record commit SHAs (7+ character hashes or 40-character full hashes) mapped to their commit messages. Helps trace implementation back to work items.
+
+To get commit message:
+
+```bash
+git log <short_hash> -n 1 --pretty=format:"%s"
+```
 
 ### Test Results
 
 ```yaml
-test_results: null | "URL to CI run" | "Local test results summary"
+test_results:
+  - timestamp: 2024-06-01T12:00:00Z
+    note: 'https://github.com/squirrel289/temple/actions/runs/12345678'
 ```
 
-Examples:
+Record test results with timestamps:
+
 ```yaml
-test_results: "https://github.com/squirrel289/temple/actions/runs/12345678"
-test_results: "All 47 tests pass, coverage 89%"
-test_results: "3 test failures in test_renderer.py (see notes)"
+test_results:
+  - timestamp: 2024-06-01T12:00:00Z
+    note: 'All 47 tests pass, coverage 89%'
+  - timestamp: 2024-06-02T10:00:00Z
+    note: '3 test failures in test_renderer.py (see PR comments)'
 ```
 
 ### Dependencies
 
 ```yaml
-dependencies:
-  - "[[54_complete_temple_native.md]]"
-  - "[[43_implement_template_syntax_validation.md]]"
+links:
+  depends_on:
+    - '[[wi-054_complete_temple_native.md]]'
+    - '[[wi-043_implement_template_syntax_validation.md]]'
 ```
 
-Update if new dependencies emerge during implementation.
+Update if new dependencies emerge during implementation. **Critical**: Before closing a work item, verify all items in `links.depends_on` are already `closed`.
 
 ## Workflow: Updating Work Items
 
 ### 1. Moving to In-Progress
 
-
-When starting work (changing status from `not_started` to `in_progress`):
+When starting work (changing status from `proposed` or `ready` to `in-progress`):
 
 1. **Automatically create and checkout a local feature branch** via `feature-branch-management` skill:
+
    ```bash
-   # Triggered automatically when status: in_progress
-   feature-branch-management create feature/60-filter-adapter
+   # Triggered automatically when status: in-progress
+   feature-branch-management create feature/wi-060
    ```
-   - Branch naming convention: `feature/<id>-<slug>` (e.g., `feature/60-filter-adapter`)
+
+   - Branch naming convention: `feature/wi-<id>` (e.g., `feature/wi-060`)
    - Branch is created from main and checked out automatically
    - If the branch already exists, it is checked out
    - This ensures all work is isolated and traceable to the work item
-   
-   **Related Field**: Track branch in work item:
-   ```yaml
-   feature_branch: feature/60-filter-adapter
-   ```
 
 2. Update the work item file frontmatter:
+
    ```markdown
    ---
-   title: "Implement FilterAdapter"
-   id: 60
-   status: in_progress  # Changed from not_started
+   title: 'Implement FilterAdapter'
+   id: 'wi-060'
+   status: in-progress
    priority: high
-   estimated_hours: 20
-   actual_hours: null
+   estimated: 20
+   actual: 2
    completed_date: null
+   status_reason: null
    notes:
-   - timestamp: 2024-06-01T12:00:00Z
-     user: @john
-     note:
-   - timestamp: 2024-06-01T12:00:00Z
-     user: @john
-     note: |
-       Started implementation of FilterAdapter in temple/sdk/.
-       Initial focus: selectattr and map filters.
+     - timestamp: 2024-06-01T12:00:00Z
+       note: |
+         Started implementation of FilterAdapter in packages/core/.
+         Initial focus: selectattr and map filters.
    ---
    ```
 
-3. Also add a placeholder for `actual_hours` tracking:
+3. Update `actual` as work progresses:
    ```yaml
-   actual_hours: 2  # Increment as work progresses
+   actual: 5 # Increment as work progresses, use decimals (e.g., 5.5 for 5h 30m)
    ```
 
 ### 2. Recording Actual Hours
 
-As work progresses, update `actual_hours`:
+As work progresses, update `actual`:
 
 ```yaml
-estimated_hours: 20
-actual_hours: 6  # 2 hours initial + 4 more hours
+estimated: 20
+actual: 6 # 2 hours initial + 4 more hours
 ```
 
 Update periodically (after major milestones, at end of session) so you have a sense of actual time investment.
 
 ### 3. Adding Related Commits
 
-When work is committed, record the commit hash:
+When work is committed, record the commit SHA and message:
 
 ```yaml
-related_commit:
-  - 6d8c044  # feat(sdk): initial FilterAdapter interface
-  - f00459b  # feat(filters): implement selectattr and map
-  - a1b2c3d  # docs: add filter usage examples
+commits:
+  6d8c044: 'feat(sdk): FilterAdapter interface'
+  f00459b: 'feat(filters): selectattr and map'
+  a1b2c3d: 'docs: add filter usage examples'
 ```
-Use the command:
-  ```bash
-  git log --oneline <short_hash> -n 1 --pretty=format:"  - %h  # %s
-  ```
-to generate the `related_commit` line for a given `<short_hash>`.
+
+Use short (7-character) or full (40-character) hashes as keys, with commit subject as the value.
 
 Keep hashes in chronological order. Multiple commits are fine—they show the evolution of the work.
 
-### 4. Transitioning to Testing
+### 4. Transitioning to Ready-for-Review
 
-When implementation is done and ready for review, move to testing:
+When implementation is done and ready for review, move to ready-for-review:
 
 1. **Sync branch with main** via `feature-branch-management`:
+
    ```bash
-   # Triggered automatically when status: testing
+   # Triggered automatically when status: ready-for-review
    feature-branch-management sync --base=main
    ```
+
    - Rebases feature branch on latest main to avoid conflicts
    - Ensures clean commit history for PR review
    - If conflicts detected, will prompt with suggested resolution steps
 
 2. **Create Pull Request** via `create-pr` skill (automatic):
+
    ```bash
-   # Triggered automatically when status: testing
-   create-pr work_item=60
+   # Triggered automatically when status: ready-for-review
+   create-pr work_item=wi-060
    ```
-   - PR title auto-generated: "60: Implement FilterAdapter"
+
+   - PR title auto-generated: "wi-060: Implement FilterAdapter"
    - PR description auto-generated from work item notes + commit history
-   - PR links to work item via "Closes #60" reference
+   - PR links to work item via "Closes wi-060" reference
    - PR URL recorded in work item metadata
 
 3. **Update work item frontmatter**:
    ```yaml
-   status: testing
-   actual_hours: 18  # Finalize effort
-   state_reason: null  # Not set yet
-   pr_number: 247  # Auto-populated by create-pr
-   pr_url: "https://github.com/squirrel289/pax/pull/247"
+   status: ready-for-review
+   actual: 18 # Finalize effort
+   status_reason: null
+   links:
+     pull_requests:
+       - 'https://github.com/templjs/templjs/pull/247'
    notes:
-   - timestamp: 2024-06-01T12:00:00Z
-     user: @john
-     note: |
-       Implementation complete. All filters implemented with type signatures.
-       PR submitted for review: #247
-       Awaiting code review and approval.
+     - timestamp: 2024-06-01T12:00:00Z
+       note: |
+         Implementation complete. All filters implemented with type signatures.
+         PR submitted for review: #247
+         Awaiting code review and approval.
    ```
 
-Do NOT set `completed_date` or `state_reason` yet.
+Do NOT set `completed_date` or `status_reason` yet.
 
 ### 5. Recording Test Results
 
 After running tests:
 
 ```yaml
-status: testing
-test_results: "https://github.com/squirrel289/temple/actions/runs/98765432"
-notes:
+status: ready-for-review
+test_results:
   - timestamp: 2024-06-01T12:00:00Z
-    user: @john
+    note: 'https://github.com/templjs/templjs/actions/runs/98765432'
+  - timestamp: 2024-06-02T08:00:00Z
     note: |
       CI results:
       - 98 tests pass
       - 2 tests fail in test_filter_edge_cases.py (filter_args validation)
       - Coverage 87% (target 85%)
-      
+
       Known issues:
       - Filter arg validation too strict for varargs
       - Will fix in follow-up PR
 ```
 
-If tests fail, add notes on what needs fixing. Update status back to `in_progress` if rework needed:
+If tests fail, add notes on what needs fixing. Update status back to `in-progress` if rework needed:
 
 ```yaml
-status: in_progress
-actual_hours: 19  # Add time spent debugging
+status: in-progress
+actual: 19
+test_results:
+  - timestamp: 2024-06-02T10:00:00Z
+    note: 'Test failures exposed issue with varargs handling. Reworking in feature/wi-060.'
 notes:
-  - timestamp: 2024-06-01T12:00:00Z
-    user: @john
-    note: Tests exposed issue with varargs handling. Working on fix in branch feature/varargs-fix.
+  - timestamp: 2024-06-02T10:00:00Z
+    note: 'Tests exposed issue with varargs handling. Working on fix.'
 ```
 
-### 6. Moving to Completed
+### 6. Moving to Closed
 
-When all tests pass and work is approved:
+When all tests pass, work is approved, and PR is merged:
 
-```yaml
-status: completed
-state_reason: success  # Set based on completion type
-actual_hours: 22  # Final tally
-completed_date: 2026-02-12
-test_results: "https://github.com/squirrel289/temple/actions/runs/98765432"
-notes:
-  - timestamp: 2024-06-01T12:00:00Z
-    user: @john
-    note: |
-      All acceptance criteria met:
-      - FilterAdapter interface implemented and documented
-      - Core filters (selectattr, map, join, default) working
-      - 95% test coverage
-      - Code reviewed and approved
-      - Merged to main in commit a1b2c3d
-```
+1. **Verify dependencies closed**: Before moving to `closed`, check that all items in `links.depends_on` have `status: closed`
 
-Set `state_reason` to one of:
+2. **Update work item frontmatter**:
+   ```yaml
+   status: closed
+   status_reason: success
+   actual: 22
+   completed_date: 2026-02-12
+   test_results:
+     - timestamp: 2024-06-01T12:00:00Z
+       note: 'https://github.com/templjs/templjs/actions/runs/98765432'
+   links:
+     pull_requests:
+       - 'https://github.com/templjs/templjs/pull/247'
+   commits:
+     a1b2c3d: 'chore: merge PR #247 (FilterAdapter implementation)'
+   notes:
+     - timestamp: 2024-06-02T15:00:00Z
+       note: |
+         All acceptance criteria met:
+         - FilterAdapter interface implemented and documented
+         - Core filters (selectattr, map, join, default) working
+         - 95% test coverage
+         - Code reviewed and approved
+         - Merged to main
+   ```
+
+Set `status_reason` to one of:
+
 - `success`: Normal completion with acceptance criteria met
-- `obsolete`: Item no longer needed (note why)
-- `redundant`: Duplicate of another item (reference it)
-- `superseded`: Made moot by another item (reference it)
-- `cancelled`: Work stopped before completion (note why)
+- `obsolete`: Item no longer needed (note why in notes)
+- `redundant`: Duplicate of another item (reference it via links)
+- `superseded`: Made moot by another item (reference it via links)
+- `cancelled`: Work stopped before completion (note why in notes)
 
-Leave file in `/backlog/`. The `finalize-work-item` skill handles archiving.
+Leave file in `/backlog/`. The `finalize-work-item` skill handles archiving to `/backlog/archive/`.
 
 ### 7. Adjusting Estimates
 
 If scope changes significantly during work:
 
 ```yaml
-estimated_hours: 20  # Original
-actual_hours: 12     # Current progress, which may exceed estimate
+estimated: 28 # Increased from 20 due to validation requirements
+actual: 14
 notes:
   - timestamp: 2024-06-01T12:00:00Z
-    user: @john
     note: |
-      Revised scope: only implementing selectattr, map, and join 
-      (default and custom filters deferred to #61).
-      New estimated_hours would be ~16, but keeping original to track 
-      scope reduction.
+      Scope expanded: discovered need for JSON Schema validation in filter 
+      arguments. Adjusted estimate by +8 hours.
 ```
 
-Or adjust explicitly if scope fundamentally changed:
+Or revert the work item to `proposed` if scope change is fundamental:
 
 ```yaml
-estimated_hours: 28  # Increased from 20 due to schema validation layer
-actual_hours: 14
+status: proposed
+estimated: 28
+actual: 14
 notes:
   - timestamp: 2024-06-01T12:00:00Z
-    user: @john
-    note: "Scope expanded: discovered need for JSON Schema validation in filter arguments. Adjusted estimate by +8 hours."
+    note: 'Scope significantly expanded. Reverting to proposed for re-estimation.'
 ```
 
 ### 8. Updating Dependencies
@@ -313,184 +335,166 @@ notes:
 If new dependencies discovered during work:
 
 ```yaml
-dependencies:
-  - "[[54_complete_temple_native.md]]"
-  - "[[44_implement_semantic_validation.md]]"  # Added: type checking needed
+links:
+  depends_on:
+    - '[[wi-054_complete_temple_native.md]]'
+    - '[[wi-044_implement_semantic_validation.md]]' # Added: type checking needed
 ```
 
-Update the work item file to reflect these.
+Update the work item file to reflect these. Document in notes why the dependency was added.
 
 ## Examples
 
 ### Example 1: Feature Work Progress
 
-**Initial creation**:
+**Initial creation** (status: proposed):
+
 ```yaml
 ---
-title: "Implement FilterAdapter"
-id: 60
-status: not_started
-state_reason: null
+title: 'Implement FilterAdapter'
+id: 'wi-060'
+status: proposed
 priority: high
-estimated_hours: 20
-actual_hours: null
-dependencies:
-  - "[[54_complete_temple_native.md]]"
+estimated: 20
+actual: null
+completed_date: null
+status_reason: null
+links:
+  depends_on:
+    - '[[wi-054_complete_temple_native.md]]'
 ---
 ```
 
-**After 2 hours**:
+**After moving to in-progress** (2 hours):
+
 ```yaml
-status: in_progress
-actual_hours: 2
+status: in-progress
+actual: 2
 notes:
   - timestamp: 2024-06-01T12:00:00Z
-    user: @john
     note: |
       Started with interface design and type signatures.
       SelectAttr filter drafted.
 ```
 
-**After testing**:
+**After ready-for-review** (18 hours):
+
 ```yaml
-status: testing
-state_reason: null
-actual_hours: 18
-related_commit:
-  - 6d8c044  # feat(sdk): FilterAdapter interface
-  - f00459b  # feat(filters): selectattr, map, join, default
-test_results: "https://github.com/.../runs/12345678"
+status: ready-for-review
+status_reason: null
+actual: 18
+commits:
+  6d8c044: 'feat(sdk): FilterAdapter interface'
+  f00459b: 'feat(filters): selectattr, map, join, default'
+links:
+  pull_requests:
+    - 'https://github.com/templjs/templjs/pull/247'
+test_results:
+  - timestamp: 2024-06-01T18:00:00Z
+    note: 'https://github.com/templjs/templjs/actions/runs/12345678'
 notes:
-  - timestamp: 2024-06-01T12:00:00Z
-    user: @john
-    note: All tests pass. 95% coverage. Awaiting code review.
+  - timestamp: 2024-06-01T18:00:00Z
+    note: |
+      Implementation complete. All tests pass. 95% coverage.
+      PR #247 submitted for review.
 ```
 
-**After completion**:
+**After merge to closed** (22 hours):
+
 ```yaml
-status: completed
-state_reason: success
-actual_hours: 20
-completed_date: 2026-02-15
-test_results: "https://github.com/.../runs/12345678"
+status: closed
+status_reason: success
+actual: 22
+completed_date: 2026-02-12
+test_results:
+  - timestamp: 2024-06-01T18:00:00Z
+    note: 'https://github.com/templjs/templjs/actions/runs/12345678'
+links:
+  pull_requests:
+    - 'https://github.com/templjs/templjs/pull/247'
+commits:
+  6d8c044: 'feat(sdk): FilterAdapter interface'
+  f00459b: 'feat(filters): selectattr, map, join, default'
+  a1b2c3d: 'merge: PR #247 FilterAdapter implementation'
 notes:
-  - timestamp: 2024-06-01T12:00:00Z
-    user: @john
-    note: Merged to main. All acceptance criteria met.
+  - timestamp: 2024-06-02T12:00:00Z
+    note: |
+      Merged to main. All acceptance criteria met.
+      Ready for finalization.
 ```
 
 ### Example 2: Bug Fix with Rework
 
 **Starting work**:
+
 ```yaml
 ---
-title: "Fix elif parsing edge case"
-id: 59
-status: in_progress
-state_reason: null
-estimated_hours: 4
-actual_hours: 1
+title: 'Fix elif parsing edge case'
+id: 'wi-059'
+status: in-progress
+estimated: 4
+actual: 1
 ---
 ```
 
-**Test failure**:
+**Test failure (rework needed)**:
+
 ```yaml
-status: in_progress
-state_reason: null
-actual_hours: 3
-test_results: "Local: 1 test fails in test_parser.py::test_consecutive_elif"
+status: in-progress
+actual: 3
+test_results:
+  - timestamp: 2024-06-01T10:00:00Z
+    note: 'Local: 1 test fails in test_parser.py::test_consecutive_elif'
 notes:
-  - timestamp: 2024-06-01T12:00:00Z
-    user: @john
+  - timestamp: 2024-06-01T10:00:00Z
     note: |
       Found deeper issue: elif blocks interfere when nested.
       Need to refactor block termination logic.
       Revising approach—effort may exceed estimate.
 ```
 
-**Resolution**:
+**Resolution (ready-for-review)**:
+
 ```yaml
-status: testing
-state_reason: null
-actual_hours: 7
-estimated_hours: 4
-test_results: "https://github.com/.../runs/87654321"
-related_commit:
-  - abc1234  # fix(parser): elif block termination logic
+status: ready-for-review
+actual: 7
+estimated: 4
+commits:
+  abc1234: 'fix(parser): elif block termination logic'
+test_results:
+  - timestamp: 2024-06-01T14:00:00Z
+    note: 'https://github.com/templjs/templjs/actions/runs/87654321'
 notes:
-  - timestamp: 2024-06-01T12:00:00Z
-    user: @john
-    note: Fixed by refactoring block_ends() logic. Took longer due to edge cases, but all tests now pass including new consecutive_elif tests.
+  - timestamp: 2024-06-01T14:00:00Z
+    note: |
+      Fixed by refactoring block_ends() logic. Took longer due to edge cases.
+      All tests now pass including new consecutive_elif tests.
+      PR submitted for review.
 ```
 
 ### Example 3: Spike/Research Update
 
 ```yaml
 ---
-title: "Evaluate expression engines"
-id: 61
-status: in_progress
-state_reason: null
-estimated_hours: 16
-actual_hours: 8
+title: 'Evaluate expression engines'
+id: 'wi-061'
+status: in-progress
+estimated: 16
+actual: 8
 notes:
-  - timestamp: 2024-06-01T12:00:00Z
-    user: @john
+  - timestamp: 2024-06-01T08:00:00Z
     note: |
       Evaluation candidates:
       1. JMESPath - mature, good for JSON, limited type support
       2. Custom recursive descent - flexible, small footprint
       3. meval - lightweight Python evaluator
-          
+
       Progress:
       - JMESPath prototype working (2h)
       - Custom parser WIP (6h) - complexity clear now, drafting comparison doc
-      
+
       Leaning toward option 2 (custom) due to control of type system.
 ---
-```
-
-## Common Patterns
-
-### Weekly Status Update
-
-Review active work items weekly:
-
-```yaml
-status: in_progress
-actual_hours: 12  # Update from 10
-notes:
-  - timestamp: 2024-06-01T12:00:00Z
-    user: @john
-    note: |
-      Week of Feb 10: 2 hours progress (mid-week catchup).
-      Current blockers: Decision on filter signature format—waiting for architecture review.
-      Expected completion: Feb 17
-```
-
-### Handling Blockers
-
-```yaml
-notes:
-  - timestamp: 2024-06-01T12:00:00Z
-    user: @john
-    note: |
-      BLOCKED: Waiting for ADR-006 decision on expression language.
-      Cannot finalize filter syntax without it.
-      Unblocked when: ADR merged and decision published
-      Impact: Pushed completion target to 2026-02-20
-```
-
-### Scope Creep Recognition
-
-```yaml
-notes:
-  - timestamp: 2024-06-01T12:00:00Z
-    user: @john
-    note: |
-      Original estimate: 12 hours (selectattr, map, join)
-      Current scope: +default filter + type validation = ~18 hours likely
-      Recommendation: Create follow-up item #62 for advanced filters, limit this to core 3.
 ```
 
 ## Tips & Conventions
@@ -498,6 +502,7 @@ notes:
 ### Atomic Updates
 
 Each update should correspond to a logical work milestone:
+
 - End of session: time tracking
 - After tests run: test results
 - After commit: commit hash
@@ -508,6 +513,7 @@ Don't update work items excessively—focus on meaningful changes.
 ### Notes Field
 
 Use `notes` for:
+
 - Progress summary
 - Blockers or issues
 - Scope changes
@@ -519,11 +525,12 @@ Avoid: detailed implementation notes (keep in commit messages instead)
 ### Time Tracking Accuracy
 
 Record hours regularly:
+
 - At end of each session
 - After significant milestone
 - Final tally when completed
 
-This helps estimate accuracy over time.
+Use decimals for partial hours (e.g., `5.5` for 5 hours 30 minutes).
 
 ### Commit Message Integration
 
@@ -535,8 +542,121 @@ feat(filters): implement selectattr and map
 Implements core filtering operations for FilterAdapter.
 Supports filtering sequences by attribute value and projection.
 
-Closes #60
-See backlog/60_implement_filter_adapter.md
+Closes wi-60
+See backlog/wi-060_implement_filter_adapter.md
+```
+
+Then update the work item with the commit hash.
+
+### Dependency Validation
+
+Before marking a work item as `closed`:
+
+1. Check the `links.depends_on` section
+2. Verify each referenced work item has `status: closed`
+3. If any `depends_on` items are not closed, leave this item at `ready-for-review` with a note explaining what's blocking closure
+
+Example:
+
+```yaml
+status: ready-for-review
+notes:
+  - timestamp: 2024-06-02T15:00:00Z
+    note: |
+      Implementation complete and tested. Awaiting closure of:
+      - [[wi-054_complete_temple_native.md]] (currently in-progress)
+      - [[wi-043_implement_syntax_validation.md]] (currently ready-for-review)
+
+      Ready to move to closed once dependencies are resolved.
+```
+
+## Common Patterns
+
+### Weekly Status Update
+
+Review active work items weekly:
+
+```yaml
+status: in-progress
+actual: 12 # Update from 10
+notes:
+  - timestamp: 2024-06-08T17:00:00Z
+    note: |
+      Week of Feb 10: 2 hours progress (mid-week catchup).
+      Current blockers: Decision on filter signature format—waiting for architecture review.
+      Expected completion: Feb 17
+```
+
+### Handling Blockers
+
+```yaml
+notes:
+  - timestamp: 2024-06-01T14:00:00Z
+    note: |
+      BLOCKED: Waiting for ADR-006 decision on expression language.
+      Cannot finalize filter syntax without it.
+      Unblocked when: ADR merged and decision published
+      Impact: Pushed completion target to 2026-02-20
+```
+
+### Scope Creep Recognition
+
+```yaml
+notes:
+  - timestamp: 2024-06-01T14:00:00Z
+    note: |
+      Original estimate: 12 hours (selectattr, map, join)
+      Current scope: +default filter + type validation = ~18 hours likely
+      Recommendation: Create follow-up item for advanced filters, limit this to core 3.
+```
+
+## Tips & Conventions
+
+### Atomic Updates
+
+Each update should correspond to a logical work milestone:
+
+- End of session: time tracking
+- After tests run: test results
+- After commit: commit hash
+- Status change: full progress summary
+
+Don't update work items excessively—focus on meaningful changes.
+
+### Notes Field
+
+Use `notes` for:
+
+- Progress summary
+- Blockers or issues
+- Scope changes
+- Decision points
+- Follow-up items
+
+Avoid: detailed implementation notes (keep in commit messages instead)
+
+### Time Tracking Accuracy
+
+Record hours regularly:
+
+- At end of each session
+- After significant milestone
+- Final tally when completed
+
+Use decimals for partial hours (e.g., `5.5` for 5 hours 30 minutes).
+
+### Commit Message Integration
+
+Reference work items in commit messages:
+
+```
+feat(filters): implement selectattr and map
+
+Implements core filtering operations for FilterAdapter.
+Supports filtering sequences by attribute value and projection.
+
+Closes wi-60
+See backlog/wi-060_implement_filter_adapter.md
 ```
 
 Then update the work item with the commit hash.
@@ -544,39 +664,9 @@ Then update the work item with the commit hash.
 ## Related Skills
 
 - **`create-work-item`**: For creating new work items from scratch
-- **`feature-branch-management`**: Invoked automatically on status transitions (create branch on in_progress, sync on testing)
-- **`create-pr`**: Invoked automatically when status → testing (create PR from feature branch)
+- **`feature-branch-management`**: Invoked automatically on status transitions (create branch on in-progress, sync on ready-for-review)
+- **`create-pr`**: Invoked automatically when status → ready-for-review (create PR from feature branch)
 - **`handle-pr-feedback`**: For addressing PR review feedback and managing rework
 - **`resolve-pr-comments`**: For addressing specific code review comments
 - **`finalize-work-item`**: For archiving completed work items after merge
-- **`git-commit`**: For recording commits that can be linked in `related_commit`
-
-## Optional Utility: Repair Commit Order
-
-Use the bundled helper script to normalize `related_commit` / `related_commits`
-blocks across backlog files, sorting hashes by commit timestamp and preserving
-missing hashes as `MISSING-COMMIT` notes.
-
-### Verify needed changes with dry run:
-
-```bash
-.agents/skills/update-work-item/scripts/normalize-related-commits.sh --dry-run
-```
-
-#### Include archived work items:
-
-```bash
-.agents/skills/update-work-item/scripts/normalize-related-commits.sh --dry-run --include-archived
-```
-
-### Apply changes:
-
-```bash
-.agents/skills/update-work-item/scripts/normalize-related-commits.sh
-```
-
-#### Include archived work items:
-
-```bash
-.agents/skills/update-work-item/scripts/normalize-related-commits.sh --include-archived
-```
+- **`git-commit`**: For recording commits that can be linked in `commits`
