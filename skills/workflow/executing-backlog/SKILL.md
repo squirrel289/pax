@@ -23,12 +23,13 @@ Use no other tools unless the user explicitly authorizes them in the request.
 
 ## Execution Gates
 
-This skill enforces quality gates at critical workflow points. See [references/execution-gates.md](references/execution-gates.md) for detailed gate specifications:
+This skill enforces quality gates at critical workflow points. See [references/execution-gates.md](references/execution-gates.md) for detailed gate specifications.This skill uses complementary aspects to ensure branch safety:
 
 - **Clarification Gate**: Verify WI identifiers, dependencies, and acceptance criteria before starting
 - **Completion Gate**: Ensure all checklist items checked before closing work items
 - **Atomic Scope Gate**: One WI per branch/PR, atomic commits with matching tests
 - **Workspace Safety Gate**: Protect out-of-scope changes from destructive operations
+- **Branch Safety Gate**: Use `guarding-branches` aspect at every merge point (mergeability checks, conflict resolution, export scanning, diff validation against main)
 
 ## Mandatory Planning Output (before acting)
 
@@ -101,6 +102,7 @@ Reference `agentic-eval` skill for full evaluation patterns.
 1. Ensure `auditing-backlog` has run recently and that `links.depends_on` data are up to date; rely on the dependency graph coverage described in `skills/auditing-backlog/SKILL.md`, Phases 2-4.
 2. Confirm no blocking dependencies are `in-progress` or `ready` by checking their status fields; only start when blockers are `closed` or explicitly deferred.
 3. Verify tooling (`pnpm`, `gh`, credentials) is configured locally; document any missing SDKs or credentials in the plan before touching code.
+4. If executing multiple work items in parallel, use `parallel-execution` skill to ensure workspace isolation (one working tree per WI) and use the subagent split rule: subagents implement code only, main agent handles all git/PR operations.
 
 ## Execution Phases (after plan confirmed)
 
@@ -139,7 +141,7 @@ Reference `agentic-eval` skill for full evaluation patterns.
 ### Phase 4: Feedback, Merge, Finalization
 
 - Use `handle-pr-feedback`/`resolve-pr-comments` to close blockers; categorize comments (blocker/major/minor) explicitly in responses.
-- Merge with `process-pr` following the chosen strategy; document the merge command/results in the plan output.
+- Merge with `merge-pr` skill, which enforces both Test Parity Gate (local tests pass) and guarding-branches checks (mergeability, conflicts, deletions) before merge.
 - Finalize the work item with `finalize-work-item`, recording actual hours, metrics, and cleaning up branches per `feature-branch-management`.
 
 ## Monitoring & Metrics
