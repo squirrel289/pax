@@ -1,0 +1,76 @@
+{
+  "version": "2.0.0",
+  "updated": "2026-01-14T11:45:44Z",
+  "patterns": [
+    {
+      "id": "pattern-001",
+      "name": "Responsive Grid Layout",
+      "type": "workflow",
+      "occurrences": 9,
+      "first_seen": "2026-01-10T09:15:00Z",
+      "last_seen": "2026-01-14T11:32:55Z",
+      "signature": {
+        "description": "Consistent use of layout.md for responsive grid patterns with Flow and Sizing"
+      },
+      "status": "pending",
+      "draft_path": "drafts/20260114-responsive-grid.md"
+    },
+    {
+      "id": "pattern-002",
+      "name": "Event Handler Setup",
+      "type": "workflow",
+      "occurrences": 5,
+      "first_seen": "2026-01-08T14:22:00Z",
+      "last_seen": "2026-01-14T10:25:55Z",
+      "signature": {
+        "description": "Standard event handler initialization using events.md patterns"
+      },
+      "status": "pending",
+      "draft_path": null
+    },
+    {
+      "id": "pattern-003",
+      "name": "Shader Uniform Fix",
+      "type": "error_resolution",
+      "occurrences": 4,
+      "first_seen": "2026-01-09T11:30:00Z",
+      "last_seen": "2026-01-13T16:45:00Z",
+      "signature": {
+        "description": "Resolving shader compilation errors by checking uniform declarations"
+      },
+      "status": "approved",
+      "draft_path": "community/shader-uniform-fix.md"
+    },
+    {
+      "id": "pattern-004",
+      "name": "Async API Retry",
+      "type": "workflow",
+      "occurrences": 6,
+      "first_seen": "2026-01-07T10:00:00Z",
+      "last_seen": "2026-01-14T10:58:44Z",
+      "signature": {
+        "description": "Implementing retry logic for async API calls with exponential backoff"
+      },
+      "status": "approved",
+      "draft_path": "community/async-api-retry.md"
+    },
+    {
+      "id": "pattern-005",
+      "name": "Type Guard Pattern",
+      "type": "error_resolution",
+      "occurrences": 3,
+      "first_seen": "2026-01-12T08:30:00Z",
+      "last_seen": "2026-01-14T09:18:55Z",
+      "signature": {
+        "description": "TypeScript type guards for safe API response handling"
+      },
+      "status": "detected",
+      "draft_path": null
+    }
+  ],
+  "metadata": {
+    "total_detected": 15,
+    "total_promoted": 2,
+    "total_archived": 4
+  }
+}

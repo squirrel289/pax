@@ -1,0 +1,40 @@
+{"ts":"2026-01-14T08:05:22Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"01-core/layout.md","category":"01-core","status":"ok","detail":""}
+{"ts":"2026-01-14T08:12:33Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"01-core/events.md","category":"01-core","status":"ok","detail":""}
+{"ts":"2026-01-14T08:18:45Z","session":"session-20260114","type":"command_started","tool":"bash","skill":"","category":"","status":"ok","detail":"cargo build --release"}
+{"ts":"2026-01-14T08:19:12Z","session":"session-20260114","type":"command_succeeded","tool":"bash","skill":"","category":"","status":"ok","detail":""}
+{"ts":"2026-01-14T08:25:18Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"01-core/layout.md","category":"01-core","status":"ok","detail":""}
+{"ts":"2026-01-14T08:32:44Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"02-components/widgets.md","category":"02-components","status":"ok","detail":""}
+{"ts":"2026-01-14T08:38:55Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"03-graphics/shaders.md","category":"03-graphics","status":"ok","detail":""}
+{"ts":"2026-01-14T08:45:22Z","session":"session-20260114","type":"command_started","tool":"bash","skill":"","category":"","status":"ok","detail":"npm run build"}
+{"ts":"2026-01-14T08:45:48Z","session":"session-20260114","type":"command_succeeded","tool":"bash","skill":"","category":"","status":"ok","detail":""}
+{"ts":"2026-01-14T08:52:33Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"01-core/layout.md","category":"01-core","status":"ok","detail":""}
+{"ts":"2026-01-14T09:05:18Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"04-patterns/modal.md","category":"04-patterns","status":"ok","detail":""}
+{"ts":"2026-01-14T09:12:44Z","session":"session-20260114","type":"command_started","tool":"bash","skill":"","category":"","status":"ok","detail":"cargo test"}
+{"ts":"2026-01-14T09:13:22Z","session":"session-20260114","type":"command_failed","tool":"bash","skill":"01-core/layout.md","category":"01-core","status":"fail","detail":"error[E0433]: failed to resolve: use of undeclared type"}
+{"ts":"2026-01-14T09:18:55Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"06-reference/troubleshooting.md","category":"06-reference","status":"ok","detail":""}
+{"ts":"2026-01-14T09:25:33Z","session":"session-20260114","type":"command_started","tool":"bash","skill":"","category":"","status":"ok","detail":"cargo test"}
+{"ts":"2026-01-14T09:26:18Z","session":"session-20260114","type":"command_succeeded","tool":"bash","skill":"","category":"","status":"ok","detail":""}
+{"ts":"2026-01-14T09:32:44Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"01-core/layout.md","category":"01-core","status":"ok","detail":""}
+{"ts":"2026-01-14T09:38:22Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"01-core/events.md","category":"01-core","status":"ok","detail":""}
+{"ts":"2026-01-14T09:45:55Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"01-core/styling.md","category":"01-core","status":"ok","detail":""}
+{"ts":"2026-01-14T09:52:33Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"01-core/layout.md","category":"01-core","status":"ok","detail":""}
+{"ts":"2026-01-14T09:58:18Z","session":"session-20260114","type":"command_started","tool":"bash","skill":"","category":"","status":"ok","detail":"npm run lint"}
+{"ts":"2026-01-14T09:58:45Z","session":"session-20260114","type":"command_succeeded","tool":"bash","skill":"","category":"","status":"ok","detail":""}
+{"ts":"2026-01-14T10:05:22Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"02-components/widgets.md","category":"02-components","status":"ok","detail":""}
+{"ts":"2026-01-14T10:12:44Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"01-core/layout.md","category":"01-core","status":"ok","detail":""}
+{"ts":"2026-01-14T10:18:33Z","session":"session-20260114","type":"skill_updated","tool":"Edit","skill":"01-core/layout.md","category":"01-core","status":"mutated","detail":"Added responsive breakpoints"}
+{"ts":"2026-01-14T10:25:55Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"01-core/events.md","category":"01-core","status":"ok","detail":""}
+{"ts":"2026-01-14T10:32:18Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"05-deployment/desktop.md","category":"05-deployment","status":"ok","detail":""}
+{"ts":"2026-01-14T10:38:44Z","session":"session-20260114","type":"command_started","tool":"bash","skill":"","category":"","status":"ok","detail":"cargo build --release"}
+{"ts":"2026-01-14T10:39:22Z","session":"session-20260114","type":"command_succeeded","tool":"bash","skill":"","category":"","status":"ok","detail":""}
+{"ts":"2026-01-14T10:45:33Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"01-core/layout.md","category":"01-core","status":"ok","detail":""}
+{"ts":"2026-01-14T10:52:18Z","session":"session-20260114","type":"draft_created","tool":"system","skill":"01-core/layout.md","category":"01-core","status":"ok","detail":"drafts/20260114-responsive-grid.md"}
+{"ts":"2026-01-14T10:58:44Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"04-patterns/async-loading.md","category":"04-patterns","status":"ok","detail":""}
+{"ts":"2026-01-14T11:05:22Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"01-core/layout.md","category":"01-core","status":"ok","detail":""}
+{"ts":"2026-01-14T11:12:55Z","session":"session-20260114","type":"command_started","tool":"bash","skill":"","category":"","status":"ok","detail":"npm test"}
+{"ts":"2026-01-14T11:13:33Z","session":"session-20260114","type":"command_succeeded","tool":"bash","skill":"","category":"","status":"ok","detail":""}
+{"ts":"2026-01-14T11:18:44Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"03-graphics/shaders.md","category":"03-graphics","status":"ok","detail":""}
+{"ts":"2026-01-14T11:25:22Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"01-core/styling.md","category":"01-core","status":"ok","detail":""}
+{"ts":"2026-01-14T11:32:55Z","session":"session-20260114","type":"skill_used","tool":"Read","skill":"01-core/layout.md","category":"01-core","status":"ok","detail":""}
+{"ts":"2026-01-14T11:38:18Z","session":"session-20260114","type":"draft_created","tool":"system","skill":"session","category":"insight","status":"ok","detail":"drafts/20260114-session-insight.md"}
+{"ts":"2026-01-14T11:45:44Z","session":"session-20260114","type":"report_generated","tool":"system","skill":"session","category":"report","status":"ok","detail":"reports/improvements.md"}

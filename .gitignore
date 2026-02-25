@@ -84,3 +84,10 @@ $RECYCLE.BIN/
 
 # LLM Agent Directories
 .agents/**
+
+# BEGIN SKILLSHARE MANAGED - DO NOT EDIT
+_wshobson-agents/
+agentic-eval/
+skill-creator/
+skillshare/
+# END SKILLSHARE MANAGED
