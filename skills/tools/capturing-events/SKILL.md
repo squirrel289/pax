@@ -1,5 +1,5 @@
 ---
-name: capture-events
+name: capturing-events
 description: Capture workspace events (file modifications, terminal commands, diagnostics, skill invocations) into local memory for pattern detection and skill evolution. Provider-agnostic design supports GitHub Copilot, Codex, Cursor, and universal workspace-only mode.
 license: MIT
 compatibility: copilot, codex, cursor, universal
@@ -10,7 +10,7 @@ metadata:
   subtype: skill
 ---
 
-# Capture Events
+# Capturing Events
 
 Provider-agnostic event capture system for PAX's Continuous Feedback Loop. Abstracts workspace signals into standardized events, stores them locally, and enables pattern detection for skill evolution.
 
@@ -72,13 +72,13 @@ All providers emit events following this standardized schema:
 
 ## Supported Event Types
 
-| Event Type        | Trigger                           | Metadata Fields                             |
-| ----------------- | --------------------------------- | ------------------------------------------- |
-| `file_modified`   | File created, edited, or deleted  | `file_path`, `diff_hash`, `modification_type` |
-| `terminal_command`| Command executed in terminal      | `command`, `execution_result`, `exit_code`  |
-| `diagnostic`      | Linter/compiler error or warning  | `file_path`, `severity`, `message`          |
-| `skill_invoked`   | Agent invokes a skill             | `skill_name`, `parameters`, `execution_result` |
-| `chat_context`    | Chat session context change       | `context_window`, `user_intent`             |
+| Event Type         | Trigger                          | Metadata Fields                                |
+| ------------------ | -------------------------------- | ---------------------------------------------- |
+| `file_modified`    | File created, edited, or deleted | `file_path`, `diff_hash`, `modification_type`  |
+| `terminal_command` | Command executed in terminal     | `command`, `execution_result`, `exit_code`     |
+| `diagnostic`       | Linter/compiler error or warning | `file_path`, `severity`, `message`             |
+| `skill_invoked`    | Agent invokes a skill            | `skill_name`, `parameters`, `execution_result` |
+| `chat_context`     | Chat session context change      | `context_window`, `user_intent`                |
 
 ## Storage Location
 
@@ -188,15 +188,15 @@ capture-events --provider cursor
 
 ## Provider Capabilities
 
-| Feature                  | Universal | Copilot | Codex | Cursor |
-| ------------------------ | --------- | ------- | ----- | ------ |
-| File modifications       | ✅        | ✅      | ✅    | ✅     |
-| Terminal commands        | ✅        | ✅      | ✅    | ✅     |
-| Diagnostics              | ✅        | ✅      | ✅    | ✅     |
-| Skill invocations        | ⚠️ limited| ✅      | ✅    | ✅     |
-| Chat context             | ❌        | ✅      | ✅    | ✅     |
-| Session continuity       | ⚠️ local | ✅      | ✅    | ✅     |
-| Cost                     | Free      | Free    | API   | Free   |
+| Feature            | Universal  | Copilot | Codex | Cursor |
+| ------------------ | ---------- | ------- | ----- | ------ |
+| File modifications | ✅         | ✅      | ✅    | ✅     |
+| Terminal commands  | ✅         | ✅      | ✅    | ✅     |
+| Diagnostics        | ✅         | ✅      | ✅    | ✅     |
+| Skill invocations  | ⚠️ limited | ✅      | ✅    | ✅     |
+| Chat context       | ❌         | ✅      | ✅    | ✅     |
+| Session continuity | ⚠️ local   | ✅      | ✅    | ✅     |
+| Cost               | Free       | Free    | API   | Free   |
 
 Legend: ✅ Full support, ⚠️ Limited support, ❌ Not available
 
@@ -281,10 +281,7 @@ capture-events --debug --log-file .vscode/pax-memory/debug.log
     "**/*.log",
     "**/coverage/**"
   ],
-  "pax.feedbackLoop.capture.eventTypes": [
-    "file_modified",
-    "skill_invoked"
-  ]
+  "pax.feedbackLoop.capture.eventTypes": ["file_modified", "skill_invoked"]
 }
 ```
 
