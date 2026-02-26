@@ -17,6 +17,7 @@ __pycache__
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+.vscode/pax-memory/
 
 # PyCharm
 .idea/
@@ -90,4 +91,5 @@ _wshobson-agents/
 agentic-eval/
 skill-creator/
 skillshare/
+evolution/
 # END SKILLSHARE MANAGED
