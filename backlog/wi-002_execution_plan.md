@@ -88,7 +88,7 @@
 
 ### Directory Structure
 
-```text
+```bash tree
 skills/tools/capture-events/
 ├── SKILL.md                          # Already exists (created in Phase 0)
 ├── implementation.py                 # NEW - Main entry point
@@ -147,7 +147,7 @@ skills/tools/capture-events/
 
 ### Phase 2: Implementation (32 hours)
 
-1. Create directory structure and __init__.py files (0.5h)
+1. Create directory structure and **init**.py files (0.5h)
 2. Implement event_schema.py with Event class and validation (4h)
 3. Implement universal.py provider (12h):
    - FileWatcher for file create/modify/delete
@@ -290,7 +290,7 @@ skills/tools/capture-events/
 ✅ JSONL storage integrity verified  
 ✅ TTL cleanup functional  
 ✅ Provider facade auto-detects universal  
-✅ PR approved and merged  
+✅ PR approved and merged
 
 ---
 
@@ -298,4 +298,3 @@ skills/tools/capture-events/
 **Ready for Phase 2**: YES  
 **Estimated Total Time**: 40 hours  
 **Blockers**: None
-
