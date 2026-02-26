@@ -3,15 +3,31 @@
 import json
 import unittest
 from datetime import datetime
+import sys
+import os
 
-from ..event_schema import Event, EventType, EventValidator
-from ..providers.universal import (
-    UniversalProvider,
-    FileWatcher,
-    TerminalListener,
-    DiagnosticCollector,
-    SkillTracker,
-)
+# Handle imports from hyphenated parent directory
+try:
+    # Try relative imports first (when run via standard unittest discovery)
+    from ..event_schema import Event, EventType, EventValidator
+    from ..providers.universal import (
+        UniversalProvider,
+        FileWatcher,
+        TerminalListener,
+        DiagnosticCollector,
+        SkillTracker,
+    )
+except (ImportError, ValueError):
+    # Fall back to sys.modules lookup (when run via custom test runner)
+    Event = sys.modules['event_schema'].Event
+    EventType = sys.modules['event_schema'].EventType
+    EventValidator = sys.modules['event_schema'].EventValidator
+    UniversalProvider = sys.modules['universal'].UniversalProvider
+    FileWatcher = sys.modules['universal'].FileWatcher
+    TerminalListener = sys.modules['universal'].TerminalListener
+    DiagnosticCollector = sys.modules['universal'].DiagnosticCollector
+    SkillTracker = sys.modules['universal'].SkillTracker
+
 
 
 class TestEventType(unittest.TestCase):

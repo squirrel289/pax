@@ -6,9 +6,21 @@ import threading
 import unittest
 from datetime import datetime, timedelta
 from pathlib import Path
+import sys
+import os
 
-from ..event_schema import Event, EventType
-from ..storage.jsonl_handler import JSONLStorage, TTLCleaner
+# Handle imports from hyphenated parent directory
+try:
+    # Try relative imports first (when run via standard unittest discovery)
+    from ..event_schema import Event, EventType
+    from ..storage.jsonl_handler import JSONLStorage, TTLCleaner
+except (ImportError, ValueError):
+    # Fall back to sys.modules lookup (when run via custom test runner)
+    Event = sys.modules['event_schema'].Event
+    EventType = sys.modules['event_schema'].EventType
+    JSONLStorage = sys.modules['jsonl_handler'].JSONLStorage
+    TTLCleaner = sys.modules['jsonl_handler'].TTLCleaner
+
 
 
 class TestJSONLStorage(unittest.TestCase):
