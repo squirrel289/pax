@@ -1,6 +1,20 @@
 # Ignore installed `skills` directories
 .*/**/skills/
 
+
+# -----------------------------------------------------------------------------
+# Node / JavaScript
+# -----------------------------------------------------------------------------
+
+.nx/cache
+.nx/workspace-data
+node_modules
+.npm-cache
+
+# -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
+
 # Ignore Python bytecode
 __pycache__
 
@@ -93,9 +107,3 @@ skill-creator/
 skillshare/
 evolution/
 # END SKILLSHARE MANAGED
-
-
-
-.nx/cache
-.nx/workspace-data
-node_modules
