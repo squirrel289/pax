@@ -91,6 +91,8 @@ Always justify action with concrete score deltas and feasibility status.
 - Do not rank options using different rubrics.
 - Do not hide hard-constraint violations inside averaged scores.
 - Keep rationale short and evidence-linked.
+- Apply an agentic-eval loop (Generate → Evaluate → Critique → Refine), max 3 iterations.
+- Use structured JSON for critique output and stop if no improvement between iterations.
 
 ## References
 

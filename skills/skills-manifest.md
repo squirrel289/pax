@@ -369,6 +369,17 @@ All guardrails are **production-ready**:
 **Extends**: `feature-branch-management` (branch creation/sync)  
 **Complements**: `finalize-work-item` (WI archival)
 
+### Aspect Skills
+
+Aspect skills provide reusable behavioral patterns that can be composed into workflow and tool skills.
+
+See [skills/aspects/README.md](aspects/README.md) for complete documentation of all aspect skills, including:
+
+- `interaction-modes`: Standardize yolo and collaborative execution patterns
+- `guarding-branches`: Protect main branch during merges
+- `prevalidating-bulk-operations`: Route bulk operations to systematic validation
+- `organizing-documents-diataxis`: Apply Diataxis framework to output placement
+
 ### Documentation
 
 #### architecture-decision-records

@@ -61,6 +61,8 @@ Produce a defensible decision by combining:
 - Apply `references/quality-gates.md` as the single source of truth for pass/fail checks.
 - Do not bypass confirmation or independent evaluator records except with explicit simulation flags.
 - Keep all scores traceable to evidence and isolated evaluator summaries.
+- Apply an agentic-eval loop (Generate → Evaluate → Critique → Refine), max 3 iterations.
+- Use structured JSON for critique output and stop if no improvement between iterations.
 
 ## Testing
 

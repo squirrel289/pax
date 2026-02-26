@@ -208,3 +208,5 @@ Use this format:
 - Do not compare options with different rubrics
 - Mark missing evidence as gaps, not assumptions
 - Keep rationale evidence-linked and concise
+- Apply an agentic-eval loop (Generate → Evaluate → Critique → Refine), max 3 iterations.
+- Use structured JSON for critique output and stop if no improvement between iterations.
