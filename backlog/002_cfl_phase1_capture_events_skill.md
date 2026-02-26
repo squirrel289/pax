@@ -1,7 +1,7 @@
 ---
 id: wi-002
 title: CFL Phase 1 - Implement capture-events Skill
-status: not-started
+status: in-progress
 priority: high
 complexity: high
 estimated_hours: 40
