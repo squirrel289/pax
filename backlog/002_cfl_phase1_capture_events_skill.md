@@ -1,12 +1,14 @@
 ---
 id: wi-002
 title: CFL Phase 1 - Implement capture-events Skill
-status: completed
+status: merged
 priority: high
 complexity: high
 estimated_hours: 40
 dependencies: [wi-001]
 created: 2026-02-26
+pull_requests:
+  - https://github.com/squirrel289/pax/pull/1
 ---
 
 ## Goal
@@ -21,7 +23,7 @@ Following PAX's assistant-agnostic philosophy, the skill uses a facade pattern t
 
 ## Tasks
 
-- [x] Implement `skills/tools/capture-events/SKILL.md` as executable skill
+- [x] Implement `skills/tools/capturing-events/SKILL.md` as executable skill
 - [x] Create event schema with timestamp, provider, event_type, metadata
 - [x] Implement universal provider event capture:
   - [x] File watcher integration (create, modify, delete)
@@ -36,7 +38,7 @@ Following PAX's assistant-agnostic philosophy, the skill uses a facade pattern t
 
 ## Deliverables
 
-1. Executable `capture-events` skill in `skills/tools/capture-events/`
+1. Executable `capture-events` skill in `skills/tools/capturing-events/`
 2. Event schema definition and validation
 3. Universal provider implementation with full workspace coverage
 4. Provider facade with auto-detection
@@ -58,4 +60,4 @@ Following PAX's assistant-agnostic philosophy, the skill uses a facade pattern t
 
 - See: [[docs/architecture/continuous-feedback-loop.md]] - System architecture
 - See: [[docs/continuous-feedback-loop-implementation-plan.md]] - Full roadmap
-- Implements: [[skills/tools/capture-events/SKILL.md]] specification
+- Implements: [[skills/tools/capturing-events/SKILL.md]] specification
