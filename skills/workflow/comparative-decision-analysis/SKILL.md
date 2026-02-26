@@ -1,6 +1,6 @@
 ---
 name: comparative-decision-analysis
-description: 'Comparative decision analysis workflow with mandatory discovery (including external options), criteria derivation and confirmation, explicit evidence discipline, hard-constraint gating, and deterministic scoring. Use for vendor analysis, head-to-head comparisons, competitor analysis, tool/architecture/workflow selection, and build-vs-buy decisions when you need reliable, auditable recommendations.'
+description: "Comparative decision analysis workflow with mandatory discovery (including external options), criteria derivation and confirmation, explicit evidence discipline, hard-constraint gating, and deterministic scoring. Use for vendor analysis, head-to-head comparisons, competitor analysis, tool/architecture/workflow selection, and build-vs-buy decisions when you need reliable, auditable recommendations."
 ---
 
 # Comparative Decision Analysis
@@ -21,15 +21,20 @@ Produce a defensible decision by combining:
 - Initial alternatives or discovery scope.
 - Optional evaluation criteria, weights, and scoring scale.
 
+**Accepting JSON from discovering-alternatives**: When using `discovering-alternatives` for discovery (Step 2), request JSON output and transform using `../discovering-alternatives/references/integration-guide.md`. The JSON format pre-populates `decision`, `alternatives`, and baseline context, streamlining the workflow.
+
 ## Workflow
 
 1. Frame decision and constraints.
-2. Run discovery from `references/discovery-protocol.md`.
-   - Include internal options, compose/extend variants, and external alternatives.
-   - Include at least one external option unless explicitly blocked.
-3. Normalize alternatives.
-   - Require at least two alternatives before scoring.
-   - Mark each alternative `feasible` or `infeasible`.
+2. **Run discovery using `discovering-alternatives` skill** (see `../discovering-alternatives/SKILL.md`).
+   - Delegate to `discovering-alternatives` for exhaustive discovery (build, buy, hybrid options).
+   - Request JSON output format for automated transformation: `output as JSON`
+   - Transform JSON using `../discovering-alternatives/references/integration-guide.md`
+   - Accept the ranked option list from `discovering-alternatives` as input to comparative analysis.
+   - If `discovering-alternatives` is unavailable, fall back to `references/discovery-protocol.md` (legacy).
+3. Normalize alternatives for comparative scoring (skip if using JSON from discovering-alternatives).
+   - Require at least two alternatives before scoring (enforced by `discovering-alternatives`).
+   - Mark each alternative `feasible` or `infeasible` (already done by `discovering-alternatives`).
 4. Derive criteria from intended use.
    - Use `references/rubric-packs.md` as a starting point, then adapt.
 5. Present the evaluation criteria, weights, score scale, and platform set, then wait for confirmation.
@@ -74,7 +79,7 @@ python3 test/skills/workflow/comparative-decision-analysis/test_score_with_guard
 
 ## References
 
-- Discovery protocol: `references/discovery-protocol.md`
+- **Discovery**: `../discovering-alternatives/SKILL.md` (primary), `references/discovery-protocol.md` (legacy fallback)
 - Input contract: `references/input-schema.md`
 - Machine-readable schema: `references/input-schema.json`
 - Rubric packs: `references/rubric-packs.md`
@@ -83,3 +88,21 @@ python3 test/skills/workflow/comparative-decision-analysis/test_score_with_guard
 - Reusable bakeoff fixture: `assets/bakeoff-fixture.v1.json`
 - Reusable bakeoff results template: `assets/bakeoff-results-template.v1.json`
 - Decision record template: `assets/comparative-decision-record-template.md`
+
+## Related Skills
+
+**Upstream (Discovery Phase)**:
+
+- [[discovering-alternatives]]: Exhaustive option discovery with evidence-backed ranking (use in Step 2)
+
+**Downstream (Selection Phase)**:
+
+- [[hybrid-decision-analysis]]: Evaluates hybrid build+buy approaches after comparative analysis completes
+- [[evaluating-alternative]]: Deep-dive evaluation of a single option (useful for top-ranked alternatives)
+
+**Workflow Sequence**:
+
+```text
+1. discovering-alternatives → 2. comparative-decision-analysis → 3. [hybrid-decision-analysis | evaluating-alternative]
+   (exhaustive discovery)       (criteria-based scoring)            (deep dive or hybrid exploration)
+```

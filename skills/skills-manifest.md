@@ -210,6 +210,29 @@ nx affected -t test --parallel=3
 nx affected -t lint --parallel=3
 ```
 
+### Decision & Discovery
+
+#### discovering-alternatives
+
+**Purpose**: Exhaustive discovery of build, buy, and hybrid options for a stated problem with evidence-backed decision matrix output.
+
+**When to Use**:
+
+- Early in solution selection to map the landscape
+- Build vs buy vs hybrid assessments
+- Creating a vendor shortlist with documented evidence
+
+**Integration Point**: Upstream of comparative decision workflows and final selection.
+
+**Example Usage**:
+
+```bash
+# Agent command
+@agent discover alternatives for a templating linter (build vs buy vs hybrid) and provide a decision matrix
+```
+
+**Location**: [skills/workflow/discovering-alternatives/SKILL.md](workflow/discovering-alternatives/SKILL.md)
+
 ### Safety & Guardrails
 
 > **Architecture Decision**: See [ADR-002: Centralize Safety Guardrails at Merge Bottleneck](../docs/adr/ADR-002-Centralize-Guardrails-at-Merge-Bottleneck.md) for design rationale.
