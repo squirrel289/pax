@@ -380,6 +380,87 @@ See [skills/aspects/README.md](aspects/README.md) for complete documentation of 
 - `prevalidating-bulk-operations`: Route bulk operations to systematic validation
 - `organizing-documents-diataxis`: Apply Diataxis framework to output placement
 
+### Continuous Improvement
+
+Skills that enable learning from development patterns and evolving the skills library based on observed usage.
+
+#### capture-events
+
+**Purpose**: Capture workspace events (file modifications, terminal commands, diagnostics, skill invocations) into local memory for pattern detection and continuous feedback loop.
+
+**When to Use**:
+
+- Running continuously in background during development
+- Building episodic memory for pattern analysis
+- Supporting assistant-agnostic feedback loops (Copilot, Codex, Cursor)
+- Enabling skill evolution based on usage patterns
+
+**Integration Point**: `.vscode/pax-memory/` (git-ignored local storage)
+
+**Example Usage**:
+
+```bash
+# Automatic (via workspace settings)
+{
+  "pax.feedbackLoop.enabled": true,
+  "pax.feedbackLoop.provider": "universal"
+}
+
+# Manual control
+capture-events --start --provider universal
+capture-events --stop
+capture-events --status
+```
+
+**Supports**:
+
+- Universal provider (workspace-only, no assistant required)
+- GitHub Copilot provider (extension integration)
+- Codex provider (API-based)
+- Cursor provider (extension integration)
+
+#### creating-skill
+
+**Purpose**: Evaluate a specific use case or skill idea against memory patterns and existing skills, then provide actionable recommendations. Delegates actual skill creation to skill-creator.
+
+**When to Use**:
+
+- Developer has an idea for a new skill
+- Repeated pattern detected by continuous feedback loop
+- Deciding between enhancing existing skill vs. creating new one
+- Determining if pattern should become PAX skill, project skill, aspect, or AGENTS.md update
+
+**Integration Point**: Continuous Feedback Loop (Recommendation Layer)
+
+**Example Usage**:
+
+```bash
+# Agent command
+@agent I need a skill for batch updating work items from CSV
+
+# creating-skill analyzes:
+# 1. Searches memory for similar patterns
+# 2. Compares against existing skills (e.g., update-work-item)
+# 3. Computes overlap and gaps
+# 4. Recommends: enhance existing (70% overlap found)
+# 5. Delegates to skill-creator if approved
+```
+
+**Recommendation Types**:
+
+- Enhance existing PAX skill (high overlap)
+- Create new PAX skill (reusable across projects)
+- Create project-local skill (project-specific use case)
+- Create or update aspect (cross-cutting concern)
+- Update AGENTS.md (routing/orchestration change)
+
+**Related**:
+
+- Uses [[capture-events]] memory data
+- Uses [[skill-reviewer]] rubric patterns
+- Delegates to [[skill-creator]] for execution
+- Part of [Continuous Feedback Loop](../docs/architecture/continuous-feedback-loop.md)
+
 ### Documentation
 
 #### architecture-decision-records
