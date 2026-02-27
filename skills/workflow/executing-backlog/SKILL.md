@@ -1,6 +1,6 @@
 ---
 name: executing-backlog
-description: 'Orchestrate the full lifecycle of implementing backlog work items from planning through delivery, with integrated validation gating for bulk operations. Use when: (1) Asked to execute backlog, implement work items (WI-ABC), or close out a task, (2) Implementing changes across 3+ similar files, (3) Need end-to-end delivery including PR/merge. Coordinates with prevalidating-bulk-operations for routing and discover-validation-criteria for schema discovery.'
+description: "Orchestrate the full lifecycle of implementing backlog work items from planning through delivery, with integrated validation gating for bulk operations. Use when: (1) Asked to execute backlog, implement work items (WI-ABC), or close out a task, (2) Implementing changes across 3+ similar files, (3) Need end-to-end delivery including PR/merge. Coordinates with prevalidating-bulk-operations for routing and discover-validation-criteria for schema discovery."
 ---
 
 # Execute Backlog
@@ -35,7 +35,7 @@ This skill enforces quality gates at critical workflow points. See [references/e
 
 Before modifying the repository, publish an explicit plan that includes: a summary sentence, the sequence of phases, the dependency status, required tests/commands, validation criteria discovered, and the next merge/cleanup tasks. Use this template and fill with concrete values:
 
-```
+```text
 Plan Summary: <short goal>
 Work Items: <WI list + dependencies (closed/pending)>
 Scope Boundaries: <single active WI for this branch/PR + explicit out-of-scope items>
@@ -74,7 +74,7 @@ When work item affects 3+ similar files:
 
 When Phase 2 validation fails, use `agentic-eval` patterns for systematic iteration:
 
-```
+```text
 Discover Criteria → Sample Change → Validation Fails
                          ↓
                   Evaluate + Fix → Re-test Sample (max 3 attempts)
@@ -99,7 +99,7 @@ Reference `agentic-eval` skill for full evaluation patterns.
 
 ## Prerequisites & Preparation
 
-1. Ensure `auditing-backlog` has run recently and that `links.depends_on` data are up to date; rely on the dependency graph coverage described in `skills/auditing-backlog/SKILL.md`, Phases 2-4.
+1. Ensure `auditing-backlog-dependency-graph` has run recently and that `links.depends_on` data are up to date; rely on the dependency graph coverage described in `skills/tools/auditing-backlog-dependency-graph/SKILL.md`, Phases 2-4.
 2. Confirm no blocking dependencies are `in-progress` or `ready` by checking their status fields; only start when blockers are `closed` or explicitly deferred.
 3. Verify tooling (`pnpm`, `gh`, credentials) is configured locally; document any missing SDKs or credentials in the plan before touching code.
 4. If executing multiple work items in parallel, use `parallel-execution` skill to ensure workspace isolation (one working tree per WI) and use the subagent split rule: subagents implement code only, main agent handles all git/PR operations.
@@ -108,7 +108,7 @@ Reference `agentic-eval` skill for full evaluation patterns.
 
 ### Phase 1: Planning & Validation
 
-- Run `auditing-backlog` to surface orphans and dependency chains before work begins.
+- Run `auditing-backlog-dependency-graph` to surface orphans and dependency chains before work begins.
 - **For bulk operations (3+ similar files)**: Run `prevalidating-bulk-operations` aspect to decide routing:
   - If routing = PATTERN_REQUIRED or CONDITIONAL+discoverable: Call `discover-validation-criteria`, document criteria dict
   - If routing = DIRECT: Skip criteria discovery, document DIRECT evidence in plan

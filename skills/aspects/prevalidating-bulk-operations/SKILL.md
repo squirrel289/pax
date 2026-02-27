@@ -23,7 +23,7 @@ This aspect provides a **decision framework** to route bulk file operations: whe
 
 ## Quick Decision Framework
 
-**Question 1: File Count**
+### Question 1: File Count
 
 | Count | Routing          | Rationale                              |
 | ----- | ---------------- | -------------------------------------- |
@@ -31,14 +31,18 @@ This aspect provides a **decision framework** to route bulk file operations: whe
 | 3–4   | CONDITIONAL      | Depends on schema discoverability (Q2) |
 | 5+    | PATTERN_REQUIRED | Pattern cost amortizes well            |
 
-**Question 2: Schema Discoverable** (ask only if 3–4 files)
+### Question 2: Schema Discoverable
+
+(ask only if 3–4 files)
 
 | Result | Routing          | Rationale                       |
 | ------ | ---------------- | ------------------------------- |
 | Yes    | PATTERN_REQUIRED | Proceed with criteria discovery |
 | No     | DIRECT (caution) | Document constraints first      |
 
-**Question 3: Operation Type** (informs Phase 2a/2b approach)
+### Question 3: Operation Type
+
+(informs Phase 2a/2b approach)
 
 | Type    | Pattern fit | Sample strategy                          |
 | ------- | ----------- | ---------------------------------------- |
@@ -78,14 +82,15 @@ After evaluating all three questions, the aspect produces:
 
 - **executing-backlog** (Phase 1): Decides whether to call `discover-validation-criteria`
 
-  ```
+  ```text
   Phase 1: For bulk operations → prevalidating-bulk-operations →
            If PATTERN: discover-validation-criteria → continue Phase 2
            If DIRECT: skip discovery → continue Phase 2
   ```
 
-- **auditing-backlog**: Risk assessment on bulk changes in backlog
-  ```
+- **auditing-backlog-dependency-graph**: Risk assessment on bulk changes in backlog
+
+  ```text
   If bulk operation not using pattern → flag as "high-risk bulk"
   Recommend pattern for future similar tasks
   ```

@@ -10,7 +10,7 @@ If the request lacks a concrete work item, dependencies, acceptance criteria, or
 2. Existing blockers/dependencies that might delay execution.
 3. Desired outcomes (tests, documentation, release step).
 
-Every response here should reference the dependency graph defined in `skills/auditing-backlog/SKILL.md` (Phases 2-4) as the single source for dependency validation before making implementation decisions.
+Every response here should reference the dependency graph defined in `skills/tools/auditing-backlog-dependency-graph/SKILL.md` (Phases 2-4) as the single source for dependency validation before making implementation decisions.
 
 ## Completion Gate
 

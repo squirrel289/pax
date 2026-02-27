@@ -1,0 +1,4 @@
+interface:
+  display_name: "Auditing Backlog"
+  short_description: "Run dependency and checkbox audits"
+  default_prompt: "Use $auditing-backlog to run dependency-graph and checkbox audits on backlog work items and report actionable fixes."
