@@ -87,7 +87,6 @@ $RECYCLE.BIN/
 
 # BEGIN SKILLSHARE MANAGED - DO NOT EDIT
 _wshobson-agents/
-agentic-eval/
-skill-creator/
-skillshare/
+**/skillshare/
+
 # END SKILLSHARE MANAGED
