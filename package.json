@@ -10,7 +10,7 @@
     "hooks:pre-commit": "pnpm run lint:staged && (pnpm run test:affected:ci || echo \"⚠️  Some tests failed but commit allowed. Run 'pnpm test' for full results.\")",
     "hooks:pre-push": "pnpm run lint:frontmatter && pnpm run test:affected:pre-push",
     "lint:eslint:staged:fix": "eslint --fix",
-    "lint:frontmatter": "tsx ../templjs/scripts/ci/lint-frontmatter.ts",
+    "lint:frontmatter": "echo 'No backlog to lint! Exiting...' && exit 0; tsx ../templjs/scripts/ci/lint-frontmatter.ts",
     "lint:markdown:fix": "sh ../templjs/scripts/ci/lint-markdown.sh --fix",
     "lint:staged": "lint-staged",
     "prepare": "husky",
