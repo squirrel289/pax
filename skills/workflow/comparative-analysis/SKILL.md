@@ -131,3 +131,8 @@ Otherwise, use `assets/comparative-analysis-record-template.md` and keep it conc
   - major platform average
   - current platform score
 - Final recommendation and rationale.
+
+## Quality Gates
+
+- Apply an agentic-eval loop (Generate → Evaluate → Critique → Refine), max 3 iterations.
+- Use structured JSON for critique output and stop if no improvement between iterations.

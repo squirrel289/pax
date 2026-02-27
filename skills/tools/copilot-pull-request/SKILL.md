@@ -1,7 +1,6 @@
 ---
 name: copilot-pull-request
 description: Skill for managing GitHub pull requests and issues using Copilot's built-in PR/issue APIs. Provides structured, agent-native operations for review, comment, resolve, and merge workflows.
-category: tools
 license: MIT
 compatibility: copilot
 metadata:
@@ -82,44 +81,44 @@ Uses: `pull_request_review_write` (merge)
 
 ```markdown
 FETCH PR:
-  operation: fetch-pr-details
-  pr-number: <number>
-  repository: <owner/repo>
+operation: fetch-pr-details
+pr-number: <number>
+repository: <owner/repo>
 
 LIST COMMENTS:
-  operation: list-comments
-  pr-number: <number>
-  repository: <owner/repo>
+operation: list-comments
+pr-number: <number>
+repository: <owner/repo>
 
 LIST UNRESOLVED COMMENTS:
-  operation: list-comments
-  pr-number: 42
-  repository: owner/repo
-  filters:
-    unresolved: true
+operation: list-comments
+pr-number: 42
+repository: owner/repo
+filters:
+unresolved: true
 
 REPLY TO COMMENT:
-  operation: reply-comment
-  pr-number: <number>
-  thread-id: <id>
-  body: "message"
-  repository: <owner/repo>
+operation: reply-comment
+pr-number: <number>
+thread-id: <id>
+body: "message"
+repository: <owner/repo>
 
 RESOLVE THREAD:
-  operation: resolve-thread
-  pr-number: <number>
-  thread-id: <id>
-  repository: <owner/repo>
+operation: resolve-thread
+pr-number: <number>
+thread-id: <id>
+repository: <owner/repo>
 
 CHECK MERGEABLE:
-  peration: check-status
-  r-number: 42
-  epository: owner/repo
+peration: check-status
+r-number: 42
+epository: owner/repo
 
 MERGE PR:
-  operation: merge-pr
-  pr-number: <number>
-  repository: <owner/repo>
-  merge-method: squash|merge|rebase
-  delete-branch: true|false
+operation: merge-pr
+pr-number: <number>
+repository: <owner/repo>
+merge-method: squash|merge|rebase
+delete-branch: true|false
 ```

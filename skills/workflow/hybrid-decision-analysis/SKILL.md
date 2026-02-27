@@ -69,6 +69,8 @@ Produce a defensible decision by combining:
 - Always expose decision status as `proceed`, `defer`, or `no-go`.
 - Include explicit per-option justification in final output.
 - Include all identified alternatives in the ranked record.
+- Apply an agentic-eval loop (Generate → Evaluate → Critique → Refine), max 3 iterations.
+- Use structured JSON for critique output and stop if no improvement between iterations.
 
 ## Testing
 

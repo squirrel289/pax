@@ -1,0 +1,287 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Discovering Alternatives Output Schema",
+  "description": "JSON output format for discovering-alternatives skill, compatible with comparative-decision-analysis input",
+  "type": "object",
+  "required": [
+    "decision",
+    "constraints",
+    "discovery_log",
+    "options",
+    "coverage_gates",
+    "ranking",
+    "discovery_confirmation"
+  ],
+  "properties": {
+    "decision": {
+      "type": "string",
+      "description": "Problem statement and decision context"
+    },
+    "constraints": {
+      "type": "object",
+      "required": ["time_horizon", "budget_sensitivity", "hard_constraints"],
+      "properties": {
+        "time_horizon": { "type": "string" },
+        "budget_sensitivity": { "type": "string" },
+        "hard_constraints": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "discovery_log": {
+      "type": "object",
+      "required": ["pretrained", "memory", "repo", "user_context", "web"],
+      "properties": {
+        "pretrained": {
+          "type": "object",
+          "required": ["query", "date", "results", "evidence"],
+          "properties": {
+            "query": { "type": "string" },
+            "date": { "type": "string", "format": "date-time" },
+            "results": { "type": "string" },
+            "evidence": { "type": "string" }
+          }
+        },
+        "memory": {
+          "type": "object",
+          "required": [
+            "query",
+            "date",
+            "tool",
+            "results",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "query": { "type": "string" },
+            "date": { "type": "string", "format": "date-time" },
+            "tool": { "type": "string" },
+            "results": { "type": "string" },
+            "evidence": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "status": {
+              "type": "string",
+              "enum": ["available", "blocked", "no_matches"]
+            }
+          }
+        },
+        "repo": {
+          "type": "object",
+          "required": [
+            "query",
+            "date",
+            "repos",
+            "results",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "query": { "type": "string" },
+            "date": { "type": "string", "format": "date-time" },
+            "repos": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "results": { "type": "string" },
+            "evidence": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "status": {
+              "type": "string",
+              "enum": ["available", "no_matches", "search_blocked"]
+            }
+          }
+        },
+        "user_context": {
+          "type": "object",
+          "required": ["input", "date", "results", "evidence"],
+          "properties": {
+            "input": { "type": "string" },
+            "date": { "type": "string", "format": "date-time" },
+            "results": { "type": "string" },
+            "evidence": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "web": {
+          "type": "object",
+          "required": [
+            "query",
+            "date",
+            "sources",
+            "results",
+            "evidence",
+            "status"
+          ],
+          "properties": {
+            "query": { "type": "string" },
+            "date": { "type": "string", "format": "date-time" },
+            "sources": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "results": { "type": "string" },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["url", "description"],
+                "properties": {
+                  "url": { "type": "string", "format": "uri" },
+                  "description": { "type": "string" }
+                }
+              }
+            },
+            "status": {
+              "type": "string",
+              "enum": ["available", "blocked_by_user", "search_failed"]
+            }
+          }
+        }
+      }
+    },
+    "options": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "category",
+          "feasibility",
+          "effort",
+          "risk",
+          "stack_fit",
+          "evidence_links",
+          "confidence"
+        ],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "category": {
+            "type": "string",
+            "enum": ["build", "buy", "hybrid"]
+          },
+          "feasibility": {
+            "type": "string",
+            "enum": ["feasible", "infeasible", "unknown"]
+          },
+          "effort": {
+            "type": "string",
+            "enum": ["S", "M", "L"]
+          },
+          "risk": {
+            "type": "string",
+            "enum": ["Low", "Med", "Medium", "High"]
+          },
+          "stack_fit": { "type": "string" },
+          "evidence_links": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "confidence": {
+            "type": "string",
+            "enum": ["high", "medium", "low"]
+          },
+          "constraints_met": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "known_gaps": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "coverage_gates": {
+      "type": "object",
+      "required": ["status", "gates"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["all_pass", "warnings", "blocked"]
+        },
+        "gates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["gate_id", "condition", "result", "action"],
+            "properties": {
+              "gate_id": { "type": "integer", "minimum": 1, "maximum": 8 },
+              "condition": { "type": "string" },
+              "result": {
+                "type": "string",
+                "enum": ["pass", "fail"]
+              },
+              "action": {
+                "type": "string",
+                "enum": ["none", "rank_with_warning", "stop_and_prompt"]
+              },
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "ranking": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "rank",
+          "option_id",
+          "rationale",
+          "implementation_path",
+          "time_estimate",
+          "cost_estimate"
+        ],
+        "properties": {
+          "rank": { "type": "integer", "minimum": 1 },
+          "option_id": { "type": "string" },
+          "rationale": { "type": "string" },
+          "implementation_path": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "time_estimate": { "type": "string" },
+          "cost_estimate": { "type": "string" }
+        }
+      }
+    },
+    "discovery_confirmation": {
+      "type": "object",
+      "required": ["user_approved", "timestamp", "user_choice"],
+      "properties": {
+        "user_approved": { "type": "boolean" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "user_choice": {
+          "type": "string",
+          "enum": ["YES", "NO", "RE-RUN"]
+        }
+      }
+    },
+    "gaps_and_assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["assumption", "impact", "next_step"],
+        "properties": {
+          "assumption": { "type": "string" },
+          "impact": {
+            "type": "string",
+            "enum": ["HIGH", "MEDIUM", "LOW"]
+          },
+          "next_step": { "type": "string" }
+        }
+      }
+    }
+  }
+}

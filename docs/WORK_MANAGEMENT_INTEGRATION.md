@@ -881,6 +881,173 @@ graph LR
     style c4 fill:#ffccbc,stroke:#d84315,stroke-width:2px
 ```
 
+## Continuous Feedback Loop Integration
+
+The work management skill suite integrates with PAX's [Continuous Feedback Loop](architecture/continuous-feedback-loop.md) to enable learning and skill evolution based on observed development patterns.
+
+### Integration Points
+
+#### 1. Work Item Finalization
+
+When [[finalize-work-item]] completes a work item:
+
+1. **Pattern Capture**: [[capture-events]] analyzes episodes from work item's timeframe
+2. **Pattern Detection**: Identifies repeated manual steps, common errors, or workflow gaps
+3. **Recommendation Generation**: [[creating-skill]] proposes skill enhancements or new skills
+4. **Human Review**: Developer reviews proposals in `.vscode/pax-memory/proposals/`
+
+**Example**:
+
+```text
+User completes work-item-007 (AST Renderer implementation)
+
+Feedback Loop detects:
+- 5 episodes of sequential read_file on backlog/*.md
+- Pattern: Batch work item reads without dedicated skill support
+
+creating-skill recommends:
+- Enhance update-work-item with --batch and --csv-input flags
+- Confidence: 0.85 (High - clear pattern with 5 occurrences)
+
+User approves → skill-creator implements enhancement
+```
+
+#### 2. PR Feedback Cycle
+
+When [[handle-pr-feedback]] processes review comments:
+
+1. **Comment Pattern Capture**: [[capture-events]] records comment types and resolutions
+2. **Institutional Knowledge Building**: Repeated feedback types suggest missing automation
+3. **Skill Enhancement Proposals**: [[creating-skill]] recommends skills to prevent similar feedback
+
+**Example**:
+
+```text
+PR review feedback (3 PRs):
+- "Frontmatter schema validation failed"
+- "Missing required field: actual_hours"
+- "ISO 8601 date format incorrect"
+
+Feedback Loop detects:
+- Pattern: Frontmatter validation errors repeated across PRs
+
+creating-skill recommends:
+- Create validate-work-item-frontmatter skill
+- Auto-invoke before create-pr to catch errors early
+- Confidence: 0.78 (Medium-High - 3 occurrences, reusable pattern)
+```
+
+#### 3. Skill Creation Decision Point
+
+When developer has an idea for workflow automation:
+
+1. **Invoke [[creating-skill]]** with use case description
+2. **Memory Search**: Query patterns and existing skills for overlap
+3. **Recommendation**: Enhance existing, create new (PAX or project), update aspect, or AGENTS.md
+4. **Delegation**: If approved, [[skill-creator]] handles implementation
+
+**Example**:
+
+```text
+Developer: "I need a skill to sync work items with Linear issues"
+
+creating-skill analyzes:
+- Memory: No existing pattern (new integration)
+- Existing skills: No overlap with Linear API
+- Scope: Project-specific (single organization uses Linear)
+
+Recommendation: Create project-local skill
+- Location: {workspace}/.agents/skills/sync-linear-issues/
+- Confidence: 0.7 (Medium - new pattern, but clear scope)
+- Rationale: Linear integration is not reusable across all PAX users
+```
+
+### Feedback Loop Workflow Diagram
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                  WORK MANAGEMENT + FEEDBACK LOOP                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Create → Implement → Test → Review → Merge → Finalize          │
+│                │         │        │              │              │
+│                ▼         ▼        ▼              ▼              │
+│           [Capture]  [Capture] [Capture]    [Capture]           │
+│                │         │        │              │              │
+│                └─────────┴────────┴──────────────┘              │
+│                              │                                   │
+│                              ▼                                   │
+│                       [Memory + Patterns]                        │
+│                              │                                   │
+│                              ▼                                   │
+│                      [Pattern Detection]                         │
+│                              │                                   │
+│                              ▼                                   │
+│                      [creating-skill] ──▶ Recommendations        │
+│                              │                                   │
+│                              ▼                                   │
+│                       [Human Review]                             │
+│                          │       │                               │
+│                    Approve   Reject                              │
+│                        │       │                                 │
+│                        ▼       └─▶ Archive                       │
+│                 [skill-creator]                                  │
+│                        │                                         │
+│                        ▼                                         │
+│                Enhanced/New Skill                                │
+│                        │                                         │
+│                        └──▶ Next Iteration Improves              │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Automatic Proposal Triggers
+
+| Trigger                          | Pattern Threshold | Action                            |
+| -------------------------------- | ----------------- | --------------------------------- |
+| Sequential tool invocations      | 3+ occurrences    | Propose batch mode enhancement    |
+| Repeated PR feedback type        | 3+ PRs            | Propose validation skill          |
+| Error-retry sequences            | 2+ occurrences    | Propose error handling skill      |
+| Manual multi-step workflow       | 5+ occurrences    | Propose orchestration skill       |
+| Project-specific API integration | 1+ occurrence     | Propose project-local skill       |
+| Cross-cutting behavior pattern   | 3+ skills         | Propose aspect creation           |
+
+### Configuration
+
+Enable continuous feedback loop for work management workflows:
+
+```json
+{
+  "pax.feedbackLoop.enabled": true,
+  "pax.feedbackLoop.provider": "universal",
+  "pax.feedbackLoop.workManagement.captureWorkItemEvents": true,
+  "pax.feedbackLoop.workManagement.capturePRFeedback": true,
+  "pax.feedbackLoop.workManagement.autoProposalThreshold": 3,
+  "pax.feedbackLoop.workManagement.interactionMode": "collaborative"
+}
+```
+
+### Benefits
+
+1. **Continuous Improvement**: Skills evolve based on actual usage patterns
+2. **Reduced Manual Work**: Repeated patterns become automated skills
+3. **Institutional Knowledge**: PR feedback patterns inform skill enhancements
+4. **Data-Driven Decisions**: Memory evidence supports enhance vs. create decisions
+5. **Assistant-Agnostic**: Works with GitHub Copilot, Codex, Cursor, or universal mode
+
+### Related Skills
+
+- [[capture-events]] - Event capture system (Capture Layer)
+- [[creating-skill]] - Skill recommendation generator (Recommendation Layer)
+- [[skill-creator]] - Skill implementation (Execution Layer)
+- [[skill-reviewer]] - Skill evaluation with rubric
+
+### Related Documentation
+
+- [Continuous Feedback Loop Architecture](architecture/continuous-feedback-loop.md)
+- [Creating Skill Documentation](../skills/workflow/creating-skill/SKILL.md)
+- [Capture Events Documentation](../skills/tools/capture-events/SKILL.md)
+
 ## Related Documentation
 
 - **Branch Management**: [[feature-branch-management/SKILL]]

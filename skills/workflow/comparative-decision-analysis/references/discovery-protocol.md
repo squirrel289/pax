@@ -1,5 +1,14 @@
 # Discovery Protocol
 
+> **DEPRECATED**: This discovery protocol is now superseded by the `discovering-alternatives` skill (see `../../discovering-alternatives/SKILL.md`), which provides:
+>
+> - Exhaustive 5-source discovery (pretrained, memory, repo, user context, web)
+> - Hard fail-fast gates and evidence requirements
+> - Structured logging with timestamps
+> - User confirmation before ranking
+>
+> **Use this legacy protocol only if `discovering-alternatives` is unavailable** or for lightweight discovery scenarios that don't require full rigor.
+
 Use this before scoring.
 
 ## Objective
