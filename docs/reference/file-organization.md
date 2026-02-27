@@ -4,7 +4,7 @@ This document defines the directory structure and file organization rules for th
 
 ## Directory Structure
 
-```
+```bash tree
 pax/
 ├── README.md                          # Repository overview
 ├── pax.code-workspace                 # VS Code workspace config
@@ -83,11 +83,13 @@ Skills are organized into **category subdirectories** based on their primary pur
 **Purpose**: Define how agents operate (interaction models, execution patterns)
 
 **Characteristics**:
+
 - Modify agent behavior globally
 - Typically noun names (modes/styles)
 - Often used as aspects for composition
 
 **Examples**:
+
 - `yolo.md` - Autonomous execution mode
 - `collaborative.md` - Interactive confirmation mode
 - `sequential-execution.md` - Ordered task execution
@@ -102,11 +104,13 @@ Skills are organized into **category subdirectories** based on their primary pur
 **Purpose**: Wrap external tools/CLIs with agent-friendly interfaces
 
 **Characteristics**:
+
 - Depend on external binaries (`git`, `gh`, `docker`, etc.)
 - Action-oriented names: `{tool}-{action}`
 - Focus on single-tool operations
 
 **Examples**:
+
 - `git-commit.md` - Git commit automation
 - `gh-pr-review.md` - GitHub PR review via CLI
 - `docker-build.md` (future)
@@ -121,12 +125,14 @@ Skills are organized into **category subdirectories** based on their primary pur
 **Purpose**: Orchestrate complex, multi-step processes
 
 **Characteristics**:
+
 - Compose multiple atomic operations
 - Often require other skills (`requires: [...]`)
 - Action-oriented names: `{verb}-{noun}[-context]`
 - May span multiple tools/systems
 
 **Examples**:
+
 - `create-pr.md` - PR creation workflow
 - `handle-pr-feedback.md` - PR feedback resolution
 - `merge-pr.md` - PR merge workflow
@@ -144,17 +150,20 @@ Skills are organized into **category subdirectories** based on their primary pur
 **Purpose**: Provide composable behaviors for skill augmentation
 
 **Characteristics**:
+
 - Prefixed with `aspect-` (see [[docs/conventions/NAMING_CONVENTIONS.md]])
 - Designed for composition (`git-commit+aspect-yolo`)
 - Define specific behavior transformations
 
 **Examples**:
+
 - `aspect-yolo.md` - Auto-execution behavior
 - `aspect-collaborative.md` - Interactive behavior
 
 **File Count**: 2 skills
 
 **Rules**:
+
 - Aspects **must** be prefixed with `aspect-`
 - Aspects **must** be located in `skills/aspects/`
 - Aspects should be reusable across multiple base skills
@@ -166,6 +175,7 @@ Skills are organized into **category subdirectories** based on their primary pur
 Each category directory **must** have a `README.md` file:
 
 **Purpose**:
+
 - Describe category intent and scope
 - List skills in the category
 - Provide usage examples
@@ -211,6 +221,7 @@ The `docs/` directory contains all documentation for PAX, organized into logical
 **Purpose**: Define rules, formats, and standards for skill authoring
 
 **Files**:
+
 - `NAMING_CONVENTIONS.md` - Naming rules for files, skills, aspects
 - `FRONTMATTER_SPECIFICATION.md` - YAML frontmatter schema
 - `FILE_ORGANIZATION.md` (this file) - Directory structure
@@ -224,6 +235,7 @@ The `docs/` directory contains all documentation for PAX, organized into logical
 **Purpose**: Comprehensive reference materials, indices, and lookups
 
 **Files**:
+
 - `TAG_TAXONOMY.md` - Standardized tags catalog
 - `SKILLS_INDEX.md` - Auto-generated skills index (all categories)
 - `API_REFERENCE.md` (future)
@@ -237,6 +249,7 @@ The `docs/` directory contains all documentation for PAX, organized into logical
 **Purpose**: Step-by-step instructions and learning materials
 
 **Files**:
+
 - `GETTING_STARTED.md` - Quickstart guide for new users
 - `SKILL_AUTHORING.md` - How to create new skills
 - `COMPOSITION_TUTORIAL.md` - Aspect composition guide
@@ -251,6 +264,7 @@ The `docs/` directory contains all documentation for PAX, organized into logical
 **Purpose**: System design, patterns, and architectural decisions
 
 **Files**:
+
 - `SKILL_COMPOSITION.md` - Composition patterns and mechanics
 - `ASPECTS.md` - Aspect system design
 - `DECISION_POINT_ENCODING.md` - Decision tree patterns
@@ -265,18 +279,20 @@ The `docs/` directory contains all documentation for PAX, organized into logical
 
 PAX documentation follows the [Diátaxis framework](https://diataxis.fr/):
 
-| Type | Purpose | Location | Style |
-|------|---------|----------|-------|
-| **Tutorials** | Learning-oriented | `docs/guides/` | Step-by-step, hands-on |
-| **How-To Guides** | Task-oriented | `docs/guides/` | Problem-solving recipes |
-| **Reference** | Information-oriented | `docs/reference/` | Dry, precise, complete |
-| **Explanation** | Understanding-oriented | `docs/architecture/` | Concepts, rationale, theory |
+| Type              | Purpose                | Location             | Style                       |
+| ----------------- | ---------------------- | -------------------- | --------------------------- |
+| **Tutorials**     | Learning-oriented      | `docs/guides/`       | Step-by-step, hands-on      |
+| **How-To Guides** | Task-oriented          | `docs/guides/`       | Problem-solving recipes     |
+| **Reference**     | Information-oriented   | `docs/reference/`    | Dry, precise, complete      |
+| **Explanation**   | Understanding-oriented | `docs/architecture/` | Concepts, rationale, theory |
 
 **Linking**:
+
 - Use wikilinks for internal references: `[[NAMING_CONVENTIONS.md]]`
 - Use relative Markdown links for external references: `[GitHub](https://github.com)`
 
 **Frontmatter**:
+
 - All documentation files **must** have frontmatter (Phase 3)
 - Use `doc-vader` schemas for validation (Phase 3)
 
@@ -289,6 +305,7 @@ PAX documentation follows the [Diátaxis framework](https://diataxis.fr/):
 The `schemas/` directory contains JSON Schema definitions for validation:
 
 **Files**:
+
 - `skill-frontmatter.schema.json` - Validates skill YAML frontmatter
 - `work-item-frontmatter.schema.json` - Validates work item frontmatter
 - `README.md` - Schema usage documentation
@@ -314,6 +331,7 @@ The `schemas/` directory contains JSON Schema definitions for validation:
 The `templates/` directory contains Temple templates for code generation:
 
 **Files**:
+
 - `skill-definition.md.tmpl` - Skill file template
 - `work-item.md.tmpl` - Work item template
 - `README.md` - Template usage documentation
@@ -338,6 +356,7 @@ temple render --template templates/skill-definition.md.tmpl \
 The `scripts/` directory contains automation scripts for validation, generation, and maintenance:
 
 **Files**:
+
 - `validate-naming.sh` - Check filename conventions
 - `validate-frontmatter.sh` - Validate YAML frontmatter against schema
 - `generate-index.sh` - Generate SKILLS_INDEX.md
@@ -359,11 +378,13 @@ The `backlog/` directory contains work items for feature development, improvemen
 **Format**: `{issue-id}-{slug}.md`
 
 **Examples**:
+
 - `001-frontmatter-schema-validation.md`
 - `042-add-docker-build-skill.md`
 - `099-refactor-pr-workflows.md`
 
 **Rules**:
+
 - Zero-padded issue IDs (3 digits)
 - Kebab-case slugs (see [[docs/conventions/NAMING_CONVENTIONS.md]])
 - `.md` extension
@@ -421,13 +442,16 @@ The `.github/` directory contains GitHub-specific configuration and automation.
 **Each skill must be in its own Markdown file**: No combining multiple skills in one file.
 
 ❌ **Bad**:
-```
+
+```markdown
 skills/tools/git-tools.md
-  - Contains: git-commit, git-push, git-pull
+
+- Contains: git-commit, git-push, git-pull
 ```
 
 ✅ **Good**:
-```
+
+```markdown
 skills/tools/git-commit.md
 skills/tools/git-push.md
 skills/tools/git-pull.md
@@ -442,20 +466,26 @@ skills/tools/git-pull.md
 **Skill category is determined by directory location**, not frontmatter.
 
 ❌ **Bad**:
+
 ```yaml
 # File: skills/workflow/git-commit.md
 ---
 name: git-commit
-category: tools  # ❌ Conflicts with directory
+category: tools # ❌ Conflicts with directory
 ---
 ```
 
 ✅ **Good**:
-```
+
+```markdown
 # File: skills/tools/git-commit.md
+
 ---
+
 name: git-commit
+
 # Category inferred from directory: tools
+
 ---
 ```
 
@@ -468,13 +498,15 @@ name: git-commit
 **All aspect skills must be in `skills/aspects/` and prefixed with `aspect-`**.
 
 ❌ **Bad**:
-```
-skills/execution/yolo.md  # Should be aspect
-skills/aspects/yolo.md     # Missing prefix
+
+```markdown
+skills/execution/yolo.md # Should be aspect
+skills/aspects/yolo.md # Missing prefix
 ```
 
 ✅ **Good**:
-```
+
+```markdown
 skills/aspects/aspect-yolo.md
 ```
 
@@ -487,13 +519,15 @@ skills/aspects/aspect-yolo.md
 **Skills directories are flat (one level deep): no subcategories**.
 
 ❌ **Bad**:
-```
+
+```markdown
 skills/tools/git/commit.md
 skills/tools/git/push.md
 ```
 
 ✅ **Good**:
-```
+
+```markdown
 skills/tools/git-commit.md
 skills/tools/git-push.md
 ```
@@ -509,7 +543,8 @@ skills/tools/git-push.md
 **Every category directory must have a `README.md`**.
 
 ❌ **Bad**:
-```
+
+```bash tree
 skills/tools/
   git-commit.md
   gh-pr-review.md
@@ -517,7 +552,8 @@ skills/tools/
 ```
 
 ✅ **Good**:
-```
+
+```bash tree
 skills/tools/
   README.md          # ✅ Present
   git-commit.md
@@ -543,6 +579,7 @@ When referencing files from **outside the repository**, use absolute paths:
 When referencing files **within the repository**, use relative paths:
 
 From `skills/tools/git-commit.md`:
+
 ```markdown
 See also: [PR Workflow](../workflow/create-pr.md)
 ```
@@ -575,6 +612,7 @@ See [[docs/conventions/NAMING_CONVENTIONS.md]] for naming rules.
    - Prefix `aspect-` for aspects
 
 3. **Create skill file**:
+
    ```bash
    touch skills/{category}/{skill-name}.md
    ```
@@ -588,12 +626,14 @@ See [[docs/conventions/NAMING_CONVENTIONS.md]] for naming rules.
 6. **Update category README**: Add skill to category list
 
 7. **Validate**:
+
    ```bash
    ./scripts/validate-naming.sh skills/{category}/{skill-name}.md
    ./scripts/validate-frontmatter.sh skills/{category}/{skill-name}.md
    ```
 
 8. **Regenerate index**:
+
    ```bash
    ./scripts/generate-index.sh
    ```
@@ -615,23 +655,25 @@ See [[docs/conventions/NAMING_CONVENTIONS.md]] for naming rules.
    - Justify need and describe scope
 
 2. **Create directory**:
+
    ```bash
    mkdir skills/{category-name}
    ```
 
 3. **Add README**:
+
    ```bash
    cat > skills/{category-name}/README.md <<EOF
    # {Category Name} Skills
-   
+
    {Purpose and scope}
-   
+
    ## Skills in This Category
-   
+
    _(None yet)_
-   
+
    ## See Also
-   
+
    - [[skills/README.md]]
    EOF
    ```
@@ -649,17 +691,19 @@ See [[docs/conventions/NAMING_CONVENTIONS.md]] for naming rules.
 The following directory structures are **deprecated** and should not be used:
 
 ❌ **Deprecated**:
-```
-.github/skills/         # Old Copilot Skills integration location
-pax/skills_old/         # Pre-refactor structure
-docs/old/               # Unorganized documentation
+
+```markdown
+.github/skills/ # Old Copilot Skills integration location
+pax/skills_old/ # Pre-refactor structure
+docs/old/ # Unorganized documentation
 ```
 
 ✅ **Current**:
-```
-skills/                 # All skills here
-docs/                   # All documentation here
-.github/skills/         # Symlink or copy from skills/
+
+```markdown
+skills/ # All skills here
+docs/ # All documentation here
+.github/skills/ # Symlink or copy from skills/
 ```
 
 ---

@@ -210,6 +210,280 @@ nx affected -t test --parallel=3
 nx affected -t lint --parallel=3
 ```
 
+### Decision & Discovery
+
+#### discovering-alternatives
+
+**Purpose**: Exhaustive discovery of build, buy, and hybrid options for a stated problem with evidence-backed decision matrix output.
+
+**When to Use**:
+
+- Early in solution selection to map the landscape
+- Build vs buy vs hybrid assessments
+- Creating a vendor shortlist with documented evidence
+
+**Integration Point**: Upstream of comparative decision workflows and final selection.
+
+**Example Usage**:
+
+```bash
+# Agent command
+@agent discover alternatives for a templating linter (build vs buy vs hybrid) and provide a decision matrix
+```
+
+**Location**: [skills/workflow/discovering-alternatives/SKILL.md](workflow/discovering-alternatives/SKILL.md)
+
+### Safety & Guardrails
+
+> **Architecture Decision**: See [ADR-002: Centralize Safety Guardrails at Merge Bottleneck](../docs/adr/ADR-002-Centralize-Guardrails-at-Merge-Bottleneck.md) for design rationale.
+
+Three guardrails skills enforce safety at critical merge points to prevent regressions.
+
+#### guarding-branches
+
+**Purpose**: Protect main branch during merge operations through conflict detection and safety checks.
+
+**When to Use**:
+
+- Before merging PRs to main
+- Verifying branch mergeability
+- Detecting unintended file deletions
+- Scanning for type/export conflicts
+
+**Integration Point**: `merge-pr` Phase 2 (Pre-Merge Verification)
+
+**Key Checks**:
+
+- Merge conflict detection (`git merge --no-commit --no-ff`)
+- Type/export conflict scanning (`grep -r type` patterns)
+- Unintended file deletion detection (`git diff --name-status`)
+- Branch protection rule validation
+
+**Location**: [`skills/aspects/guarding-branches/SKILL.md`](aspects/guarding-branches/SKILL.md)
+
+#### validating-changes
+
+**Purpose**: Ensure code quality before PR submission through local test runs.
+
+**When to Use**:
+
+- Before creating a PR
+- Before requesting review
+- During Test Parity Gate enforcement
+- Verifying no regressions introduced
+
+**Integration Point**: `merge-pr` Phase 1 (Test Parity Gate)
+
+**Key Checks**:
+
+- Affected tests pass locally (`pnpm test:affected:ci`)
+- No regression runs (test before/after comparison)
+- Coverage meets targets
+- Integration tests pass in local environment
+
+**Location**: [`skills/workflow/validating-changes/SKILL.md`](workflow/validating-changes/SKILL.md)
+
+#### workspace-isolation
+
+**Purpose**: Enable parallel work item execution with git worktrees for complete workspace separation.
+
+**When to Use**:
+
+- Executing multiple work items in parallel
+- Need isolated working directories per WI
+- Want ~3× speedup for N independent WIs
+- Coordinating subagent code implementation
+
+**Integration Point**: `executing-backlog` Phase 1, `update-work-item` Section 1
+
+**Key Features**:
+
+- Worktree creation for each active WI
+- Isolated working directories, shared git database
+- Subagent code-only implementation (subagent split rule)
+- Main agent serialized PR operations during fan-in
+
+**Location**: [`skills/execution/workspace-isolation/SKILL.md`](execution/workspace-isolation/SKILL.md)
+
+**Example Usage**:
+
+```bash
+# Agent command
+@agent execute 3 work items in parallel using workspace isolation
+
+# Triggers workspace-isolation skill:
+# 1. Create worktrees (WI-007, WI-008, WI-009)
+# 2. Spawn N subagents (code implementation only)
+# 3. Fan-in: Main agent merges serially via merge-pr
+# Result: ~3× faster than sequential execution
+```
+
+#### Guardrail Activation Flow
+
+```plaintext
+User via executing-backlog or direct merge-pr call
+│
+├─ Developer finishes implementation
+│  └─ Push branch + create PR
+│
+├─ Reviews/approvals complete
+│  └─ Ready to merge
+│
+└─ Call merge-pr (enforces all guardrails)
+   ├─ PHASE 1: Test Parity Gate (validating-changes)
+   │  ├─ Run pnpm test:affected:ci
+   │  ├─ Verify no unintended deletions
+   │  └─ FAIL if tests don't pass → Stop, don't merge
+   │
+   ├─ PHASE 2: Pre-Merge Verification (guarding-branches)
+   │  ├─ Verify GitHub PR checks pass
+   │  ├─ Verify approvals received
+   │  ├─ Check merge conflicts
+   │  └─ FAIL if constraints violated → Stop
+   │
+   ├─ PHASE 4: Execute Merge
+   │  └─ Merge to main (squash/rebase/merge)
+   │
+   └─ PHASE 5: Finalization
+      └─ Report results, cleanup branches
+```
+
+**Result**: Guardrails enforced at **merge bottleneck**. Any code path calling `merge-pr` (directly or via workflow) must pass Test Parity Gate + guarding-branches checks.
+
+#### Usage Patterns
+
+##### Pattern 1: executing-backlog Workflow
+
+```plaintext
+Phase 1: Planning
+Phase 2: Branching & Implementation
+Phase 3: PR & Review (validation delegated to merge-pr)
+Phase 4: Merge (calls merge-pr)
+        └─ merge-pr enforces Test Parity Gate + guarding-branches
+```
+
+##### Pattern 2: Direct merge-pr Usage
+
+```bash
+# Script or automation calls merge-pr directly
+merge_pr pr-number=123 repo=owner/repo
+# Automatically enforces Test Parity Gate + guarding-branches
+```
+
+##### Pattern 3: Parallel Work Items
+
+```plaintext
+1. Setup: Create worktrees for each WI (workspace-isolation)
+2. Execution: Spawn N subagents in parallel (code-only)
+3. Fan-in: Main agent calls merge-pr serially for each WI
+   └─ Each merge enforces guardrails
+```
+
+#### Testing & Validation Status
+
+All guardrails are **production-ready**:
+
+- ✅ `merge-pr` Phase 1 enforcement: Prevents broken code merges
+- ✅ `guarding-branches` aspect: Tested in temple-linter, vscode-temple-linter workflows
+- ✅ `validating-changes` aspect: Tested against CI/test patterns
+- ✅ `workspace-isolation` skill: Reference implementation with realistic examples
+
+**Replaces**: `process-pr` skill (deprecated)  
+**Extends**: `feature-branch-management` (branch creation/sync)  
+**Complements**: `finalize-work-item` (WI archival)
+
+### Aspect Skills
+
+Aspect skills provide reusable behavioral patterns that can be composed into workflow and tool skills.
+
+See [skills/aspects/README.md](aspects/README.md) for complete documentation of all aspect skills, including:
+
+- `interaction-modes`: Standardize yolo and collaborative execution patterns
+- `guarding-branches`: Protect main branch during merges
+- `prevalidating-bulk-operations`: Route bulk operations to systematic validation
+- `organizing-documents-diataxis`: Apply Diataxis framework to output placement
+
+### Continuous Improvement
+
+Skills that enable learning from development patterns and evolving the skills library based on observed usage.
+
+#### capture-events
+
+**Purpose**: Capture workspace events (file modifications, terminal commands, diagnostics, skill invocations) into local memory for pattern detection and continuous feedback loop.
+
+**When to Use**:
+
+- Running continuously in background during development
+- Building episodic memory for pattern analysis
+- Supporting assistant-agnostic feedback loops (Copilot, Codex, Cursor)
+- Enabling skill evolution based on usage patterns
+
+**Integration Point**: `.vscode/pax-memory/` (git-ignored local storage)
+
+**Example Usage**:
+
+```bash
+# Automatic (via workspace settings)
+{
+  "pax.feedbackLoop.enabled": true,
+  "pax.feedbackLoop.provider": "universal"
+}
+
+# Manual control
+capture-events --start --provider universal
+capture-events --stop
+capture-events --status
+```
+
+**Supports**:
+
+- Universal provider (workspace-only, no assistant required)
+- GitHub Copilot provider (extension integration)
+- Codex provider (API-based)
+- Cursor provider (extension integration)
+
+#### creating-skill
+
+**Purpose**: Evaluate a specific use case or skill idea against memory patterns and existing skills, then provide actionable recommendations. Delegates actual skill creation to skill-creator.
+
+**When to Use**:
+
+- Developer has an idea for a new skill
+- Repeated pattern detected by continuous feedback loop
+- Deciding between enhancing existing skill vs. creating new one
+- Determining if pattern should become PAX skill, project skill, aspect, or AGENTS.md update
+
+**Integration Point**: Continuous Feedback Loop (Recommendation Layer)
+
+**Example Usage**:
+
+```bash
+# Agent command
+@agent I need a skill for batch updating work items from CSV
+
+# creating-skill analyzes:
+# 1. Searches memory for similar patterns
+# 2. Compares against existing skills (e.g., update-work-item)
+# 3. Computes overlap and gaps
+# 4. Recommends: enhance existing (70% overlap found)
+# 5. Delegates to skill-creator if approved
+```
+
+**Recommendation Types**:
+
+- Enhance existing PAX skill (high overlap)
+- Create new PAX skill (reusable across projects)
+- Create project-local skill (project-specific use case)
+- Create or update aspect (cross-cutting concern)
+- Update AGENTS.md (routing/orchestration change)
+
+**Related**:
+
+- Uses [[capture-events]] memory data
+- Uses [[skill-reviewer]] rubric patterns
+- Delegates to [[skill-creator]] for execution
+- Part of [Continuous Feedback Loop](../docs/architecture/continuous-feedback-loop.md)
+
 ### Documentation
 
 #### architecture-decision-records

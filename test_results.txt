@@ -1,0 +1,113 @@
+test_capture_error (skills.tools.capture_events.tests.test_event_capture.TestDiagnosticCollector.test_capture_error)
+Test capturing error diagnostic. ... ok
+test_capture_info (skills.tools.capture_events.tests.test_event_capture.TestDiagnosticCollector.test_capture_info)
+Test capturing info diagnostic. ... ok
+test_capture_warning (skills.tools.capture_events.tests.test_event_capture.TestDiagnosticCollector.test_capture_warning)
+Test capturing warning diagnostic. ... ok
+test_create_valid_event (skills.tools.capture_events.tests.test_event_capture.TestEvent.test_create_valid_event)
+Test creating valid event. ... ok
+test_event_equality (skills.tools.capture_events.tests.test_event_capture.TestEvent.test_event_equality)
+Test event equality. ... ok
+test_event_from_dict (skills.tools.capture_events.tests.test_event_capture.TestEvent.test_event_from_dict)
+Test creating event from dict. ... ok
+test_event_from_json (skills.tools.capture_events.tests.test_event_capture.TestEvent.test_event_from_json)
+Test creating event from JSON. ... ok
+test_event_to_dict (skills.tools.capture_events.tests.test_event_capture.TestEvent.test_event_to_dict)
+Test event to dict conversion. ... ok
+test_event_to_json (skills.tools.capture_events.tests.test_event_capture.TestEvent.test_event_to_json)
+Test event to JSON conversion. ... ok
+test_event_validation (skills.tools.capture_events.tests.test_event_capture.TestEvent.test_event_validation)
+Test event validation. ... ok
+test_event_with_explicit_timestamp (skills.tools.capture_events.tests.test_event_capture.TestEvent.test_event_with_explicit_timestamp)
+Test event with explicit timestamp. ... ok
+test_invalid_event_type (skills.tools.capture_events.tests.test_event_capture.TestEvent.test_invalid_event_type)
+Test creating event with invalid type. ... ok
+test_invalid_metadata (skills.tools.capture_events.tests.test_event_capture.TestEvent.test_invalid_metadata)
+Test creating event with invalid metadata. ... ok
+test_invalid_provider (skills.tools.capture_events.tests.test_event_capture.TestEvent.test_invalid_provider)
+Test creating event with invalid provider. ... ok
+test_diagnostic_events (skills.tools.capture_events.tests.test_event_capture.TestEventType.test_diagnostic_events)
+Test diagnostic event types. ... ok
+test_file_events (skills.tools.capture_events.tests.test_event_capture.TestEventType.test_file_events)
+Test file event types. ... ok
+test_skill_events (skills.tools.capture_events.tests.test_event_capture.TestEventType.test_skill_events)
+Test skill event types. ... ok
+test_terminal_events (skills.tools.capture_events.tests.test_event_capture.TestEventType.test_terminal_events)
+Test terminal event types. ... ok
+test_validate_invalid_json_line (skills.tools.capture_events.tests.test_event_capture.TestEventValidator.test_validate_invalid_json_line)
+Test validating invalid JSON line. ... ok
+test_validate_invalid_provider (skills.tools.capture_events.tests.test_event_capture.TestEventValidator.test_validate_invalid_provider)
+Test validating event with invalid provider. ... ok
+test_validate_json_line (skills.tools.capture_events.tests.test_event_capture.TestEventValidator.test_validate_json_line)
+Test validating JSON line. ... ok
+test_validate_valid_event (skills.tools.capture_events.tests.test_event_capture.TestEventValidator.test_validate_valid_event)
+Test validating valid event. ... ok
+test_capture_create_event (skills.tools.capture_events.tests.test_event_capture.TestFileWatcher.test_capture_create_event)
+Test capturing file create event. ... ok
+test_capture_delete_event (skills.tools.capture_events.tests.test_event_capture.TestFileWatcher.test_capture_delete_event)
+Test capturing file delete event. ... ok
+test_capture_modify_event (skills.tools.capture_events.tests.test_event_capture.TestFileWatcher.test_capture_modify_event)
+Test capturing file modify event. ... ok
+test_invalid_event_type (skills.tools.capture_events.tests.test_event_capture.TestFileWatcher.test_invalid_event_type)
+Test invalid event type. ... ok
+test_capture_invocation (skills.tools.capture_events.tests.test_event_capture.TestSkillTracker.test_capture_invocation)
+Test capturing skill invocation. ... ok
+test_capture_with_details (skills.tools.capture_events.tests.test_event_capture.TestSkillTracker.test_capture_with_details)
+Test capturing with details. ... ok
+test_capture_execution (skills.tools.capture_events.tests.test_event_capture.TestTerminalListener.test_capture_execution)
+Test capturing terminal execution. ... ok
+test_output_truncation (skills.tools.capture_events.tests.test_event_capture.TestTerminalListener.test_output_truncation)
+Test that large output is truncated. ... ok
+test_capture_diagnostic_event (skills.tools.capture_events.tests.test_event_capture.TestUniversalProvider.test_capture_diagnostic_event)
+Test capturing diagnostic event. ... ok
+test_capture_file_event (skills.tools.capture_events.tests.test_event_capture.TestUniversalProvider.test_capture_file_event)
+Test capturing file event. ... ok
+test_capture_skill_event (skills.tools.capture_events.tests.test_event_capture.TestUniversalProvider.test_capture_skill_event)
+Test capturing skill event. ... ok
+test_capture_terminal_event (skills.tools.capture_events.tests.test_event_capture.TestUniversalProvider.test_capture_terminal_event)
+Test capturing terminal event. ... ok
+test_append_multiple_events (skills.tools.capture_events.tests.test_storage.TestJSONLStorage.test_append_multiple_events)
+Test appending multiple events. ... ok
+test_append_single_event (skills.tools.capture_events.tests.test_storage.TestJSONLStorage.test_append_single_event)
+Test appending a single event. ... ok
+test_clear (skills.tools.capture_events.tests.test_storage.TestJSONLStorage.test_clear)
+Test clearing storage. ... ok
+test_concurrent_append (skills.tools.capture_events.tests.test_storage.TestJSONLStorage.test_concurrent_append)
+Test concurrent append operations. ... ok
+test_count (skills.tools.capture_events.tests.test_storage.TestJSONLStorage.test_count)
+Test counting events. ... ok
+test_count_empty (skills.tools.capture_events.tests.test_storage.TestJSONLStorage.test_count_empty)
+Test counting empty storage. ... ok
+test_jsonl_format (skills.tools.capture_events.tests.test_storage.TestJSONLStorage.test_jsonl_format)
+Test that storage uses proper JSONL format. ... ok
+test_read_all (skills.tools.capture_events.tests.test_storage.TestJSONLStorage.test_read_all)
+Test reading all events. ... ok
+test_read_by_provider (skills.tools.capture_events.tests.test_storage.TestJSONLStorage.test_read_by_provider)
+Test reading events by provider. ... ok
+test_read_by_type (skills.tools.capture_events.tests.test_storage.TestJSONLStorage.test_read_by_type)
+Test reading events by type. ... ok
+test_read_from_empty_storage (skills.tools.capture_events.tests.test_storage.TestJSONLStorage.test_read_from_empty_storage)
+Test reading from empty storage. ... ok
+test_read_since (skills.tools.capture_events.tests.test_storage.TestJSONLStorage.test_read_since)
+Test reading events since timestamp. ... ok
+test_cleanup_all_old_events (skills.tools.capture_events.tests.test_storage.TestTTLCleaner.test_cleanup_all_old_events)
+Test cleanup when all events are old. ... ok
+test_cleanup_dry_run (skills.tools.capture_events.tests.test_storage.TestTTLCleaner.test_cleanup_dry_run)
+Test cleanup dry-run mode. ... ok
+test_cleanup_empty_storage (skills.tools.capture_events.tests.test_storage.TestTTLCleaner.test_cleanup_empty_storage)
+Test cleanup on empty storage. ... ok
+test_cleanup_preserves_recent_events (skills.tools.capture_events.tests.test_storage.TestTTLCleaner.test_cleanup_preserves_recent_events)
+Test that cleanup preserves recent events. ... ok
+test_cleanup_removes_old_events (skills.tools.capture_events.tests.test_storage.TestTTLCleaner.test_cleanup_removes_old_events)
+Test that cleanup removes old events. ... ok
+test_cleanup_with_corrupted_lines (skills.tools.capture_events.tests.test_storage.TestTTLCleaner.test_cleanup_with_corrupted_lines)
+Test cleanup with some corrupted event lines. ... ok
+test_custom_ttl_days (skills.tools.capture_events.tests.test_storage.TestTTLCleaner.test_custom_ttl_days)
+Test cleaner with custom TTL days. ... ok
+test_should_cleanup (skills.tools.capture_events.tests.test_storage.TestTTLCleaner.test_should_cleanup)
+Test should_cleanup check. ... ok
+
+----------------------------------------------------------------------
+Ran 54 tests in 0.011s
+
+OK

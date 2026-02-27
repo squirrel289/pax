@@ -162,3 +162,5 @@ Minimum required fields:
 - Mark missing evidence explicitly as gaps.
 - Keep recommendation rationale tied to score deltas.
 - Preserve deterministic ranking and tie-break rules.
+- Apply an agentic-eval loop (Generate → Evaluate → Critique → Refine), max 3 iterations.
+- Use structured JSON for critique output and stop if no improvement between iterations.

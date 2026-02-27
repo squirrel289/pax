@@ -79,6 +79,26 @@ Quick reference index of all available skills.
 "Get unresolved comments on PR #42 using gh-pr-review"
 ```
 
+### [capture-events](../skills/tools/capture-events/SKILL.md)
+
+**Category**: Tools  
+**Purpose**: Capture workspace events for continuous feedback loop and pattern detection.  
+**Key Use**: Build episodic memory for skill evolution and recommendations.  
+**Composes**: N/A (atomic skill, but feeds [[creating-skill]])
+
+**Supports**:
+
+- Universal provider (workspace-only, no assistant required)
+- GitHub Copilot provider (extension integration)
+- Codex provider (API-based)
+- Cursor provider (extension integration)
+
+**Example**:
+
+```plaintext
+"Enable continuous event capture for skill evolution"
+```
+
 ---
 
 ## Interaction Modes
@@ -169,6 +189,25 @@ Interaction modes are implemented as an aspect rather than standalone skills. Sk
 ```plaintext
 "Process PR #42 end-to-end"
 ```
+
+### [creating-skill](../skills/workflow/creating-skill/SKILL.md)
+
+**Category**: Workflow  
+**Purpose**: Evaluate skill ideas against memory patterns and provide recommendations for enhancement or creation.  
+**Key Use**: Recommend whether to enhance existing skills, create new PAX skills, project-local skills, aspects, or update AGENTS.md.  
+**Composes**:
+
+- capture-events (memory data)
+- skill-reviewer (overlap analysis)
+- interaction-modes (yolo OR collaborative)
+
+**Example**:
+
+```plaintext
+"Should I create a new skill for batch updating work items?"
+```
+
+**Note**: Delegates actual creation to [[skill-creator]] per PAX conventions.
 
 ---
 

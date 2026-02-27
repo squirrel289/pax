@@ -75,7 +75,24 @@ This workflow composes:
 
 ## Workflow Steps
 
-### Phase 1: Pre-Merge Verification
+### Phase 1: Test Parity Gate (Mandatory)
+
+Before any PR verification, enforce the Test Parity Gate:
+
+1. **Run local CI tests** (validating-changes aspect)
+   - Execute `pnpm test:affected:ci` on the feature branch
+   - If tests fail: Stop and report failure (do not proceed to merge)
+   - If tests pass: Continue to Phase 2
+
+2. **Verify no unintended deletions** (guarding-branches aspect)
+   - Run `git diff origin/main...HEAD --name-status | grep '^D'`
+   - If deletions found: Verify they are intentional (check work item acceptance criteria)
+   - If deletions are unintended: Stop and report (do not merge)
+   - If deletions are intentional: Continue to Phase 2
+
+**Rationale**: This gate ensures that before any GitHub PR verification, the code has been validated locally and matches the work item scope. Prevents merging code that fails CI locally (which should have been caught in prior phases).
+
+### Phase 2: Pre-Merge Verification
 
 1. **Fetch PR details**
    - Get PR metadata
@@ -93,7 +110,7 @@ This workflow composes:
    - Check for merge conflicts
    - Verify branch is up to date
 
-4. **Verify CI checks**
+4. **Verify CI checks** (guarding-branches aspect)
    - List all status checks
    - Verify required checks pass
    - Check for failing checks
@@ -103,7 +120,7 @@ This workflow composes:
    - Verify no unresolved threads (or policy allows)
    - Check for blocking comments
 
-### Phase 2: Merge Decision
+### Phase 3: Merge Decision
 
 1. **Determine merge readiness**
 
@@ -119,7 +136,7 @@ This workflow composes:
    - Or infer from repo settings/history
    - Default to squash if uncertain
 
-### Phase 3: Execution
+### Phase 4: Execution
 
 1. **Execute merge** (if ready)
 
@@ -138,7 +155,7 @@ This workflow composes:
    - Check main branch updated
    - Prune remote tracking branches
 
-### Phase 4: Finalization
+### Phase 5: Finalization
 
 1. **Verify completion**
     - Confirm PR status is merged

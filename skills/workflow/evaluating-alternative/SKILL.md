@@ -81,6 +81,8 @@ Optional:
 - No ranking or final recommendation output.
 - All missing evidence stays explicit (`null` scores + gap notes).
 - Every score and summary claim should be traceable to evidence.
+- Apply a brief agentic-eval reflection on the evaluator summary (max 2 iterations) to verify evidence coverage.
+- Keep critique output structured (JSON) and do not emit separate analysis files.
 
 Apply `references/quality-gates.md` for pass/fail checks.
 

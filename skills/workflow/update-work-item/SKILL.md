@@ -122,7 +122,9 @@ Update if new dependencies emerge during implementation. **Critical**: Before cl
 
 When starting work (changing status from `proposed` or `ready` to `in-progress`):
 
-1. **Automatically create and checkout a local feature branch** via `feature-branch-management` skill:
+1. **If executing multiple work items in parallel**, use `parallel-execution` skill to ensure workspace isolation: one git worktree per WI with main agent handling all git/PR operations and subagents implementing code only.
+
+2. **Automatically create and checkout a local feature branch** via `feature-branch-management` skill:
 
    ```bash
    # Triggered automatically when status: in-progress
@@ -134,7 +136,12 @@ When starting work (changing status from `proposed` or `ready` to `in-progress`)
    - If the branch already exists, it is checked out
    - This ensures all work is isolated and traceable to the work item
 
-2. Update the work item file frontmatter:
+3. **Validate branch state** via `guarding-branches` aspect before first commit:
+   - Confirm you're on the correct feature branch
+   - Verify no untracked files or uncommitted changes from previous work
+   - Run `git clean -n` to preview cleanup if needed
+
+4. Update the work item file frontmatter:
 
    ```markdown
    ---
@@ -154,7 +161,7 @@ When starting work (changing status from `proposed` or `ready` to `in-progress`)
    ---
    ```
 
-3. Update `actual` as work progresses:
+5. Update `actual` as work progresses:
    ```yaml
    actual: 5 # Increment as work progresses, use decimals (e.g., 5.5 for 5h 30m)
    ```
@@ -189,7 +196,18 @@ Keep hashes in chronological order. Multiple commits are fine—they show the ev
 
 When implementation is done and ready for review, move to ready-for-review:
 
-1. **Sync branch with main** via `feature-branch-management`:
+1. **Validate all changes** via `validating-changes` skill:
+   - Run local CI tests: `pnpm test:affected:ci`
+   - If tests fail, add regression tests and fix code, then re-run until all pass
+   - Verify no unintended file deletions: `git diff origin/main...HEAD --name-status | grep '^D'` (should return nothing)
+   - Confirm only files related to this WI are modified
+
+2. **Validate branch state** via `guarding-branches` aspect:
+   - Verify no untracked files: `git status --porcelain | grep "^??"` (should return nothing)
+   - Confirm no uncommitted changes: `git status` (working tree clean)
+   - Verify branch contains only atomic, WI-scoped commits
+
+3. **Sync branch with main** via `feature-branch-management`:
 
    ```bash
    # Triggered automatically when status: ready-for-review
@@ -200,7 +218,7 @@ When implementation is done and ready for review, move to ready-for-review:
    - Ensures clean commit history for PR review
    - If conflicts detected, will prompt with suggested resolution steps
 
-2. **Create Pull Request** via `create-pr` skill (automatic):
+4. **Create Pull Request** via `create-pr` skill (automatic):
 
    ```bash
    # Triggered automatically when status: ready-for-review
@@ -212,7 +230,7 @@ When implementation is done and ready for review, move to ready-for-review:
    - PR links to work item via "Closes wi-060" reference
    - PR URL recorded in work item metadata
 
-3. **Update work item frontmatter**:
+5. **Update work item frontmatter**:
    ```yaml
    status: ready-for-review
    actual: 18 # Finalize effort
@@ -270,7 +288,12 @@ When all tests pass, work is approved, and PR is merged:
 
 1. **Verify dependencies closed**: Before moving to `closed`, check that all items in `links.depends_on` have `status: closed`
 
-2. **Update work item frontmatter**:
+2. **Validate branch safety** via `guarding-branches` aspect:
+   - Confirm PR is `MERGEABLE` and no branch protection rules are blocking merge
+   - If auto-merge is required by branch policy, enable it; otherwise approve and merge manually
+   - After merge, perform post-merge validation: run CI tests and verify no regressions
+
+3. **Update work item frontmatter**:
    ```yaml
    status: closed
    status_reason: success
