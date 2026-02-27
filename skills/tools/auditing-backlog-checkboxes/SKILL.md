@@ -1,6 +1,6 @@
 ---
 name: auditing-backlog-checkboxes
-description: "Audit backlog work items in `closed`, `completed`, or `ready-for-review` status that still contain unchecked checklist items (`[ ]`). Validate each unchecked item against code and test evidence, mark only fully validated items as `[x]`, and add a concrete resolution plan for every remaining unchecked item. Use when asked to audit completion evidence, clean up stale checklists, or prepare work items for closure/finalization."
+description: "Audit backlog work items in `closed`, `completed`, or `ready-for-review` status that still contain unchecked checklist items (`[ ]`). Validate each unchecked item against code and test evidence, mark only fully validated items as `[x]`, and produce an inline summary report of completed items plus actionable next steps for each remaining incomplete item. Use when asked to audit completion evidence, clean up stale checklists, or prepare work items for closure/finalization."
 metadata:
   type: document
   subtype: skill
@@ -79,33 +79,26 @@ If any of the above is missing, keep `[ ]`.
 
 For each validated checkbox, update `[ ]` to `[x]` in place.
 
-For each remaining unchecked checkbox, add or update a section named:
+For each remaining unchecked checkbox:
 
-```markdown
-### Resolution Plan for Remaining Unchecked Items
-```
-
-Use one numbered plan item per unchecked checkbox with this format:
-
-```markdown
-1. [ ] <original checkbox text>
-                - Missing evidence: <specific missing code/test/proof>
-                - Next action: <concrete implementation or validation step>
-                - Verification command: `<exact command>`
-                - Completion signal: <artifact proving it can be marked [x]>
-```
-
-Do not remove unresolved checkboxes. Keep them visible until completion evidence exists.
+- Keep `[ ]` unchanged in the work item file.
+- Do not add `resolution-plan` fields or append resolution-plan sections to work items.
+- Do not remove unresolved checkboxes. Keep them visible until completion evidence exists.
 
 ### 4) Final Consistency Pass
 
 After edits:
 
 1. Re-run `"$SKILL_DIR/scripts/find_target_checkboxes.sh"` and confirm remaining `[ ]` lines are intentional.
-2. Ensure every remaining `[ ]` has a matching plan item in the resolution section.
-3. Prepare a summary grouped by file:
+2. Prepare an inline summary report grouped by file with:
    - Count marked `[x]`
    - Count unresolved `[ ]`
+   - Completed items (checkbox text + evidence reference)
+   - Actionable next steps for each unresolved item:
+     - Missing evidence: `specific missing code/test/proof`
+     - Next action: `concrete implementation or validation step`
+     - Verification command: `<exact command>`
+     - Completion signal: `artifact proving it can be marked [x]`
    - Commands used for verification
 
 ## Non-Negotiable Rules
@@ -114,11 +107,12 @@ After edits:
 - Do not mark a checkbox complete if tests are absent, failing, or unrelated to the checkbox claim.
 - Do not change work item status fields unless explicitly requested.
 - Keep evidence references concrete (file path, test file, command, result).
+- Keep unresolved-item remediation guidance in the inline report only; do not insert it into work item files.
 
 ## Output Contract
 
 Return:
 
 1. Files updated with newly marked `[x]` checkboxes.
-2. A per-file resolution plan for remaining unchecked items.
+2. An inline per-file summary report listing completed items and actionable next steps for every remaining unchecked item.
 3. A concise audit summary with evidence references and verification commands.

@@ -9,7 +9,7 @@ A checkbox is eligible for `[x]` only if all gates pass.
 1. Claim clarity
 
 - Convert checkbox text into a single concrete claim.
-- If claim is ambiguous, keep `[ ]` and create a plan item to clarify wording.
+- If claim is ambiguous, keep `[ ]` and record an inline next step to clarify wording.
 
 1. Implementation evidence
 
@@ -47,7 +47,7 @@ Use concise, concrete references during review:
 - Command: `<exact command>`
 - Result: `pass` / `fail` with key output summary
 
-## Resolution Plan Requirements for Remaining `[ ]`
+## Inline Report Requirements for Remaining `[ ]`
 
 For each unresolved checkbox, provide:
 
@@ -67,7 +67,7 @@ For each unresolved checkbox, provide:
 
 - Observable result needed to allow `[x]`.
 
-## Example Plan Item
+## Example Unresolved Report Item
 
 ```markdown
 1. [ ] Add integration test for parser error recovery
