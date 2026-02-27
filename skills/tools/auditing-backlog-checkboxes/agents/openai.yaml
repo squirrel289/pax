@@ -1,4 +1,4 @@
 interface:
   display_name: "Auditing Backlog Checkboxes"
   short_description: "Validate unchecked backlog checklist items with code and tests"
-  default_prompt: "Use $auditing-backlog-checkboxes to audit closed/completed or ready-for-review backlog items, mark only evidence-backed checklist boxes as [x], and produce an inline summary report with actionable next steps for remaining [ ] items."
+  default_prompt: "Use $auditing-backlog-checkboxes to audit closed/completed or ready-for-review backlog items, mark only evidence-backed checklist boxes as [x], and output only a per-work-item summary status for Tasks and Acceptance Criteria plus the recommended workflow next steps."

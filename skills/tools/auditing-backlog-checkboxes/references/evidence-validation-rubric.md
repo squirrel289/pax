@@ -47,32 +47,38 @@ Use concise, concrete references during review:
 - Command: `<exact command>`
 - Result: `pass` / `fail` with key output summary
 
-## Inline Report Requirements for Remaining `[ ]`
+## Summary Status Reporting Requirements
 
-For each unresolved checkbox, provide:
+For each audited work item, report section-level counts only:
 
-1. Missing evidence
+1. Tasks
 
-- Specific gap: missing file, missing behavior, missing test, or failing command.
+- checked this turn / total checked
+- total unchecked / total checkboxes
 
-1. Next action
+1. Acceptance Criteria
 
-- Concrete development or validation step.
+- checked this turn / total checked
+- total unchecked / total checkboxes
 
-1. Verification command
+1. WARNINGS (if any):
 
-- Exact command to run when action completes.
+- Ambiguous checkbox text
+- Missing implementation evidence
+- Missing or failing test evidence
 
-1. Completion signal
+1. Recommended Next Steps
 
-- Observable result needed to allow `[x]`.
+- Generate next steps dynamically from observed findings and status context, using this deterministic synthesis order:
+  1. Ambiguous checkbox warnings.
+  2. Missing implementation evidence warnings.
+  3. Missing or failing test evidence warnings.
+  4. Remaining unchecked items with terminal status (`closed`/`completed`) requiring status reactivation.
+  5. Remaining unchecked items requiring execution of outstanding scope.
+  6. Fully validated `closed` items ready for finalization.
+  7. If no warnings and no unchecked items, emit exactly one bullet: `No further action required.`
+- Do not constrain recommendations to a fixed domain; choose actions that best resolve observed evidence gaps.
+- Keep recommendations concise, actionable, and ordered by the synthesis sequence.
+- De-duplicate semantically equivalent actions.
 
-## Example Unresolved Report Item
-
-```markdown
-1. [ ] Add integration test for parser error recovery
-   - Missing evidence: no failing/passing integration test asserting recovery behavior.
-   - Next action: add `test/parser/error-recovery.integration.test.ts` covering malformed nested input.
-   - Verification command: `pnpm vitest run test/parser/error-recovery.integration.test.ts`
-   - Completion signal: test passes and references the production recovery path.
-```
+Do not emit per-checkbox unresolved remediation details in the report output.
