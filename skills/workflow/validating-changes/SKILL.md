@@ -1,6 +1,6 @@
 ---
 name: validating-changes
-description: Validate code changes before PR update and merge. Use when preparing to update a PR, pushing changes, or running pre-merge checks: (1) run local CI parity tests, (2) add regression tests for new failures, (3) verify all tests pass before pushing or requesting review.
+description: "Validate code changes before PR update and merge. Use when preparing to update a PR, pushing changes, or running pre-merge checks: (1) run local CI parity tests, (2) add regression tests for new failures, (3) verify all tests pass before pushing or requesting review."
 metadata:
   type: document
   subtype: skill
@@ -41,6 +41,7 @@ When a new failure is discovered:
 5. Verify new test fails before your fix, then passes after
 
 **Example**:
+
 ```typescript
 it('maps positions within template blocks', () => {
   // Regression: positions falling within template syntax must map back to original
@@ -69,6 +70,7 @@ If a PR CI check fails but local tests pass:
 4. If you cannot reproduce, investigate environment differences (Node version, dependencies, etc.)
 
 **Common commands**:
+
 - Type check: `pnpm run type:check`
 - Lint: `pnpm run lint:eslint` or `pnpm run lint:staged`
 - Tests: `pnpm test:affected:ci` or `pnpm -C <package> test`
@@ -94,20 +96,24 @@ The hook is configured in `.husky/pre-push`; if disabled, manually run the comma
 ## Troubleshooting
 
 **Tests fail but I think they should pass?**
+
 - Check the test file for recent changes that might affect it
 - Read the failure message carefully — it often suggests the fix
 - Run the test in isolation: `vitest run <test-file>` for more detail
 
 **CI passes locally but fails on GitHub?**
+
 - Environment mismatch: Check Node version, pnpm version in CI vs local
 - Cache issue: Try `pnpm install --frozen-lockfile` to match CI exactly
 - Race condition: Some tests may be order-dependent; run full suite, not individual tests
 
 **Pre-push hook is too slow?**
+
 - The hook runs many checks; if it's blocking, file an issue for optimization
 - DO NOT disable the hook; instead, improve the hooks configuration per repo instructions
 
 **Regression test feels like overkill?**
+
 - It prevents the same bug from shipping twice; it's worth the token cost
 - Keep regression tests concise and focused on the specific edge case
 - Link the test to the issue/PR in a comment for context

@@ -1,6 +1,6 @@
 ---
 name: performing-retro
-description: Conduct a post-session review to organize changes into logical commits and document work. Use when: (1) Session has implemented features, fixes, or refactoring and changes are scattered across files, (2) Need to group related changes into atomic commits with conventional messages, (3) Want to create summary documentation of work completed, (4) Final validation before pushing changes. Helps transform a working session into clean git history and clear documentation.
+description: "Conduct a post-session review to organize changes into logical commits and document work. Use when: (1) Session has implemented features, fixes, or refactoring and changes are scattered across files, (2) Need to group related changes into atomic commits with conventional messages, (3) Want to create summary documentation of work completed, (4) Final validation before pushing changes. Helps transform a working session into clean git history and clear documentation."
 license: MIT
 metadata:
   category: workflow
@@ -38,6 +38,7 @@ Use this skill when:
 **Goal**: Understand what changed and why.
 
 1. **Review git status**:
+
    ```bash
    git status
    git diff --stat        # File change summary
@@ -55,7 +56,8 @@ Use this skill when:
    - Are there architectural decisions worth documenting?
 
 **Example from guardrails implementation**:
-```
+
+```text
 Modified:
 - skills/workflow/merge-pr/SKILL.md (added Test Parity Gate phase)
 - skills/workflow/executing-backlog/SKILL.md (simplified to use merge-pr)
@@ -89,7 +91,8 @@ Grouping:
    - Documentation last (summaries of what was done)
 
 3. **Map files to commits**:
-   ```
+
+   ```text
    Commit 1: Create guarding-branches + validating-changes aspects
    Commit 2: Create workspace-isolation skill (parallel execution)
    Commit 3: Integrate guardrails into merge-pr (new Phase 1)
@@ -107,6 +110,7 @@ Grouping:
 For each planned commit:
 
 1. **Stage relevant files**:
+
    ```bash
    git add path/to/file1 path/to/file2 ...
    ```
@@ -119,10 +123,10 @@ For each planned commit:
 
    ```bash
    git commit -m "feat(guardrails): add guarding-branches and validating-changes aspects
-   
+
    - guarding-branches: Merge conflict detection, export scanning, deletion prevention
    - validating-changes: Local test validation, regression capture
-   
+
    These aspects provide reusable validation patterns for branch safety."
    ```
 
@@ -146,29 +150,37 @@ For each planned commit:
      - Related files (links to skills/code)
 
 2. **Structure summary**:
+
    ```markdown
    # Feature Name Implementation
 
    ## Overview
+
    [1 paragraph explaining what was done]
 
    ## Architecture
+
    [Design decisions and rationale]
 
    ## Integration Points
+
    [How existing workflows changed]
 
    ## Key Files Updated
+
    - [List with brief purpose]
 
    ## Testing & Validation
+
    - [Validation approach]
 
    ## Status
+
    - Ready for adoption/testing/review
    ```
 
 3. **Commit summary documentation**:
+
    ```bash
    git add docs/FEATURE-NAME_IMPLEMENTATION_SUMMARY.md
    git commit -m "docs(feature): document implementation and architecture"
@@ -179,6 +191,7 @@ For each planned commit:
 **Goal**: Ensure all work is properly committed and documented.
 
 1. **Verify commits**:
+
    ```bash
    git log --oneline -N  # Show last N commits
    git log -p            # Review diffs
@@ -201,7 +214,7 @@ For each planned commit:
 
 ### Conventional Commit Format
 
-```
+```text
 <type>[optional scope]: <description>
 
 [optional body]
@@ -227,6 +240,7 @@ For each planned commit:
 ### Scopes
 
 Scopes should identify the area affected:
+
 - `(guardrails)` - Guardrail aspects/skills
 - `(execution)` - Execution-related changes
 - `(workflow)` - Workflow skill changes
@@ -235,7 +249,7 @@ Scopes should identify the area affected:
 
 ### Examples
 
-```
+```text
 # New feature with scope
 feat(guardrails): add guarding-branches aspect for merge safety
 
@@ -260,14 +274,14 @@ feat(execution): add workspace-isolation skill for parallel work items
 
 Avoid these common mistakes:
 
-| Mistake | Why It's Wrong | Solution |
-|---------|----------------|----------|
-| **Mega-commit** | Mixes unrelated changes; hard to review | Split into atomic commits |
-| **Orphaned files** | Unexplained changes; unclear intent | Every change → 1 commit |
-| **Vague messages** | "Update stuff", "Fix things" | Use conventional format, describe specifically |
-| **Uncommitted work** | Incomplete session; risky to lose | Commit everything in Phase 3 |
-| **No summary docs** | Future readers don't understand | Create summary in Phase 4 |
-| **Out-of-order commits** | Dependencies unclear | Order: foundation → integration → docs |
+| Mistake                  | Why It's Wrong                          | Solution                                       |
+| ------------------------ | --------------------------------------- | ---------------------------------------------- |
+| **Mega-commit**          | Mixes unrelated changes; hard to review | Split into atomic commits                      |
+| **Orphaned files**       | Unexplained changes; unclear intent     | Every change → 1 commit                        |
+| **Vague messages**       | "Update stuff", "Fix things"            | Use conventional format, describe specifically |
+| **Uncommitted work**     | Incomplete session; risky to lose       | Commit everything in Phase 3                   |
+| **No summary docs**      | Future readers don't understand         | Create summary in Phase 4                      |
+| **Out-of-order commits** | Dependencies unclear                    | Order: foundation → integration → docs         |
 
 ## Example Walkthrough
 
@@ -275,10 +289,10 @@ Avoid these common mistakes:
 
 After implementing guardrails, `git status` shows:
 
-```
+```text
 Modified:
 - skills/workflow/merge-pr/SKILL.md
-- skills/workflow/executing-backlog/SKILL.md  
+- skills/workflow/executing-backlog/SKILL.md
 - skills/workflow/update-work-item/SKILL.md
 
 Untracked:
@@ -291,6 +305,7 @@ Untracked:
 ### Phase 1: Gather & Analyze
 
 **Changes grouped by purpose**:
+
 1. New aspects: guarding-branches, validating-changes (foundation)
 2. New skill: workspace-isolation (parallel execution)
 3. Modified workflows: merge-pr, executing-backlog, update-work-item (integration)
@@ -298,7 +313,7 @@ Untracked:
 
 ### Phase 2: Plan Commits
 
-```
+```text
 Commit 1: feat(guardrails): add guarding-branches + validating-changes
 Commit 2: feat(execution): add workspace-isolation skill
 Commit 3: refactor(workflow): centralize guardrails in merge-pr
@@ -328,6 +343,7 @@ git commit -m "refactor(workflow): centralize Test Parity Gate in merge-pr Phase
 ### Phase 4: Document Work
 
 Create `docs/GUARDRAILS_IMPLEMENTATION_SUMMARY.md` explaining:
+
 - What guardrails were implemented
 - Architecture decisions (merge bottleneck enforcement)
 - Integration points in workflows
@@ -340,7 +356,7 @@ git commit -m "docs(guardrails): document implementation and architecture"
 
 ### Phase 5: Validate
 
-```bash
+```text
 git log --oneline -7
 # f8f8afa feat(guardrails): add guarding-branches and validating-changes aspects
 # f77ae51 feat(execution): add workspace-isolation skill
@@ -362,6 +378,7 @@ Each commit tells part of the story; together they show: "Implemented guardrails
 ## Safety Guardrails
 
 Never:
+
 - Force push to main/master
 - Commit secrets or credentials
 - Use `--no-verify` to bypass hooks
@@ -369,6 +386,7 @@ Never:
 - Commit without clear message
 
 Always:
+
 - Review `git status` and `git diff` before committing
 - Use conventional commit format
 - Keep changes atomic and logical

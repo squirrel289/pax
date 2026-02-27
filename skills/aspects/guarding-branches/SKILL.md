@@ -1,6 +1,6 @@
 ---
 name: guarding-branches
-description: Enforce protected-branch guardrails for safe PR lifecycle, conflict resolution, and merge safety. Use when working on feature branches against protected main: before merging feature PRs, resolving merge conflicts, syncing with main, or managing work-item updates on protected branches.
+description: "Enforce protected-branch guardrails for safe PR lifecycle, conflict resolution, and merge safety. Use when working on feature branches against protected main: before merging feature PRs, resolving merge conflicts, syncing with main, or managing work-item updates on protected branches."
 metadata:
   type: document
   subtype: skill
@@ -88,16 +88,19 @@ When updating work items or documentation on protected main:
 ## Troubleshooting
 
 **Merge conflicts not resolved?**
+
 - Manually inspect conflicting file
 - Check git status: `git status --porcelain`
 - Resolve with editor, then stage and commit
 
 **Type conflicts after merge?**
+
 - Search for duplicate exports: `rg "export.*<typename>" <file>`
 - Rename one variant (e.g., append provider prefix)
 - Re-run type check
 
 **Unintended deletions detected?**
+
 - Identify deleted files: `git diff origin/main...HEAD --name-status | grep '^D'`
 - Restore from main: `git show origin/main:<file> > <file>`
 - Commit restoration: `git add <file> && git commit -m "chore: restore deleted file"`

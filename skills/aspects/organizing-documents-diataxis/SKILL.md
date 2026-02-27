@@ -1,6 +1,6 @@
 ---
 name: organizing-documents-diataxis
-description: Apply Diataxis framework to organize workflow output into documentation directories. Use to guide skill output placement: inline by default unless user requests file; rationale-heavy content to docs/architecture/; lookup tables and reference guides to docs/reference/. Avoid standalone analysis summaries in docs root. Composable into any analysis or decision-making skill.
+description: "Apply Diataxis framework to organize workflow output into documentation directories. Use to guide skill output placement: inline by default unless user requests file; rationale-heavy content to docs/architecture/; lookup tables and reference guides to docs/reference/. Avoid standalone analysis summaries in docs root. Composable into any analysis or decision-making skill."
 ---
 
 # Aspect: Organizing Documents (Diataxis)
@@ -24,12 +24,12 @@ Compose this aspect into any skill that:
 
 PAX documentation uses the [Diátaxis framework](https://diataxis.fr/) to organize content:
 
-| Type | Purpose | Location | Style | Examples |
-|------|---------|----------|-------|----------|
-| **Tutorials** | Learning-oriented, step-by-step | `docs/guides/` | Hands-on, narrative | Getting started guides |
-| **How-to Guides** | Task-oriented, problem-solving | `docs/guides/` | Recipe format, context-specific | Common workflows, checklists |
-| **Reference** | Information-oriented, complete | `docs/reference/` | Dry, precise, lookup-oriented | Decision trees, quick refs, schemas, matrices |
-| **Explanation** | Understanding-oriented, rationale | `docs/architecture/` | Conceptual, decision drivers, theory | Analysis records, design decisions, reports |
+| Type              | Purpose                           | Location             | Style                                | Examples                                      |
+| ----------------- | --------------------------------- | -------------------- | ------------------------------------ | --------------------------------------------- |
+| **Tutorials**     | Learning-oriented, step-by-step   | `docs/guides/`       | Hands-on, narrative                  | Getting started guides                        |
+| **How-to Guides** | Task-oriented, problem-solving    | `docs/guides/`       | Recipe format, context-specific      | Common workflows, checklists                  |
+| **Reference**     | Information-oriented, complete    | `docs/reference/`    | Dry, precise, lookup-oriented        | Decision trees, quick refs, schemas, matrices |
+| **Explanation**   | Understanding-oriented, rationale | `docs/architecture/` | Conceptual, decision drivers, theory | Analysis records, design decisions, reports   |
 
 ## Output Placement Rules
 
@@ -42,7 +42,8 @@ Unless the user explicitly requests a file:
 - This respects user intent and AI cost constraints
 
 **Example**:
-```
+
+```text
 User: "Compare these tools using comparative-analysis"
 → Provide ranking + recommendation inline
 → Do not create docs/architecture/comparison-record.md automatically
@@ -58,10 +59,12 @@ When creating files, place explanation-oriented outputs here:
 - Evaluation summaries with evidence traces
 
 **Naming**: Use descriptive names with context
+
 - ✅ Good: `pr-workflow-analysis-2026-02.md`, `comparing-parsing-approaches.md`
 - ❌ Bad: `analysis.md`, `comparison.md`, `report.md`
 
 **Format**: Include:
+
 - Decision context (what was being decided)
 - Evaluation criteria and evidence
 - Ranked options with score breakdowns
@@ -78,10 +81,12 @@ Place information-oriented lookup content here:
 - Index and lookup tables for complex information
 
 **Naming**: Use short, lookup-friendly names
+
 - ✅ Good: `tool-feature-matrix.md`, `workflow-decision-tree.md`, `api-quick-ref.md`
 - ❌ Bad: `tools-comparison-analysis.md` (too detailed for reference)
 
-**Format**: 
+**Format**:
+
 - Scannable tables or short descriptions
 - No lengthy explanations (move rationale to `docs/architecture/`)
 - Cross-references to fuller explanations in `docs/architecture/` if needed
@@ -98,7 +103,7 @@ Do **not** create ephemeral analysis files in the `docs/` root:
 
 ## Decision Flow
 
-```
+```text
 User asks for analysis/comparison
     ↓
 1. Generate output inline by default
@@ -123,6 +128,7 @@ User asks for analysis/comparison
 **User request**: "Compare skills X, Y, Z using comparative-analysis and save results"
 
 **Output placement**:
+
 - Inline: Ranked list with top recommendation
 - If file requested:
   - Summary table → `docs/reference/skill-comparison-matrix.md` (lookup table)
@@ -133,6 +139,7 @@ User asks for analysis/comparison
 **User request**: "Evaluate these build tools with scoring and recommendation"
 
 **Output placement**:
+
 - Inline: Recommendation and top option summary
 - If file requested:
   - Full comparative decision record → `docs/architecture/build-tool-evaluation-2026-02.md`
@@ -143,6 +150,7 @@ User asks for analysis/comparison
 **User request**: "Decide on PR merge strategy"
 
 **Output placement**:
+
 - Inline: Selected strategy and decision rationale
 - If file requested:
   - Decision record → `docs/architecture/pr-merge-strategy-decision.md`
@@ -174,7 +182,7 @@ Then, when generating outputs:
 
 ## Related Documentation
 
-- **Diátaxis Framework**: https://diataxis.fr/
+- **Diátaxis Framework**: <https://diataxis.fr/>
 - **File Organization**: [[docs/reference/FILE_ORGANIZATION.md]]
 - **Naming Conventions**: [[docs/conventions/NAMING_CONVENTIONS.md]]
 - **Frontmatter Specification**: [[docs/conventions/FRONTMATTER_SPECIFICATION.md]]

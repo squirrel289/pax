@@ -3,33 +3,33 @@ name: merge-pr
 description: Workflow skill for safely merging pull requests after verification
 license: MIT
 metadata:
-   category: workflow
-   audience: agents, scripts, CI
-   composed-from:
-   - pull-request-tool
-   - sequential-execution
-   aspects:
-      - interaction-modes
-   decisions:
-      - id: merge_readiness
-         trigger: after-verification
-         yolo: [proceed_if_checks_pass]
-         collaborative:
-            prompt: "Merge readiness decision"
-            options:
-               - id: merge_squash
-                  label: "Merge with squash"
-                  action: merge --squash
-               - id: merge_rebase
-                  label: "Merge with rebase"
-                  action: merge --rebase
-               - id: create_draft
-                  label: "Mark as draft"
-                  action: mark-draft
-               - id: custom
-                  label: "Other action..."
-                  allow_freeform: true
-            resume: "Proceed with selected action"
+  category: workflow
+  audience: agents, scripts, CI
+  composed-from:
+    - pull-request-tool
+    - sequential-execution
+  aspects:
+    - interaction-modes
+  decisions:
+    - id: merge_readiness
+      trigger: after-verification
+      yolo: [proceed_if_checks_pass]
+      collaborative:
+        prompt: "Merge readiness decision"
+        resume: "Proceed with selected action"
+        options:
+          - id: merge_squash
+            label: "Merge with squash"
+            action: merge --squash
+          - id: merge_rebase
+            label: "Merge with rebase"
+            action: merge --rebase
+          - id: create_draft
+            label: "Mark as draft"
+            action: mark-draft
+          - id: custom
+            label: "Other action..."
+            allow_freeform: true
 ---
 
 # Merge PR
@@ -158,14 +158,14 @@ Before any PR verification, enforce the Test Parity Gate:
 ### Phase 5: Finalization
 
 1. **Verify completion**
-    - Confirm PR status is merged
-    - Verify commit appears in main
-    - Check branch deleted if requested
+   - Confirm PR status is merged
+   - Verify commit appears in main
+   - Check branch deleted if requested
 
 2. **Report results**
-    - Summarize merge operation
-    - Report any issues
-    - Provide next steps if needed
+   - Summarize merge operation
+   - Report any issues
+   - Provide next steps if needed
 
 ## Interaction Modes (Aspect)
 
@@ -327,14 +327,12 @@ C) Cancel merge operation
 # Full PR workflow using composed skills
 
 1. process-pr (parent workflow)
-   
 2. resolve-pr-comments
    - Address all feedback
-   
 3. merge-pr (this workflow)
    - Verify readiness
    - Execute merge
-   
+
 Done: PR fully processed and merged
 ```
 
@@ -350,45 +348,48 @@ Done: PR fully processed and merged
 
 ```markdown
 PURPOSE:
-  Safely merge PR after comprehensive verification
+Safely merge PR after comprehensive verification
 
 COMPOSITION:
-  pull-request-tool + sequential-execution + (yolo OR collaborative)
+pull-request-tool + sequential-execution + (yolo OR collaborative)
 
 MODES:
-  YOLO:          Auto-merge if ready
-  Collaborative: Confirm before merge
+YOLO: Auto-merge if ready
+Collaborative: Confirm before merge
 
 PHASES:
-  1. Pre-Merge Verification
-  2. Merge Decision
-  3. Execution
-  4. Finalization
+
+1. Pre-Merge Verification
+2. Merge Decision
+3. Execution
+4. Finalization
 
 VERIFICATION:
-  - Mergeable state
-  - Required approvals
-  - Status checks
-  - No conflicts
-  - Branch protection
+
+- Mergeable state
+- Required approvals
+- Status checks
+- No conflicts
+- Branch protection
 
 MERGE METHODS:
-  merge:   Merge commit (preserves history)
-  squash:  Single commit (clean history)
-  rebase:  Linear history (preserves commits)
+merge: Merge commit (preserves history)
+squash: Single commit (clean history)
+rebase: Linear history (preserves commits)
 
 PARAMETERS:
-  pr-number:      Required
-  repository:     Required (owner/repo)
-  interaction-mode: yolo or collaborative
-  merge-method:   merge/squash/rebase
-  delete-branch:  true (default)
-  auto-merge:     false (default)
+pr-number: Required
+repository: Required (owner/repo)
+interaction-mode: yolo or collaborative
+merge-method: merge/squash/rebase
+delete-branch: true (default)
+auto-merge: false (default)
 
 SAFETY:
-  Never merge with:
-  - Failing required checks
-  - Missing approvals
-  - Merge conflicts
-  - Branch protection violations
+Never merge with:
+
+- Failing required checks
+- Missing approvals
+- Merge conflicts
+- Branch protection violations
 ```
