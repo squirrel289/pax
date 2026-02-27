@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Filter-Repo Migration"
+  short_description: "Move files/folders across repos with history using filter-repo"
+  default_prompt: "Migrate one or more directories or files from a source repository to a target repository with git filter-repo while preserving history."
