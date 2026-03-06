@@ -4,9 +4,9 @@ description: Workflow skill for addressing and resolving pull request review com
 category: workflow
 license: MIT
 composed-from:
-    - pull-request-tool
-    - sequential-execution OR parallel-execution
-    - yolo OR collaborative
+  - pull-request-tool
+  - sequential-execution OR parallel-execution
+  - yolo OR collaborative
 ---
 
 # Resolve PR Comments
@@ -40,12 +40,9 @@ This workflow composes:
 
 You must specify the pull request to process using **either** of the following input formats:
 
-- **Separate Parameters:**
-        - **pr-number**: Pull request number (e.g., `42`)
-        - **repository**: Repository in the format `owner/repo` (e.g., `octocat/Hello-World`)
+- **Separate Parameters:** - **pr-number**: Pull request number (e.g., `42`) - **repository**: Repository in the format `owner/repo` (e.g., `octocat/Hello-World`)
 
-- **Combined URL:**
-        - **pr-url**: Full pull request URL (e.g., `https://github.com/owner/repo/pull/42`)
+- **Combined URL:** - **pr-url**: Full pull request URL (e.g., `https://github.com/owner/repo/pull/42`)
 
 If both formats are provided, `pr-url` takes precedence.
 
@@ -62,64 +59,52 @@ If both formats are provided, `pr-url` takes precedence.
 ### Phase 1: Discovery
 
 1. **Fetch PR details** (pull-request-tool)
-     - Get PR metadata
-     - Verify PR is open
-     - Check current status
+   - Get PR metadata
+   - Verify PR is open
+   - Check current status
 
 2. **List review comments** (pull-request-tool)
-     - Get all review threads
-     - Filter based on parameters
-     - Group by file and thread
+   - Get all review threads
+   - Filter based on parameters
+   - Group by file and thread
 
 ### Phase 2: Analysis
 
 1. **Analyze comments** (sequential-execution OR parallel-execution)
-     - Categorize by type (question, change request, suggestion)
-     - Identify dependencies between comments
-     - Prioritize or group for resolution
+   - Categorize by type (question, change request, suggestion)
+   - Identify dependencies between comments
+   - Prioritize or group for resolution
 
 2. **Plan approach**
-     - Determine which comments need code changes
-     - Which need clarification/discussion
-     - Which can be resolved with replies
+   - Determine which comments need code changes
+   - Which need clarification/discussion
+   - Which can be resolved with replies
 
 ### Phase 3: Resolution
 
 1. **Address each comment** (sequential-execution OR parallel-execution)
 
-     For each comment (in order or concurrently, based on execution-mode):
+   For each comment (in order or concurrently, based on execution-mode):
 
-     a. **Review the feedback**
-            - Read comment and context
-            - Understand the request
-            - Check referenced code
+   a. **Review the feedback** - Read comment and context - Understand the request - Check referenced code
 
-     b. **Determine action**
-            - Code change needed?
-            - Just needs reply/clarification?
-            - Already addressed?
+   b. **Determine action** - Code change needed? - Just needs reply/clarification? - Already addressed?
 
-     c. **Take action**
-            - Make code changes if needed
-            - Reply to thread with explanation
-            - Mark as resolved if appropriate
+   c. **Take action** - Make code changes if needed - Reply to thread with explanation - Mark as resolved if appropriate
 
-     d. **Verify resolution**
-            - Ensure change addresses feedback
-            - Run tests if code changed
-            - Confirm reviewer intent met
+   d. **Verify resolution** - Ensure change addresses feedback - Run tests if code changed - Confirm reviewer intent met
 
 ### Phase 4: Finalization
 
 1. **Push changes** (if any code changes made)
-     - Commit all changes
-     - Push to PR branch
-     - Trigger CI checks
+   - Commit all changes
+   - Push to PR branch
+   - Trigger CI checks
 
 2. **Final verification**
-     - Verify all targeted comments addressed
-     - Check for any new comments
-     - Update PR description if needed
+   - Verify all targeted comments addressed
+   - Check for any new comments
+   - Update PR description if needed
 
 ## Interaction and Execution Modes
 
@@ -127,6 +112,7 @@ If both formats are provided, `pr-url` takes precedence.
 
 ```markdown
 When interaction-mode = yolo:
+
 - Automatically determine best response to each comment
 - Make code changes without confirmation
 - Auto-resolve threads after addressing
@@ -137,6 +123,7 @@ When interaction-mode = yolo:
 
 ```markdown
 When interaction-mode = collaborative:
+
 - Show each comment to user
 - Propose response/change
 - Get approval before proceeding
@@ -156,11 +143,12 @@ When interaction-mode = collaborative:
 Task: Resolve all unresolved PR comments on PR #42 in owner/repo using parallel execution
 
 Execution:
+
 1. Fetch unresolved comments (5 found)
 2. Process all comments in parallel:
-     - Comment 1: "Add error handling" → Add try/catch, reply, resolve
-     - Comment 2: "Fix typo" → Fix, reply, resolve
-     - ...
+   - Comment 1: "Add error handling" → Add try/catch, reply, resolve
+   - Comment 2: "Fix typo" → Fix, reply, resolve
+   - ...
 3. Push changes
 4. Report: "Resolved 5 comments, updated 3 files"
 ```
@@ -171,6 +159,7 @@ Execution:
 Task: Address review comments collaboratively, one at a time
 
 Execution:
+
 1. Fetch 3 unresolved comments
 2. Show comment 1, get user input, apply change, resolve
 3. Repeat for each comment in order
@@ -186,11 +175,13 @@ TASK: Resolve PR Comments (#42)
 STATUS: Complete
 
 COMMENTS ADDRESSED: 8/8
+
 - 5 required code changes
 - 2 clarifications
 - 1 acknowledgment
 
 FILES MODIFIED:
+
 - src/auth.ts (2 changes)
 - src/api.ts (1 change)
 - src/utils.ts (2 changes)
@@ -206,7 +197,7 @@ CI STATUS: Passing
 PR Comment Resolution Progress
 
 ✅ Comment 1/8 - "Add error handling" - Resolved
-✅ Comment 2/8 - "Fix typo" - Resolved  
+✅ Comment 2/8 - "Fix typo" - Resolved
 ⏳ Comment 3/8 - "Refactor function" - In progress
 
 Current: Reviewing proposed refactoring approach
@@ -218,22 +209,22 @@ Next: 5 comments remaining
 ### Common Issues
 
 1. **Conflict with recent changes**
-     - Pull latest changes
-     - Re-evaluate comment applicability
-     - Resolve conflicts if needed
+   - Pull latest changes
+   - Re-evaluate comment applicability
+   - Resolve conflicts if needed
 
 2. **Unclear feedback**
-     - YOLO: Make best-effort interpretation, document assumption
-     - Collaborative: Ask user for clarification
+   - YOLO: Make best-effort interpretation, document assumption
+   - Collaborative: Ask user for clarification
 
 3. **Comment already addressed**
-     - Verify fix is present
-     - Reply explaining it's addressed
-     - Resolve thread
+   - Verify fix is present
+   - Reply explaining it's addressed
+   - Resolve thread
 
 4. **Tests fail after changes**
-     - YOLO: Attempt auto-fix, revert if fails
-     - Collaborative: Show failure, ask for guidance
+   - YOLO: Attempt auto-fix, revert if fails
+   - Collaborative: Show failure, ask for guidance
 
 ## Best Practices
 
@@ -252,42 +243,39 @@ Next: 5 comments remaining
 # Full PR processing using composed skills
 
 1. resolve-pr-comments (this workflow)
-     - Uses: pull-request-tool + sequential-execution OR parallel-execution + yolo
-     - Addresses all review feedback
+   - Uses: pull-request-tool + sequential-execution OR parallel-execution + yolo
+   - Addresses all review feedback
 
 2. Check CI status
-     - Uses: pull-request-tool
-     - Verify tests pass
+   - Uses: pull-request-tool
+   - Verify tests pass
 
 3. Merge PR
-     - Uses: merge-pr workflow
-     - Complete the process
+   - Uses: merge-pr workflow
+   - Complete the process
 ```
 
 ## Quick Reference
 
 ```markdown
 PURPOSE:
-    Systematically address and resolve PR review comments
+Systematically address and resolve PR review comments
 
 COMPOSITION:
-    pull-request-tool + sequential-execution OR parallel-execution + (yolo OR collaborative)
+pull-request-tool + sequential-execution OR parallel-execution + (yolo OR collaborative)
 
 MODES:
-    **YOLO**:          Autonomous resolution
-    **Collaborative**: Interactive with user input
+**YOLO**: Autonomous resolution
+**Collaborative**: Interactive with user input
 
 EXECUTION:
-    **sequential**:    One comment at a time
-    **parallel**:      Multiple comments concurrently
+**sequential**: One comment at a time
+**parallel**: Multiple comments concurrently
 
-PHASES:
-    1. **Discovery**:   Fetch PR and comments
-    2. **Analysis**:    Categorize and prioritize
-    3. **Resolution**:  Address each comment
-    4. **Finalization**: Push changes, verify
+PHASES: 1. **Discovery**: Fetch PR and comments 2. **Analysis**: Categorize and prioritize 3. **Resolution**: Address each comment 4. **Finalization**: Push changes, verify
 
 PARAMETERS:
+
 - **pr-number** (required): Pull request number (e.g., `42`)
 - **repository** (required): Repository in the format `owner/repo` (e.g., `octocat/Hello-World`)
 - **pr-url**: Full pull request URL (e.g., `https://github.com/owner/repo/pull/42`). Takes precedence if provided.
@@ -298,14 +286,14 @@ PARAMETERS:
 - **reviewer**: Filter comments by specific reviewer
 
 OUTPUT:
-    Summary of comments addressed, files changed, status
+Summary of comments addressed, files changed, status
 ```
 
 ## Related Skills
 
 - **pull-request-tool**: For fetching PR details, posting replies, resolving threads
 - **handle-pr-feedback**: For triage and decision routing based on feedback severity
-- **update-work-item**: For reverting work item status when major feedback is detected
+- **updating-work-item**: For reverting work item status when major feedback is detected
 - **process-pr**: Orchestrates full PR workflow including feedback resolution
 - **sequential-execution**: For ordered comment processing
 - **parallel-execution**: For concurrent comment addressing

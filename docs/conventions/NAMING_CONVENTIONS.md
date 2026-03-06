@@ -9,20 +9,23 @@ This document establishes naming standards for all files, directories, skills, a
 **Format**: `{skill-name}.md`
 
 **Rules**:
+
 - Use **kebab-case** (lowercase with hyphens)
 - No underscores, no spaces, no camelCase
 - Descriptive, action-oriented names
 - Maximum 50 characters (prefer shorter)
 
 **Examples**:
+
 - ✅ `git-commit.md`
-- ✅ `create-work-item.md`
+- ✅ `creating-work-item.md`
 - ✅ `merge-pr.md`
 - ❌ `git_commit.md` (underscores)
 - ❌ `GitCommit.md` (uppercase)
 - ❌ `commit.md` (too vague)
 
 **Rationale**:
+
 - Kebab-case is standard for web URLs and CLIs
 - Consistent with GitHub convention (repo names, branch names)
 - Compatible with all operating systems
@@ -35,17 +38,20 @@ This document establishes naming standards for all files, directories, skills, a
 **Format**: `aspect-{aspect-name}.md`
 
 **Rules**:
+
 - Prefix with `aspect-`
 - Aspect name in kebab-case
 - Located in `skills/aspects/` directory
 
 **Examples**:
+
 - ✅ `aspect-yolo.md`
 - ✅ `aspect-collaborative.md`
 - ❌ `yolo-aspect.md` (wrong suffix)
 - ❌ `aspect_yolo.md` (underscores)
 
 **Rationale**:
+
 - Prefix makes aspects immediately recognizable
 - Consistent with skill naming (kebab-case)
 - Easy to filter/search: `ls skills/aspects/aspect-*.md`
@@ -56,14 +62,15 @@ This document establishes naming standards for all files, directories, skills, a
 
 **Format**: Various (see table)
 
-| File Type | Format | Example |
-|-----------|--------|---------|
-| Skill definition | `{skill-name}.md` | `git-commit.md` |
-| Skill README | `README.md` | `skills/workflow/README.md` |
-| Implementation script | `{skill-name}.{ext}` | `git-commit.sh` (if used) |
-| Test file | `test-{skill-name}.{ext}` | `test-git-commit.ts` |
+| File Type             | Format                    | Example                     |
+| --------------------- | ------------------------- | --------------------------- |
+| Skill definition      | `{skill-name}.md`         | `git-commit.md`             |
+| Skill README          | `README.md`               | `skills/workflow/README.md` |
+| Implementation script | `{skill-name}.{ext}`      | `git-commit.sh` (if used)   |
+| Test file             | `test-{skill-name}.{ext}` | `test-git-commit.ts`        |
 
 **Rules**:
+
 - README files are always `README.md` (uppercase)
 - Scripts match skill name (same kebab-case)
 - Tests prefixed with `test-`
@@ -75,11 +82,13 @@ This document establishes naming standards for all files, directories, skills, a
 **Format**: `{category-name}/`
 
 **Rules**:
+
 - Use **kebab-case** for multi-word categories
 - Singular or plural based on content type (prefer plural)
 - No special characters
 
 **Examples**:
+
 - ✅ `skills/`
 - ✅ `aspects/`
 - ✅ `execution/`
@@ -95,14 +104,15 @@ This document establishes naming standards for all files, directories, skills, a
 
 Skills should be named as **actions** (verbs or verb phrases):
 
-| Pattern | Examples |
-|---------|----------|
-| `{verb}-{noun}` | `create-pr`, `merge-pr`, `update-work-item` |
-| `{verb}-{noun}-{context}` | `handle-pr-feedback`, `finalize-work-item` |
-| `{tool}-{action}` | `git-commit`, `gh-pr-review` |
+| Pattern                       | Examples                                        |
+| ----------------------------- | ----------------------------------------------- |
+| `{verb}-{noun}`               | `create-pr`, `merge-pr`, `updating-work-item`   |
+| `{verb}-{noun}-{context}`     | `handle-pr-feedback`, `finalizing-work-item`    |
+| `{tool}-{action}`             | `git-commit`, `gh-pr-review`                    |
 | `{concept}` (nouns for modes) | `yolo`, `collaborative`, `sequential-execution` |
 
 **Rationale**:
+
 - Action-oriented names are self-documenting
 - Matches user intent: "I want to commit changes" → `git-commit`
 - Distinguishes from aspect modes (nouns like `yolo`)
@@ -113,13 +123,14 @@ Skills should be named as **actions** (verbs or verb phrases):
 
 Use full words unless abbreviation is universally recognized:
 
-| ❌ Avoid | ✅ Use Instead |
-|---------|---------------|
-| `create-wi` | `create-work-item` |
-| `upd-item` | `update-work-item` |
-| `proc-pr` | `process-pr` |
+| ❌ Avoid    | ✅ Use Instead       |
+| ----------- | -------------------- |
+| `create-wi` | `creating-work-item` |
+| `upd-item`  | `updating-work-item` |
+| `proc-pr`   | `process-pr`         |
 
 **Exceptions** (widely recognized):
+
 - ✅ `pr` (pull request)
 - ✅ `cli` (command-line interface)
 - ✅ `ui` (user interface)
@@ -132,6 +143,7 @@ Use full words unless abbreviation is universally recognized:
 **Format**: `{base-skill}+{aspect1}+{aspect2}`
 
 **Rules**:
+
 - Skills composed from aspects use `+` separator in **frontmatter only**
 - Filename is still kebab-case without `+`
 - `composed-from` field lists aspects
@@ -148,6 +160,7 @@ composed-from: git-commit+yolo
 **Filename**: `git-commit-yolo.md` (not `git-commit+yolo.md`)
 
 **Rationale**:
+
 - `+` operator is clear composition notation (math/set theory)
 - Kebab-case filename for filesystem compatibility
 - Frontmatter records composition relationship
@@ -158,12 +171,12 @@ composed-from: git-commit+yolo
 
 ### Existing Categories
 
-| Category | Purpose | Naming Pattern |
-|----------|---------|----------------|
-| `execution/` | How agents operate (yolo, collaborative) | Mode or style names |
-| `tools/` | Integration with external tools (git, gh) | Tool-based names |
-| `workflow/` | Multi-step processes (create-pr, merge-pr) | Workflow action names |
-| `aspects/` | Reusable behavior modifiers | `aspect-{name}` |
+| Category     | Purpose                                    | Naming Pattern        |
+| ------------ | ------------------------------------------ | --------------------- |
+| `execution/` | How agents operate (yolo, collaborative)   | Mode or style names   |
+| `tools/`     | Integration with external tools (git, gh)  | Tool-based names      |
+| `workflow/`  | Multi-step processes (create-pr, merge-pr) | Workflow action names |
+| `aspects/`   | Reusable behavior modifiers                | `aspect-{name}`       |
 
 ---
 
@@ -172,7 +185,7 @@ composed-from: git-commit+yolo
 **Process**:
 
 1. **Identify need**: Multiple skills share a common theme
-2. **Choose category name**: 
+2. **Choose category name**:
    - Singular for concepts (e.g., `execution/`)
    - Plural for collections (e.g., `tools/`)
    - Kebab-case for multi-word (e.g., `code-generation/`)
@@ -198,11 +211,13 @@ EOF
 ### Anti-Pattern 1: Generic Names
 
 ❌ **Bad**:
+
 - `skill.md`
 - `process.md`
 - `handler.md`
 
 ✅ **Good**:
+
 - `git-commit.md`
 - `process-pr.md`
 - `handle-pr-feedback.md`
@@ -214,11 +229,13 @@ EOF
 ### Anti-Pattern 2: Inconsistent Separators
 
 ❌ **Bad**:
+
 - `git_commit.md` (underscore)
 - `GitCommit.md` (PascalCase)
 - `git.commit.md` (dots)
 
 ✅ **Good**:
+
 - `git-commit.md` (kebab-case)
 
 **Why**: Consistency enables automated tooling and pattern matching
@@ -228,10 +245,12 @@ EOF
 ### Anti-Pattern 3: Overly Long Names
 
 ❌ **Bad**:
+
 - `create-and-initialize-new-work-item-with-metadata.md`
 
 ✅ **Good**:
-- `create-work-item.md`
+
+- `creating-work-item.md`
 
 **Why**: Long names are unwieldy; skill description provides details
 
@@ -240,10 +259,12 @@ EOF
 ### Anti-Pattern 4: Duplicate Information
 
 ❌ **Bad**:
+
 - `git-commit-skill.md` (redundant `-skill`)
 - `aspect-yolo-aspect.md` (redundant `-aspect`)
 
 ✅ **Good**:
+
 - `git-commit.md`
 - `aspect-yolo.md`
 
@@ -263,6 +284,7 @@ EOF
 ### How to Rename
 
 1. **Identify current usage**:
+
    ```bash
    grep -r "old-skill-name" pax/
    ```
@@ -273,6 +295,7 @@ EOF
    - Examples and tutorials
 
 3. **Rename file**:
+
    ```bash
    git mv skills/{category}/old-name.md skills/{category}/new-name.md
    ```
@@ -280,6 +303,7 @@ EOF
 4. **Deprecation notice** (if widely used):
    - Keep old file with redirect for 1 minor version
    - Add deprecation warning:
+
      ```markdown
      > **DEPRECATED**: This skill has been renamed to [[new-name]].
      > This redirect will be removed in v2.0.0.
@@ -308,6 +332,7 @@ EOF
 ```
 
 **Implementation** (see [[backlog/naming-validation-tool.md]]):
+
 - Shell script with regex patterns
 - Pre-commit hook integration
 - CI check for PRs
@@ -372,6 +397,7 @@ EOF
 ### Namespace Prefixes
 
 **Proposal**: For large skill collections, consider namespacing:
+
 - `pax-core:git-commit`
 - `pax-github:create-pr`
 - `pax-workflow:process-pr`

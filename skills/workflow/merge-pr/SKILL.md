@@ -342,7 +342,7 @@ Done: PR fully processed and merged
 - **`feature-branch-management`**: Invoked after merge to clean up feature branch
 - **`process-pr`**: Orchestrates full PR workflow (includes merge-pr in Stage 5)
 - **`handle-pr-feedback`**: Addresses PR review feedback before merge
-- **`update-work-item`**: Updates work item status after PR merged
+- **`updating-work-item`**: Updates work item status after PR merged
 
 ## Quick Reference
 

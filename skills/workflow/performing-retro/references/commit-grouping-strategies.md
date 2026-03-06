@@ -10,24 +10,24 @@ When implementing a new feature across multiple components:
 Commit 1: feat(core): core feature implementation
           - New data structures
           - Core algorithms
-          
+
 Commit 2: feat(api): expose feature via API
           - New endpoints
           - Request/response schemas
-          
+
 Commit 3: feat(ui): UI components for feature
           - React components
           - Styling
-          
+
 Commit 4: feat(integration): wire feature end-to-end
           - Connect API to UI
           - Data flow setup
-          
+
 Commit 5: test(feature): add comprehensive tests
           - Unit tests
           - Integration tests
           - E2E tests
-          
+
 Commit 6: docs(feature): document feature and usage
           - README updates
           - API documentation
@@ -42,11 +42,11 @@ When fixing a bug that requires refactoring:
 Commit 1: refactor(module): restructure for clarity
           - No behavior change
           - Just reorganization
-          
+
 Commit 2: fix(bug): resolve bug with new structure
           - References the refactored code
           - Clear why refactor was needed
-          
+
 Commit 3: test(regression): add test to prevent recurrence
           - Test that catches the bug
           - Validates fix
@@ -60,18 +60,18 @@ When adding validation or safety checks:
 Commit 1: feat(aspect): add validation aspect
           - New validation logic
           - Reusable pattern
-          
+
 Commit 2: feat(skill): create skill using aspect
           - New skill that uses aspect
-          
+
 Commit 3: refactor(integration): integrate into workflows
           - Update existing workflows
           - Add validation gates
-          
+
 Commit 4: refactor(process): simplify by delegating validation
           - Remove duplicate validation
           - Consolidate at single point
-          
+
 Commit 5: docs(architecture): document design decisions
           - Why validation at this point
           - How enforcement works
@@ -85,15 +85,15 @@ When removing deprecated features or cleaning up:
 Commit 1: deprecation(feature): mark feature as deprecated
           - Add deprecation warnings
           - Document migration path
-          
+
 Commit 2: docs(migration): document how to migrate
           - Migration guide
           - Examples
-          
+
 Commit 3: refactor(removal): remove deprecated feature
           - Clean removal
           - Update references
-          
+
 Commit 4: docs(cleanup): remove legacy documentation
           - Old docs referencing removed feature
 ```
@@ -120,30 +120,30 @@ When planning commits, ask:
 1. **Is this change independent?**
    - Can it be reviewed in isolation?
    - Does it depend on other changes in this batch?
-   → If independent: separate commit
-   → If dependent: same commit or sequence them clearly
+     → If independent: separate commit
+     → If dependent: same commit or sequence them clearly
 
 2. **Does this commit affect multiple concerns?**
    - Feature implementation + tests + docs?
    - Bug fix + refactoring + tests?
-   → If mixed concerns: separate based on concern type
-   → Feature first, then integration, then docs/tests
+     → If mixed concerns: separate based on concern type
+     → Feature first, then integration, then docs/tests
 
 3. **Would future readers understand the "why"?**
    - Does the commit message explain intent?
    - Would commit history help someone understand decisions?
-   → If unclear: expand message or split commit
+     → If unclear: expand message or split commit
 
 4. **Can this be tested independently?**
    - Add tests in same commit or separate?
-   → If fundamental to understanding change: same commit
-   → If validation/regression test: separate commit
+     → If fundamental to understanding change: same commit
+     → If validation/regression test: separate commit
 
 ## Examples from Real Sessions
 
 ### Guardrails Implementation
 
-```bash
+````bash
 Commit 1: feat(guardrails): add guarding-branches and validating-changes aspects
           Files: skills/aspects/guarding-branches/SKILL.md
                  skills/workflow/validating-changes/SKILL.md
@@ -157,8 +157,8 @@ Commit 3: refactor(workflow): centralize Test Parity Gate in merge-pr
 Commit 4: refactor(workflow): simplify executing-backlog to use merge-pr
           Files: skills/workflow/executing-backlog/SKILL.md
 
-Commit 5: refactor(workflow): integrate guardrails into update-work-item
-          Files: skills/workflow/update-work-item/SKILL.md
+Commit 5: refactor(workflow): integrate guardrails into updating-work-item
+          Files: skills/tools/updating-work-item/SKILL.md
 
 Commit 6: docs(guardrails): document implementation and architecture
           Files: docs/GUARDRAILS_IMPLEMENTATION_SUMMARY.md
@@ -207,3 +207,4 @@ Before finalizing your retro:
 ---
 
 **Remember**: Good commits help future readers (including yourself) understand not just what changed, but why and when each decision was made.
+````

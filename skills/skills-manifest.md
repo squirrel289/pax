@@ -10,7 +10,7 @@ This document catalogs the agent skills integrated into the development workflow
 
 ### Work Item Management
 
-#### update-work-item
+#### updating-work-item
 
 **Purpose**: Update progress, status, and metadata for backlog work items.
 
@@ -35,7 +35,7 @@ This document catalogs the agent skills integrated into the development workflow
 # started_date: 2026-02-18
 ```
 
-#### finalize-work-item
+#### finalizing-work-item
 
 **Purpose**: Complete and archive a work item after successful merge.
 
@@ -59,7 +59,7 @@ mv backlog/005_chevrotain_lexer.md backlog/archive/
 # Update frontmatter: status: completed, completed_date: 2026-02-18
 ```
 
-#### create-work-item
+#### creating-work-item
 
 **Purpose**: Create new work items with standardized structure and auto-numbering.
 
@@ -294,7 +294,7 @@ Three guardrails skills enforce safety at critical merge points to prevent regre
 - Want ~3× speedup for N independent WIs
 - Coordinating subagent code implementation
 
-**Integration Point**: `executing-backlog` Phase 1, `update-work-item` Section 1
+**Integration Point**: `executing-backlog` Phase 1, `updating-work-item` Section 1
 
 **Key Features**:
 
@@ -390,7 +390,7 @@ All guardrails are **production-ready**:
 
 **Replaces**: `process-pr` skill (deprecated)  
 **Extends**: `feature-branch-management` (branch creation/sync)  
-**Complements**: `finalize-work-item` (WI archival)
+**Complements**: `finalizing-work-item` (WI archival)
 
 ### Aspect Skills
 
@@ -463,7 +463,7 @@ capture-events --status
 
 # creating-skill analyzes:
 # 1. Searches memory for similar patterns
-# 2. Compares against existing skills (e.g., update-work-item)
+# 2. Compares against existing skills (e.g., updating-work-item)
 # 3. Computes overlap and gaps
 # 4. Recommends: enhance existing (70% overlap found)
 # 5. Delegates to skill-creator if approved
@@ -513,21 +513,21 @@ capture-events --status
 ┌─────────────────────────────────────┐
 │    Work Item Lifecycle              │
 ├─────────────────────────────────────┤
-│  create-work-item                   │
+│  creating-work-item                 │
 │         ↓                           │
 │  feature-branch-management          │
 │         ↓                           │
-│  update-work-item (in_progress)     │
+│  updating-work-item (in_progress)   │
 │         ↓                           │
 │  git-commit (iterative)             │
 │         ↓                           │
-│  update-work-item (testing)         │
+│  updating-work-item (testing)       │
 │         ↓                           │
 │  create-pr                          │
 │         ↓                           │
 │  handle-pr-feedback (if needed)     │
 │         ↓                           │
-│  finalize-work-item (after merge)   │
+│  finalizing-work-item (after merge) │
 └─────────────────────────────────────┘
 ```
 
@@ -538,7 +538,7 @@ Skills integrate with automated workflows:
 1. **Pre-commit Hooks**: `git-commit` validates conventional commit format
 2. **PR Creation**: `create-pr` populates PR template with work item metadata
 3. **CI Tests**: `parallel-execution` runs affected tests
-4. **Post-merge**: `finalize-work-item` archives completed work
+4. **Post-merge**: `finalizing-work-item` archives completed work
 
 ## Custom Skills
 

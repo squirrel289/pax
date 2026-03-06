@@ -1,12 +1,12 @@
 ---
-name: create-work-item
+name: creating-work-item
 description: "Create a new work item (backlog entry) with standardized structure, metadata, and conventions. Use when starting new work, proposing features, or documenting tasks. Supports: (1) Auto-numbering next available ID, (2) Frontmatter with status/priority/effort fields, (3) Goal/Background/Tasks/Deliverables/Acceptance Criteria structure, (4) Dependency tracking via wikilinks"
-metadata: 
+metadata:
   category: project-management
 license: MIT
 ---
 
-# Create Work Item
+# Creating Work Item
 
 ## Overview
 
@@ -29,11 +29,11 @@ Skip work items for:
 - Trivial one-off fixes (can be done directly)
 - Exploratory work without clear scope (start with spike first)
 - Time-critical hotfixes (commit directly, backlog after)
-- Duplicate items (update existing instead, see `update-work-item` skill)
+- Duplicate items (update existing instead, see `updating-work-item` skill)
 
 ## Work Item Lifecycle
 
-```
+```asciiflow
 Created (not_started)
     ↓
 Implementation (in_progress)
@@ -50,6 +50,7 @@ Archived (to archive/)
 **Directory**: `/backlog/` (current items) or `/backlog/archive/` (completed/superseded)
 
 **Naming Convention**: `<number>_<slug>.md` where:
+
 - `<number>`: Sequential integer (e.g., 54, 55, 56)
 - `<slug>`: Kebab-case description (e.g., `complete_temple_native`, `implement_adapter_spec`)
 
@@ -119,7 +120,7 @@ What artifacts or code changes will result:
 
 Clear, verifiable markers of completion:
 
-- [ ] All new tests pass (test_*.py)
+- [ ] All new tests pass (test\_\*.py)
 - [ ] Code coverage > 80%
 - [ ] Documented in docs/ (README or ADR)
 - [ ] Reviewed and merged to main
@@ -161,12 +162,14 @@ notes:
 ```
 
 **Status Values**:
+
 - `not_started`: Ready to begin
 - `in_progress`: Active work
 - `testing`: Implementation done, awaiting review/test results
 - `completed`: Finished (may have different reasons—see `state_reason`)
 
 **state_reason** (used only when `status: completed`):
+
 - `success`: Work completed successfully, all criteria met
 - `obsolete`: Item no longer relevant (market/approach changed)
 - `redundant`: Duplicate of another work item
@@ -174,12 +177,14 @@ notes:
 - `cancelled`: Work stopped, won't implement (note why)
 
 **Priority**:
+
 - `low`: Nice-to-have, can be deferred
 - `medium`: Standard work item
 - `high`: Important, plan next
 - `critical`: Blocking other work
 
 **Complexity**:
+
 - `low`: ≤6 hours, isolated change
 - `medium`: 6-20 hours, affects multiple areas
 - `high`: 20+ hours, architectural or cross-cutting
@@ -270,11 +275,9 @@ dependencies:
   - "[[54_complete_temple_native.md]]"
   - "[[44_implement_semantic_validation.md]]"
 ---
-
 ## Goal
 
 Add JSON Schema validation to `temple-linter` to catch schema violations in templates at lint time, catching type mismatches and missing required fields before runtime.
-
 ...
 ```
 
@@ -342,8 +345,9 @@ Link to related work items using `[[filename]]` syntax:
 
 ```markdown
 dependencies:
-  - "[[54_complete_temple_native.md]]"
-  - "[[43_implement_template_syntax_validation.md]]"
+
+- "[[54_complete_temple_native.md]]"
+- "[[43_implement_template_syntax_validation.md]]"
 ```
 
 The double-bracket syntax creates wiki-link references that tools can parse.
@@ -354,8 +358,8 @@ Record commits that implement this work:
 
 ```yaml
 related_commit:
-  - 6d8c044  # feat(parser): canonicalize control-flow end tokens
-  - f00459b  # fix(renderer): handle filter signature validation
+  - 6d8c044 # feat(parser): canonicalize control-flow end tokens
+  - f00459b # fix(renderer): handle filter signature validation
 ```
 
 Add these incrementally as work progresses, then complete the item.
@@ -392,9 +396,9 @@ Example: After completing #57, move `57_implement_json_schema_validation.md` to 
 
 ## Related Skills
 
-- **`update-work-item`**: For changing status, effort, and adding test results during work
-- **`feature-branch-management`**: Automatically invoked by `update-work-item` to create feature branches
+- **`updating-work-item`**: For changing status, effort, and adding test results during work
+- **`feature-branch-management`**: Automatically invoked by `updating-work-item` to create feature branches
 - **`create-pr`**: Automatically invoked to create pull requests when item status → testing
 - **`handle-pr-feedback`**: For addressing PR review feedback
-- **`finalize-work-item`**: For completing and archiving items after PR merged
+- **`finalizing-work-item`**: For completing and archiving items after PR merged
 - **`git-commit`**: For recording implementation commits that reference work items

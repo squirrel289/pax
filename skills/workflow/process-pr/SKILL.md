@@ -157,6 +157,7 @@ Before merge, verify in parallel:
 
 ```markdown
 When interaction-mode = yolo:
+
 - Complete entire workflow without confirmation
 - Make all decisions automatically
 - Auto-resolve issues where possible
@@ -169,6 +170,7 @@ Example:
 User: "Process PR #42 in YOLO mode"
 
 Agent executes full workflow:
+
 1. Fetches PR, checks status (parallel)
 2. Runs local tests (parallel)
 3. Addresses 3 review comments
@@ -186,6 +188,7 @@ Reports: "PR #42 processed and merged. Addressed 3 comments, all checks pass, me
 
 ```markdown
 When interaction-mode = collaborative:
+
 - Show progress at each stage
 - Request confirmation for major decisions
 - Present issues for user guidance
@@ -202,7 +205,7 @@ Agent: "Starting PR #42 processing...
 Stage 1: Initial Assessment
 ✅ PR details fetched
 ✅ Reviews: 2 approvals
-⚠️  Unresolved comments: 3
+⚠️ Unresolved comments: 3
 
 Should I proceed to address the comments? (yes/no/show)"
 
@@ -301,10 +304,11 @@ For low-risk PRs:
 
 ```markdown
 Parameters:
-  run-local-checks: false
-  resolve-comments: false (assume resolved)
-  
+run-local-checks: false
+resolve-comments: false (assume resolved)
+
 Workflow:
+
 1. Verify CI and approvals
 2. Merge immediately
 ```
@@ -315,11 +319,12 @@ For high-risk PRs:
 
 ```markdown
 Parameters:
-  run-local-checks: true
-  resolve-comments: true
-  interaction-mode: collaborative
-  
+run-local-checks: true
+resolve-comments: true
+interaction-mode: collaborative
+
 Workflow:
+
 1. Full local verification
 2. Interactive comment resolution
 3. Manual merge confirmation
@@ -331,10 +336,11 @@ For processing many PRs:
 
 ```markdown
 Parameters:
-  pr-number: [42, 43, 44, 45]
-  interaction-mode: yolo
-  
+pr-number: [42, 43, 44, 45]
+interaction-mode: yolo
+
 Workflow:
+
 1. Process PRs in parallel using parallel-execution
 2. Each PR follows full process-pr workflow
 3. Report summary of all PRs
@@ -385,6 +391,7 @@ STAGES COMPLETED:
 ✅ Stage 5: Merge (squash method)
 
 SUMMARY:
+
 - PR #42: "Add authentication middleware"
 - Comments addressed: 3
 - Files changed: 4
@@ -425,6 +432,7 @@ Next: 1 more comment, then final checks
 User: "Process PR #42 end-to-end"
 
 Execution:
+
 - Uses: process-pr (this workflow)
 - Mode: collaborative (default)
 - Stages: All 5 stages
@@ -437,6 +445,7 @@ Execution:
 User: "Process all approved PRs"
 
 Execution:
+
 1. List open PRs
 2. Filter for approved PRs
 3. Use parallel-execution to spawn:
@@ -453,6 +462,7 @@ Execution:
 User: "Set up automated PR pipeline"
 
 Execution:
+
 1. Monitor for new reviews/approvals
 2. When PR approved:
    - Trigger process-pr in yolo mode
@@ -464,48 +474,52 @@ Execution:
 
 ```markdown
 PURPOSE:
-  End-to-end PR processing from review to merge
+End-to-end PR processing from review to merge
 
 COMPOSITION:
-  parallel-execution + sequential-execution + pull-request-tool +
-  resolve-pr-comments + merge-pr + (yolo OR collaborative)
+parallel-execution + sequential-execution + pull-request-tool +
+resolve-pr-comments + merge-pr + (yolo OR collaborative)
 
 MODES:
-  YOLO:          Fully autonomous end-to-end
-  Collaborative: Interactive with checkpoints
+YOLO: Fully autonomous end-to-end
+Collaborative: Interactive with checkpoints
 
 STAGES:
-  1. Initial Assessment (parallel)
-  2. Local Verification (sequential)
-  3. Address Feedback (sequential)
-  4. Final Verification (parallel)
-  5. Merge (sequential)
+
+1. Initial Assessment (parallel)
+2. Local Verification (sequential)
+3. Address Feedback (sequential)
+4. Final Verification (parallel)
+5. Merge (sequential)
 
 PARAMETERS:
-  pr-number:        Required (single or array)
-  repository:       Required (owner/repo)
-  interaction-mode: yolo or collaborative
-  merge-method:     merge/squash/rebase
-  delete-branch:    true (default)
-  run-local-checks: true (default)
-  resolve-comments: true (default)
+pr-number: Required (single or array)
+repository: Required (owner/repo)
+interaction-mode: yolo or collaborative
+merge-method: merge/squash/rebase
+delete-branch: true (default)
+run-local-checks: true (default)
+resolve-comments: true (default)
 
 OPTIMIZATION:
-  - Parallel where possible (assessment, verification)
-  - Sequential where needed (comments, merge)
-  - Mixed for optimal speed
+
+- Parallel where possible (assessment, verification)
+- Sequential where needed (comments, merge)
+- Mixed for optimal speed
 
 SAFETY:
-  Always verify:
-  - Required approvals
-  - All checks pass
-  - No conflicts
-  - Correct base branch
-  
-  Never:
-  - Merge with failing tests
-  - Skip approvals
-  - Override protection
+Always verify:
+
+- Required approvals
+- All checks pass
+- No conflicts
+- Correct base branch
+
+Never:
+
+- Merge with failing tests
+- Skip approvals
+- Override protection
 ```
 
 ## Related Skills
@@ -514,6 +528,6 @@ SAFETY:
 - **resolve-pr-comments**: For handling review feedback during PR processing
 - **merge-pr**: For executing merge with proper verification and cleanup
 - **handle-pr-feedback**: For triaging feedback severity and routing decisions
-- **update-work-item**: For updating work item status when PR is merged
+- **updating-work-item**: For updating work item status when PR is merged
 - **parallel-execution**: For concurrent assessment of PR readiness
 - **sequential-execution**: For ordered workflow phases (assess → resolve → merge)

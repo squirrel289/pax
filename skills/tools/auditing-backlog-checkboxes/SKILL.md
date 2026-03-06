@@ -135,9 +135,9 @@ Deterministic synthesis order (apply top to bottom, include only applicable acti
 1. Ambiguous checkbox warnings: add an action to clarify/rewrite checkbox wording to a verifiable claim.
 2. Missing implementation evidence warnings: add an action to implement or link the concrete code path.
 3. Missing or failing test evidence warnings: add an action to add/fix verification and re-run targeted tests.
-4. Unchecked items remain and status is `closed` or `completed`: add an action to use `update-work-item` to move to an active status before further work.
+4. Unchecked items remain and status is `closed` or `completed`: add an action to use `updating-work-item` to move to an active status before further work.
 5. Unchecked items remain (any status): add an action to execute remaining scope via the most relevant workflow (for example `executing-backlog` when applicable).
-6. No unchecked items and no warnings and status is `closed`: add `finalize-work-item`.
+6. No unchecked items and no warnings and status is `closed`: add `finalizing-work-item`.
 7. No unchecked items and no warnings and status is not `closed`: emit exactly one bullet, `No further action required.`
 
 Normalization rules:

@@ -1,6 +1,6 @@
 ---
 name: workspace-isolation
-description: 'Use git worktrees to maintain isolated workspaces for multiple parallel work items. Ensures atomic commits, prevents state conflicts, and enables true parallelism with clean git history. Use when executing multiple work items simultaneously with complete workspace separation.'
+description: "Use git worktrees to maintain isolated workspaces for multiple parallel work items. Ensures atomic commits, prevents state conflicts, and enables true parallelism with clean git history. Use when executing multiple work items simultaneously with complete workspace separation."
 metadata:
   category: project-management
   pattern: git-worktree, workspace-isolation
@@ -28,7 +28,7 @@ Use this pattern when:
 
 ### Worktree Structure
 
-```
+```bash tree
 repo/
 ├── .git/                    # Shared git database
 ├── src/
@@ -48,6 +48,7 @@ repo/
 ```
 
 **Key properties**:
+
 - Each worktree is a complete, independent working directory
 - All worktrees share the same `.git/` database
 - Working tree state (files, uncommitted changes) is isolated per worktree
@@ -95,7 +96,7 @@ git worktree prune
 
 **Expected output**:
 
-```
+```text
 repo                          abc1234 [main]
 wt_wi_001                     def5678 [feature/wi-001]
 wt_wi_002                     ghi9012 [feature/wi-002]
@@ -135,7 +136,7 @@ spawn_subagent \
   work_item_id=002 \
   workspace=/repo/wt_wi_002/ \
   prompt="Implement WI-002: [description]. Update status to ready-for-review in backlog/002_*.md, then stop."
-  
+
 spawn_subagent \
   work_item_id=003 \
   workspace=/repo/wt_wi_003/ \
@@ -147,6 +148,7 @@ spawn_subagent \
 Inside each worktree, subagents:
 
 1. **Update work item status**:
+
    ```bash
    cd /repo/wt_wi_001/
    # Edit backlog/001_*.md: set status: in-progress, record started_at
@@ -155,6 +157,7 @@ Inside each worktree, subagents:
    ```
 
 2. **Implement code**:
+
    ```bash
    # Edit src/... files
    git add src/...
@@ -164,6 +167,7 @@ Inside each worktree, subagents:
    ```
 
 3. **Update work item when complete**:
+
    ```bash
    # Edit backlog/001_*.md: set status: ready-for-review, record actual hours
    git add backlog/001_*.md
@@ -176,6 +180,7 @@ Inside each worktree, subagents:
 ### Isolation Guarantee
 
 Each worktree has:
+
 - Isolated working directory (no cross-contamination)
 - Isolated index/staging area
 - Shared git refs (feature branches are visible to all)
@@ -381,7 +386,7 @@ To minimize conflicts during fan-in:
 
 ### Sequential Execution (3 WIs, each 8 hours)
 
-```
+```asciigraph
 WI-001  |========== 8h ==========|
 WI-002                           |========== 8h ==========|
 WI-003                                                    |========== 8h ==========|
@@ -392,7 +397,7 @@ Fan-in overhead: Minimal (PRs created sequentially)
 
 ### Parallel Execution with Worktrees
 
-```
+```asciigraph
 WI-001  |========== 8h ==========|
 WI-002  |========== 8h ==========|  (parallel start)
 WI-003  |========== 8h ==========|  (parallel start)
@@ -450,18 +455,21 @@ git worktree remove <path>  # After PR merged and cleanup done
 ## Checklist: Parallel Execution
 
 **Setup Phase**:
+
 - [ ] All WIs have no inter-dependencies (`links.depends_on` all resolved)
 - [ ] File sets don't overlap (conflict-free merges)
 - [ ] Worktrees created successfully
 - [ ] Feature branches exist and are checked out
 
 **Execution Phase**:
+
 - [ ] Each subagent assigned unique worktree
 - [ ] Code changes stay within worktree boundaries
 - [ ] Status updates committed before subagent exits
 - [ ] Commits are atomic and WI-scoped
 
 **Review Phase**:
+
 - [ ] Fan-in processes WIs sequentially
 - [ ] Rebase/merge conflicts resolved
 - [ ] Tests pass after merging origin/main
@@ -501,7 +509,7 @@ git worktree remove wt_wi_001
 
 ## Related Skills
 
-- `update-work-item`: Called by subagents to transition statuses during execution
+- `updating-work-item`: Called by subagents to transition statuses during execution
 - `executing-backlog`: Use for single WI sequential execution (no worktrees needed)
 - `parallel-execution`: Use this skill + parallel-execution skill for optimal throughput
 - `guarding-branches`: Apply during fan-in (Step 2b-2f) for conflict detection

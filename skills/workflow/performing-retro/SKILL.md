@@ -61,7 +61,7 @@ Use this skill when:
 Modified:
 - skills/workflow/merge-pr/SKILL.md (added Test Parity Gate phase)
 - skills/workflow/executing-backlog/SKILL.md (simplified to use merge-pr)
-- skills/workflow/update-work-item/SKILL.md (added parallel execution guidance)
+- skills/tools/updating-work-item/SKILL.md (added parallel execution guidance)
 
 New:
 - skills/aspects/guarding-branches/SKILL.md (new aspect)
@@ -72,7 +72,7 @@ New:
 Grouping:
 1. Core guardrail aspects (guarding-branches + validating-changes)
 2. Parallel execution skill (workspace-isolation)
-3. Workflow integration (merge-pr, executing-backlog, update-work-item)
+3. Workflow integration (merge-pr, executing-backlog, updating-work-item)
 4. Documentation (summary doc)
 ```
 
@@ -97,7 +97,7 @@ Grouping:
    Commit 2: Create workspace-isolation skill (parallel execution)
    Commit 3: Integrate guardrails into merge-pr (new Phase 1)
    Commit 4: Integrate guardrails into executing-backlog
-   Commit 5: Integrate guardrails into update-work-item
+   Commit 5: Integrate guardrails into updating-work-item
    Commit 6: Document guardrails implementation
    ```
 
@@ -293,7 +293,7 @@ After implementing guardrails, `git status` shows:
 Modified:
 - skills/workflow/merge-pr/SKILL.md
 - skills/workflow/executing-backlog/SKILL.md
-- skills/workflow/update-work-item/SKILL.md
+- skills/tools/updating-work-item/SKILL.md
 
 Untracked:
 - skills/aspects/guarding-branches/SKILL.md
@@ -308,7 +308,7 @@ Untracked:
 
 1. New aspects: guarding-branches, validating-changes (foundation)
 2. New skill: workspace-isolation (parallel execution)
-3. Modified workflows: merge-pr, executing-backlog, update-work-item (integration)
+3. Modified workflows: merge-pr, executing-backlog, updating-work-item (integration)
 4. Documentation: summary file (explanation)
 
 ### Phase 2: Plan Commits
@@ -318,7 +318,7 @@ Commit 1: feat(guardrails): add guarding-branches + validating-changes
 Commit 2: feat(execution): add workspace-isolation skill
 Commit 3: refactor(workflow): centralize guardrails in merge-pr
 Commit 4: refactor(workflow): integrate guardrails into executing-backlog
-Commit 5: refactor(workflow): integrate guardrails into update-work-item
+Commit 5: refactor(workflow): integrate guardrails into updating-work-item
 Commit 6: docs(guardrails): document implementation summary
 ```
 
@@ -397,7 +397,7 @@ Always:
 
 - `git-commit`: Detailed conventional commit guidance and execution
 - `executing-backlog`: Workflow that precedes performing-retro
-- `finalize-work-item`: Post-retro work item closure and archival
+- `finalizing-work-item`: Post-retro work item closure and archival
 
 ---
 

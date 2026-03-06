@@ -82,7 +82,7 @@ When updating work items or documentation on protected main:
 ## Integration with Other Skills
 
 - **executing-backlog**: References this aspect at orchestration gates (mergeability, conflict resolution, diff checks)
-- **update-work-item**: References this aspect in "in-progress" and "ready-for-review" transitions
+- **updating-work-item**: References this aspect in "in-progress" and "ready-for-review" transitions
 - **parallel-execution**: Uses this aspect to validate each workspace's branch state before checkout
 
 ## Troubleshooting

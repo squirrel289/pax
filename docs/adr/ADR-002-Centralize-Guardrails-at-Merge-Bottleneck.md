@@ -14,7 +14,7 @@
 
 Multiple distributed validation points create bypass risk and maintenance burden:
 
-- **Observed**: Local test validation scattered across workflow skills (executing-backlog, update-work-item, direct merge paths)
+- **Observed**: Local test validation scattered across workflow skills (executing-backlog, updating-work-item, direct merge paths)
 - **Root cause**: No single enforcement point for safety checks; validation duplicated in multiple locations
 - **Impact**:
   - Broken code can slip through if validation is skipped in any workflow
@@ -33,7 +33,7 @@ Centralize all safety guardrails in `merge-pr` skill as **mandatory Phase 1** (T
 
 1. **merge-pr becomes the enforcement bottleneck**: All merge paths (workflows, scripts, direct calls) must go through merge-pr
 2. **Phase 1 is mandatory and fail-stop**: Local tests + deletion checks run before any GitHub verification
-3. **Other workflows delegate validation**: executing-backlog, update-work-item, and other skills remove duplicate checks
+3. **Other workflows delegate validation**: executing-backlog, updating-work-item, and other skills remove duplicate checks
 4. **Three complementary skills**:
    - `guarding-branches`: Merge conflict detection, export scanning, deletion prevention (Phase 2)
    - `validating-changes`: Local test validation pattern (reusable aspect, enforced in Phase 1)
@@ -92,7 +92,7 @@ Centralize all safety guardrails in `merge-pr` skill as **mandatory Phase 1** (T
 - **Guaranteed enforcement**: All merge paths enforced; bypass impossible
 - **Fail-fast feedback**: Local tests before GitHub checks (7× faster)
 - **Single source of truth**: Update merge-pr, all workflows benefit
-- **Cleaner workflows**: executing-backlog, update-work-item simplified
+- **Cleaner workflows**: executing-backlog, updating-work-item simplified
 - **Parallel execution support**: workspace-isolation enables ~3× speedup for N independent work items
 - **Reusable patterns**: guarding-branches and validating-changes are composable aspects
 
@@ -190,7 +190,7 @@ Result: 2 min cycle for failure detection; never opens PR with broken code
 
 3. **workspace-isolation** (skill): Parallel execution with worktrees
    - Location: `skills/execution/workspace-isolation/SKILL.md`
-   - Used in: executing-backlog Phase 1, update-work-item Section 1
+   - Used in: executing-backlog Phase 1, updating-work-item Section 1
    - Subagent split rule: Code implementation (subagents) vs git/PR ops (main agent)
 
 ---
@@ -210,7 +210,7 @@ Result: 2 min cycle for failure detection; never opens PR with broken code
 - **Simplified**: Phase 4 now just "Merge with merge-pr"
 - **Benefit**: Cleaner workflow; single source of truth
 
-### update-work-item (Enhanced)
+### updating-work-item (Enhanced)
 
 - **Added**: workspace-isolation guidance in Section 1 (Moving to In-Progress)
 - **Added**: validating-changes pre-PR checks in Section 4 (Ready for Review)

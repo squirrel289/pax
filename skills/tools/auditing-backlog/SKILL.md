@@ -72,8 +72,8 @@ For Cross-Signal Risks, highlight items where dependency or status state conflic
 
 1. If schema/frontmatter blockers exist, do not present closure-ready recommendations.
 2. Always run dependency audit before checkbox audit.
-3. If an item is `closed` or `completed` with unresolved unchecked boxes, recommend reopening via `update-work-item`.
-4. If both passes are clean for an item, recommend `finalize-work-item` only when status is `closed`.
+3. If an item is `closed` or `completed` with unresolved unchecked boxes, recommend reopening via `updating-work-item`.
+4. If both passes are clean for an item, recommend `finalizing-work-item` only when status is `closed`.
 
 ## Output Contract
 

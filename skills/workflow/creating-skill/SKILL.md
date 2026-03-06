@@ -48,7 +48,6 @@ Intelligent skill creation advisor that searches memory for related patterns, co
 **Search Operations**:
 
 1. **Pattern Search**: Query `.vscode/pax-memory/patterns.json` for similar patterns
-
    - Match by use case keywords
    - Match by file types involved
    - Match by command sequences
@@ -73,12 +72,12 @@ Intelligent skill creation advisor that searches memory for related patterns, co
       "pattern_id": "repeated-file-read-pattern-001",
       "occurrences": 5,
       "confidence": 0.85,
-      "related_skills": ["update-work-item"]
+      "related_skills": ["updating-work-item"]
     }
   ],
   "existing_skills_overlap": [
     {
-      "skill": "update-work-item",
+      "skill": "updating-work-item",
       "overlap_score": 0.7,
       "coverage_gaps": ["Does not handle batch mode", "No CSV parsing"]
     }
@@ -86,7 +85,7 @@ Intelligent skill creation advisor that searches memory for related patterns, co
   "relevant_episodes": [
     "ep-101: read backlog/001.md",
     "ep-103: read backlog/002.md",
-    "ep-107: update-work-item invoked"
+    "ep-107: updating-work-item invoked"
   ]
 }
 ```
@@ -97,14 +96,14 @@ Intelligent skill creation advisor that searches memory for related patterns, co
 
 Apply these rules in order:
 
-| Condition                                          | Recommendation                | Rationale                                        |
-| -------------------------------------------------- | ----------------------------- | ------------------------------------------------ |
-| >70% overlap with existing PAX skill               | **Enhance existing**          | Avoid duplication, improve reusable skill        |
-| Reusable across multiple projects                  | **Create PAX skill**          | Broad applicability, benefits all users          |
-| Project-specific workflow, narrow use case         | **Create project skill**      | Keep PAX library focused, reduce maintenance     |
-| Cross-cutting concern (routing, interaction)       | **Create or update aspect**   | Composable behavior pattern                      |
-| Changes decision-point routing or agent boundaries | **Update AGENTS.md**          | Workflow orchestration, not skill logic          |
-| <50% overlap, no reusable pattern                  | **Compose existing skills**   | Leverage composition instead of new skill        |
+| Condition                                          | Recommendation              | Rationale                                    |
+| -------------------------------------------------- | --------------------------- | -------------------------------------------- |
+| >70% overlap with existing PAX skill               | **Enhance existing**        | Avoid duplication, improve reusable skill    |
+| Reusable across multiple projects                  | **Create PAX skill**        | Broad applicability, benefits all users      |
+| Project-specific workflow, narrow use case         | **Create project skill**    | Keep PAX library focused, reduce maintenance |
+| Cross-cutting concern (routing, interaction)       | **Create or update aspect** | Composable behavior pattern                  |
+| Changes decision-point routing or agent boundaries | **Update AGENTS.md**        | Workflow orchestration, not skill logic      |
+| <50% overlap, no reusable pattern                  | **Compose existing skills** | Leverage composition instead of new skill    |
 
 **Confidence Scoring**:
 
@@ -135,17 +134,17 @@ Thresholds:
 **Evidence from Memory**:
 
 - Pattern ID: repeated-file-read-pattern-001 (5 occurrences over 6 days)
-- Related skills: update-work-item (70% overlap)
+- Related skills: updating-work-item (70% overlap)
 - Relevant episodes: 12 episodes showing batch work item operations
 
 **Existing Skill Analysis**:
 
-- **Skill**: update-work-item
-- **Location**: `pax/skills/workflow/update-work-item/`
+- **Skill**: updating-work-item
+- **Location**: `pax/skills/tools/updating-work-item/`
 - **Coverage**: Single work item updates, status transitions, frontmatter validation
 - **Gaps**: No batch mode, no CSV parsing, no parallel execution
 
-**Proposed Action**: Enhance update-work-item
+**Proposed Action**: Enhance updating-work-item
 
 **Enhancement Details**:
 
@@ -163,15 +162,15 @@ Thresholds:
 - Frontmatter schema conflicts (mitigation: dry-run mode)
 - Partial failure handling (mitigation: transaction log)
 
-**Alternative Considered**: Create new batch-update-work-items skill
+**Alternative Considered**: Create new batch-updating-work-items skill
 
-- **Rejected because**: 70% code duplication with update-work-item
+- **Rejected because**: 70% code duplication with updating-work-item
 - **Trade-off**: Enhancement adds complexity vs. separate skill adds maintenance burden
 
 **Next Steps**:
 
 1. Review this recommendation
-2. If approved, invoke: `@agent use skill-creator to enhance update-work-item with batch CSV mode`
+2. If approved, invoke: `@agent use skill-creator to enhance updating-work-item with batch CSV mode`
 3. Provide CSV schema documentation
 4. Add test cases for batch mode
 
@@ -196,7 +195,8 @@ Agent response:
 @agent I'm delegating this to skill-creator as required by PAX conventions.
 
 [Invokes skill-creator with context]:
-- Recommendation: enhance update-work-item
+
+- Recommendation: enhance updating-work-item
 - Enhancement details: [from recommendation]
 - Evidence and rationale: [from memory analysis]
 ```
@@ -296,7 +296,7 @@ Before outputting recommendation:
 ```markdown
 **Conflict Detected**:
 
-- Memory patterns suggest: enhance update-work-item
+- Memory patterns suggest: enhance updating-work-item
 - Existing skill analysis suggests: create new skill
 - Episode frequency suggests: low priority
 
@@ -346,9 +346,9 @@ Automatic invocation triggers:
 
 **Input**: "I keep manually updating multiple work items with the same status change"
 
-**Memory Patterns**: 8 occurrences of sequential update-work-item invocations
+**Memory Patterns**: 8 occurrences of sequential updating-work-item invocations
 
-**Recommendation**: Enhance update-work-item with batch mode
+**Recommendation**: Enhance updating-work-item with batch mode
 
 **Confidence**: 0.9 (High - clear pattern, high overlap)
 

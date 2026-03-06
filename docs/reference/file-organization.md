@@ -137,9 +137,9 @@ Skills are organized into **category subdirectories** based on their primary pur
 - `handle-pr-feedback.md` - PR feedback resolution
 - `merge-pr.md` - PR merge workflow
 - `process-pr.md` - End-to-end PR processing
-- `create-work-item.md` - Work item creation
-- `update-work-item.md` - Work item updates
-- `finalize-work-item.md` - Work item completion
+- `creating-work-item.md` - Work item creation
+- `updating-work-item.md` - Work item updates
+- `finalizing-work-item.md` - Work item completion
 
 **File Count**: 11 skills
 
@@ -417,7 +417,7 @@ Completed work items are moved to `backlog/archive/`:
 git mv backlog/001-feature.md backlog/archive/001-feature.md
 ```
 
-**See**: [[.github/skills/finalize-work-item/SKILL.md]]
+**See**: [[.github/skills/finalizing-work-item/SKILL.md]]
 
 ---
 

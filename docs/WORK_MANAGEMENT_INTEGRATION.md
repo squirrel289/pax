@@ -10,9 +10,9 @@ The PAX work management skill suite now provides complete support for the full w
 
 These skills manage specific responsibilities and don't depend on other skills:
 
-- **[[create-work-item/SKILL]]**: Create new backlog items with standardized structure
-- **[[update-work-item/SKILL]]**: Track progress on items during implementation
-- **[[finalize-work-item/SKILL]]**: Archive completed items
+- **[[creating-work-item/SKILL]]**: Create new backlog items with standardized structure
+- **[[updating-work-item/SKILL]]**: Track progress on items during implementation
+- **[[finalizing-work-item/SKILL]]**: Archive completed items
 - **[[feature-branch-management/SKILL]]**: Git operations (create, sync, cleanup branches)
 - **[[copilot-pull-request/SKILL]] + [[gh-pr-review/SKILL]]**: Backend implementations for PR operations
 
@@ -24,7 +24,7 @@ These skills manage specific responsibilities and don't depend on other skills:
 ### Workflow Skills (Compose Other Skills)
 
 - **[[create-pr/SKILL]]**: Composes [[pull-request-tool/SKILL]] to create PRs from feature branches
-- **[[handle-pr-feedback/SKILL]]**: Composes [[pull-request-tool/SKILL]], [[resolve-pr-comments/SKILL]], [[update-work-item/SKILL]]
+- **[[handle-pr-feedback/SKILL]]**: Composes [[pull-request-tool/SKILL]], [[resolve-pr-comments/SKILL]], [[updating-work-item/SKILL]]
 - **[[resolve-pr-comments/SKILL]]**: Composes [[pull-request-tool/SKILL]], execution modes
 - **[[merge-pr/SKILL]]**: Composes [[pull-request-tool/SKILL]], [[feature-branch-management/SKILL]]
 
@@ -42,62 +42,62 @@ graph TB
         YOLO["YOLO Mode<br/>Autonomous"]
         COLLAB["Collaborative<br/>Interactive"]
     end
-    
+
     subgraph Atomic["⚛️ Atomic Skills: Single Responsibility"]
-        CWI["create-work-item<br/>Create items"]
-        UWI["update-work-item<br/>Track progress"]
-        FWI["finalize-work-item<br/>Archive items"]
+        CWI["creating-work-item<br/>Create items"]
+        UWI["updating-work-item<br/>Track progress"]
+        FWI["finalizing-work-item<br/>Archive items"]
         BM["feature-branch-management<br/>Git ops"]
         PRT["pull-request-tool<br/>PR ops"]
     end
-    
+
     subgraph Workflow["🔄 Workflow Skills: Compose Atomic Skills"]
         CPR["create-pr<br/>Generate PR"]
         HPF["handle-pr-feedback<br/>Triage feedback"]
         RPC["resolve-pr-comments<br/>Fix comments"]
         MRP["merge-pr<br/>Safe merge"]
     end
-    
+
     subgraph Orchestration["🎯 Orchestration: Full Lifecycle"]
         PPR["process-pr<br/>Full PR workflow"]
     end
-    
+
     GIT --> BM
     GHAPI --> PRT
     YOLO --> CPR
     COLLAB --> HPF
-    
+
     CWI --> UWI
     UWI -->|"Auto-invokes on<br/>status transitions"| BM
     UWI -->|"Auto-invokes on<br/>testing"| CPR
-    
+
     BM --> CPR
     PRT --> CPR
     PRT --> HPF
     RPC --> HPF
     PRT --> MRP
     BM --> MRP
-    
+
     CPR --> PPR
     HPF --> PPR
     RPC --> PPR
     MRP --> PPR
-    
+
     classDef dashedBorder stroke-width:2px,stroke-dasharray:5,5
     class Foundation,Atomic,Workflow,Orchestration dashedBorder
-    
+
     classDef foundationNodes fill:#1976d2,color:#fff
     style Foundation fill:#e3f2fd,stroke:#1976d2,color:#000
     class GIT,GHAPI,YOLO,COLLAB foundationNodes
-    
+
     classDef atomicNodes fill:#388e3c,color:#fff
     style Atomic fill:#f1f8e9,stroke:#388e3c,color:#000
     class CWI,UWI,FWI,BM,PRT atomicNodes
-    
+
     classDef workflowNodes fill:#f57c00,color:#fff
     style Workflow fill:#fff3e0,stroke:#f57c00,color:#000
     class CPR,HPF,RPC,MRP workflowNodes
-    
+
     style Orchestration fill:#ffebee,stroke:#c62828,color:#000
     style PPR fill:#c62828,color:#fff
 
@@ -109,35 +109,35 @@ graph TB
 
 ```mermaid
 graph TD
-    A["Phase 1: Create Item<br/>create-work-item"] -->|"status: not_started"| B["📄 Work Item Created<br/>/backlog/ID_*"]
-    
-    B -->|"update-work-item<br/>not_started → in_progress"| C["Phase 2: Initialize<br/>Auto-invoke: feature-branch-management<br/>create feature/ID-slug"]
-    
+    A["Phase 1: Create Item<br/>creating-work-item"] -->|"status: not_started"| B["📄 Work Item Created<br/>/backlog/ID_*"]
+
+    B -->|"updating-work-item<br/>not_started → in_progress"| C["Phase 2: Initialize<br/>Auto-invoke: feature-branch-management<br/>create feature/ID-slug"]
+
     C -->|"Feature branch created"| D["status: in_progress<br/>Developer implements"]
-    
-    D -->|"implementation complete<br/>update-work-item<br/>in_progress → testing"| E["Phase 4: Ready for Review<br/>Auto-invoke: feature-branch-management sync<br/>Auto-invoke: create-pr"]
-    
+
+    D -->|"implementation complete<br/>updating-work-item<br/>in_progress → testing"| E["Phase 4: Ready for Review<br/>Auto-invoke: feature-branch-management sync<br/>Auto-invoke: create-pr"]
+
     E -->|"Branch synced & PR created"| F["📋 status: testing<br/>Code Review Phase"]
-    
+
     F -->|"Reviewer Comments"| G{"Feedback<br/>Severity?"}
-    
+
     G -->|"Minor/Trivial"| H["Phase 5A: Minor Feedback<br/>Auto-invoke:<br/>resolve-pr-comments"]
     H -->|"Fixes applied"| I["Re-request Review"]
     I -->|"If approved"| J["✓ Approved"]
-    
-    G -->|"Major/Blocker"| K["Phase 5B: Major Feedback<br/>Auto-invoke:<br/>update-work-item revert"]
+
+    G -->|"Major/Blocker"| K["Phase 5B: Major Feedback<br/>Auto-invoke:<br/>updating-work-item revert"]
     K -->|"Status: in_progress"| L["🔄 Developer Reworks<br/>Back to Phase 3"]
-    L -->|"update-work-item<br/>→ testing"| F
-    
+    L -->|"updating-work-item<br/>→ testing"| F
+
     I -->|"More feedback"| G
     J -->|"All approved & CI passing"| M["Phase 6: Merge Ready<br/>merge-pr<br/>Auto-invoke: branch cleanup"]
-    
+
     M -->|"PR merged to main"| N["✅ Merged<br/>Branch deleted"]
-    
-    N -->|"finalize-work-item"| O["Phase 7: Finalization<br/>Record metrics<br/>Archive item"]
-    
+
+    N -->|"finalizing-work-item"| O["Phase 7: Finalization<br/>Record metrics<br/>Archive item"]
+
     O -->|"status: completed"| P["🎉 Lifecycle Complete<br/>/backlog/archive/ID_*"]
-    
+
     style A fill:#e1f5ff, color:#000
     style C fill:#e1f5ff, color:#000
     style E fill:#e1f5ff, color:#000
@@ -154,13 +154,13 @@ graph TD
 **User Action**: Request new work (feature, spike, task, bug fix)
 
 ```ascii-tree
-create-work-item
+creating-work-item
 ├─ Input: Title, description, acceptance criteria, estimate
 ├─ Output: Work item file in /backlog/ with ID and status: not_started
-└─ Next: update-work-item (to move to in_progress)
+└─ Next: updating-work-item (to move to in_progress)
 ```
 
-**Skills Involved**: [[create-work-item/SKILL]]
+**Skills Involved**: [[creating-work-item/SKILL]]
 
 ---
 
@@ -171,7 +171,7 @@ create-work-item
 **Workflow**:
 
 ```ascii-tree
-update-work-item (status: not_started → in_progress)
+updating-work-item (status: not_started → in_progress)
 │
 ├─ Automatically invokes: feature-branch-management create feature/<id>-<slug>
 │  ├─ Creates local feature branch
@@ -188,7 +188,7 @@ update-work-item (status: not_started → in_progress)
 
 **Skills Involved**:
 
-- [[update-work-item/SKILL]] (orchestrator)
+- [[updating-work-item/SKILL]] (orchestrator)
 - [[feature-branch-management/SKILL]] (automatic branch creation)
 
 **Output**: Work item in `in_progress`, feature branch created and checked out
@@ -209,10 +209,10 @@ On feature branch:
 └─ Repeat until implementation complete
 ```
 
-**Periodic Skill Invocations** (via update-work-item):
+**Periodic Skill Invocations** (via updating-work-item):
 
 ```ascii-tree
-update-work-item record-progress
+updating-work-item record-progress
 ├─ Update actual_hours
 ├─ Add related_commit references
 ├─ Update notes with progress/blockers
@@ -221,7 +221,7 @@ update-work-item record-progress
 
 **Skills Involved**:
 
-- [[update-work-item/SKILL]] (progress tracking)
+- [[updating-work-item/SKILL]] (progress tracking)
 
 **Output**: Work item tracks effort and implementation commits
 
@@ -234,7 +234,7 @@ update-work-item record-progress
 **Workflow**:
 
 ```ascii-tree
-update-work-item (status: in_progress → testing)
+updating-work-item (status: in_progress → testing)
 │
 ├─ Automatically invokes: feature-branch-management sync
 │  ├─ Fetches latest main
@@ -260,7 +260,7 @@ update-work-item (status: in_progress → testing)
 
 **Skills Involved**:
 
-- [[update-work-item/SKILL]] (orchestrator)
+- [[updating-work-item/SKILL]] (orchestrator)
 - [[feature-branch-management/SKILL]] (automatic branch sync)
 - [[create-pr/SKILL]] (automatic PR creation)
 - [[pull-request-tool/SKILL]] (via create-pr)
@@ -314,7 +314,7 @@ handle-pr-feedback (interaction: yolo or collaborative)
 ├─ Detect major/blocker feedback
 ├─ Decision: Significant rework needed
 │
-├─ Automatically invoke: update-work-item (reverse transition)
+├─ Automatically invoke: updating-work-item (reverse transition)
 │  ├─ status: testing → in_progress
 │  └─ notes: "PR feedback: [Issue]. Reverting to in_progress for rework."
 │
@@ -327,7 +327,7 @@ handle-pr-feedback (interaction: yolo or collaborative)
 **Skills Involved**:
 
 - [[handle-pr-feedback/SKILL]] (feedback triage and decision)
-- [[update-work-item/SKILL]] (status reversion)
+- [[updating-work-item/SKILL]] (status reversion)
 - [[pull-request-tool/SKILL]] (comment operations)
 - [[feature-branch-management/SKILL]] (optional sync)
 
@@ -343,7 +343,7 @@ handle-pr-feedback (interaction: yolo or collaborative)
 
 ```pseudocode
 Loop:
-  handle-pr-feedback → address comments → update-work-item
+  handle-pr-feedback → address comments → updating-work-item
 
 Until: All comments addressed + Reviewer approves
 ```
@@ -352,7 +352,7 @@ Until: All comments addressed + Reviewer approves
 
 - [[handle-pr-feedback/SKILL]] (feedback loop coordinator)
 - [[resolve-pr-comments/SKILL]] (address specific comments)
-- [[update-work-item/SKILL]] (status transitions as needed)
+- [[updating-work-item/SKILL]] (status transitions as needed)
 
 ---
 
@@ -406,7 +406,7 @@ merge-pr (or process-pr which includes merge-pr)
 **Workflow**:
 
 ```ascii-tree
-finalize-work-item
+finalizing-work-item
 │
 ├─ Verify Completion
 │  └─ All acceptance criteria met ✓
@@ -430,7 +430,7 @@ finalize-work-item
 
 **Skills Involved**:
 
-- [[finalize-work-item/SKILL]] (orchestration)
+- [[finalizing-work-item/SKILL]] (orchestration)
 - [[feature-branch-management/SKILL]] (cleanup if needed)
 
 **Output**: Work item archived, metrics recorded, branch cleaned
@@ -449,7 +449,7 @@ Every workflow skill supports two interaction modes:
 Users can specify per workflow:
 
 ```bash
-update-work-item id=60 interaction=yolo  # Auto-create branch
+updating-work-item id=60 interaction=yolo  # Auto-create branch
 handle-pr-feedback pr_number=247 interaction=collaborative  # Ask before reverting
 merge-pr pr_number=247 interaction=yolo  # Auto-merge if ready
 ```
@@ -474,23 +474,23 @@ The architecture includes 5 critical trigger points where status changes or feed
 
 ```mermaid
 graph LR
-    T1["TRIGGER 1<br/>not_started → in_progress"] -->|"update-work-item"| B1["feature-branch-management<br/>create"]
+    T1["TRIGGER 1<br/>not_started → in_progress"] -->|"updating-work-item"| B1["feature-branch-management<br/>create"]
     B1 -->|"Result"| R1["✓ Feature branch<br/>created & checked out"]
-    
-    T2["TRIGGER 2<br/>in_progress → testing"] -->|"update-work-item"| B2["feature-branch-management<br/>sync"]
-    T2 -->|"update-work-item"| C1["create-pr"]
+
+    T2["TRIGGER 2<br/>in_progress → testing"] -->|"updating-work-item"| B2["feature-branch-management<br/>sync"]
+    T2 -->|"updating-work-item"| C1["create-pr"]
     B2 -->|"Result"| R2["✓ Branch rebased<br/>on origin/main"]
     C1 -->|"Result"| R2C["✓ PR created<br/>Auto-populated"]
-    
-    T3["TRIGGER 3<br/>Major feedback<br/>detected"] -->|"handle-pr-feedback"| U1["update-work-item<br/>testing → in_progress"]
+
+    T3["TRIGGER 3<br/>Major feedback<br/>detected"] -->|"handle-pr-feedback"| U1["updating-work-item<br/>testing → in_progress"]
     U1 -->|"Result"| R3["✓ Work item<br/>reverted"]
-    
+
     T4["TRIGGER 4<br/>Merge<br/>successful"] -->|"merge-pr"| C2["feature-branch-management<br/>cleanup"]
     C2 -->|"Result"| R4["✓ Local & remote<br/>branches deleted"]
-    
-    T5["TRIGGER 5<br/>Finalization"] -->|"finalize-work-item"| C3["feature-branch-management<br/>cleanup if needed"]
+
+    T5["TRIGGER 5<br/>Finalization"] -->|"finalizing-work-item"| C3["feature-branch-management<br/>cleanup if needed"]
     C3 -->|"Result"| R5["✓ Final cleanup<br/>complete"]
-    
+
     style T1 fill:#4caf50,color:#fff
     style T2 fill:#4caf50,color:#fff
     style T3 fill:#f44336,color:#fff
@@ -511,40 +511,40 @@ graph LR
 ```mermaid
 graph TD
     A["PR Submitted"] -->|"Waiting for Review"| B["👁️ Reviewer Comments"]
-    
+
     B -->|"handle-pr-feedback<br/>Fetch & Classify"| C{"Classify<br/>Feedback<br/>Severity"}
-    
+
     C -->|"Trivial/Minor"| D["Minor Issues<br/>Typos, formatting<br/>docstrings"]
     C -->|"Moderate"| E["Moderate Rework<br/>Logic changes<br/>medium complexity"]
     C -->|"Major/Blocker"| F["Major/Blocker Issues<br/>Design flaws<br/>security concerns"]
-    
+
     D -->|"Auto-route"| G["resolve-pr-comments<br/>Auto-fix"]
     E -->|"Decision Point"| H{"User Input<br/>YOLO/Collab"}
-    
+
     G -->|"Fixes committed<br/>Threads resolved"| I["✓ Changes Pushed"]
     I -->|"Re-request Review"| J["🔄 Back to Review"]
     J -->|"If approved"| K["✓ Approved"]
     J -->|"If more feedback"| C
-    
+
     H -->|"Auto-fix attempt"| L["resolve-pr-comments<br/>with confidence"]
     H -->|"Manual fix"| M["Developer Fixes<br/>Manually"]
-    
+
     L -->|"Success?"| N{"Approved?"}
     N -->|"Yes"| K
     N -->|"No - Revert"| O["Revert Attempt"]
-    
+
     M -->|"Fixes committed"| I
-    
+
     F -->|"Cannot Auto-Fix<br/>Escalate"| P["⚠️ Handle Major Issue<br/>Options:<br/>1. Auto-revert work item<br/>2. Manual review<br/>3. Escalate"]
-    
-    P -->|"If revert"| Q["Auto-invoke<br/>update-work-item<br/>testing → in_progress"]
+
+    P -->|"If revert"| Q["Auto-invoke<br/>updating-work-item<br/>testing → in_progress"]
     Q -->|"Developer reworks"| R["Back to Phase 3<br/>Re-implement"]
     R -->|"Re-submit"| C
-    
+
     P -->|"If approve after<br/>manual review"| K
-    
+
     K -->|"All Comments Done<br/>Approved by All<br/>CI Passing"| S["✅ Ready to Merge"]
-    
+
     style A fill:#e3f2fd
     style B fill:#fff9c4
     style G fill:#c8e6c9
@@ -559,21 +559,21 @@ graph TD
 ```mermaid
 graph LR
     START[["🔵 not_started<br/>Work Item Created"]]
-    
-    START -->|"update-work-item<br/>not_started → in_progress"| IN_PROG["⏳ in_progress<br/>Auto-invokes:<br/>• feature-branch-management create<br/>• checkout feature/ID-slug"]
-    
-    IN_PROG -->|"update-work-item<br/>record progress<br/>(stays in_progress)"| IN_PROG
-    
-    IN_PROG -->|"update-work-item<br/>in_progress → testing"| TESTING["🔍 testing<br/>Auto-invokes:<br/>• feature-branch-management sync<br/>• create-pr<br/>Auto-invokes: handle-pr-feedback"]
-    
+
+    START -->|"updating-work-item<br/>not_started → in_progress"| IN_PROG["⏳ in_progress<br/>Auto-invokes:<br/>• feature-branch-management create<br/>• checkout feature/ID-slug"]
+
+    IN_PROG -->|"updating-work-item<br/>record progress<br/>(stays in_progress)"| IN_PROG
+
+    IN_PROG -->|"updating-work-item<br/>in_progress → testing"| TESTING["🔍 testing<br/>Auto-invokes:<br/>• feature-branch-management sync<br/>• create-pr<br/>Auto-invokes: handle-pr-feedback"]
+
     TESTING -->|"handle-pr-feedback<br/>Minor Issues Only<br/>(auto-fix via resolve-pr-comments)"| TESTING
-    
+
     TESTING -->|"handle-pr-feedback<br/>Major/Blocker Detected<br/>(auto-revert to rework)"| IN_PROG
-    
-    TESTING -->|"finalize-work-item<br/>After merge-pr succeeds"| COMPLETED["✅ completed<br/>Auto-invokes:<br/>• feature-branch-management cleanup<br/>• Archive to /backlog/archive/"]
-    
+
+    TESTING -->|"finalizing-work-item<br/>After merge-pr succeeds"| COMPLETED["✅ completed<br/>Auto-invokes:<br/>• feature-branch-management cleanup<br/>• Archive to /backlog/archive/"]
+
     COMPLETED --> END[["(end)"]]
-    
+
     style START fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
     style IN_PROG fill:#f0f4c3,stroke:#f57f17,stroke-width:2px
     style TESTING fill:#fce4ec,stroke:#c2185b,stroke-width:2px
@@ -585,7 +585,7 @@ graph LR
 
 ### Skill Composition
 
-- **[[feature-branch-management/SKILL]]** used by: [[update-work-item/SKILL]], [[merge-pr/SKILL]], [[finalize-work-item/SKILL]], [[handle-pr-feedback/SKILL]]
+- **[[feature-branch-management/SKILL]]** used by: [[updating-work-item/SKILL]], [[merge-pr/SKILL]], [[finalizing-work-item/SKILL]], [[handle-pr-feedback/SKILL]]
   - No duplication of git operations
   - Single interface for all branch operations
 
@@ -598,41 +598,41 @@ graph LR
 
 ```mermaid
 graph TB
-    BM["🎯 feature-branch-management<br/>Single Source of Truth<br/>Git Operations"] 
-    
+    BM["🎯 feature-branch-management<br/>Single Source of Truth<br/>Git Operations"]
+
     BM_OP1["Operation 1: Create<br/>git checkout -b<br/>feature/ID-slug"]
     BM_OP2["Operation 2: Sync<br/>git fetch + rebase<br/>on origin/main"]
     BM_OP3["Operation 3: Cleanup<br/>delete local & remote<br/>branches"]
-    
+
     BM --> BM_OP1
     BM --> BM_OP2
     BM --> BM_OP3
-    
-    UWI["update-work-item<br/>Status Transitions"]
+
+    UWI["updating-work-item<br/>Status Transitions"]
     CPR["create-pr<br/>PR Creation"]
     MRP["merge-pr<br/>Post-Merge"]
-    FWI["finalize-work-item<br/>Archival"]
+    FWI["finalizing-work-item<br/>Archival"]
     HPF["handle-pr-feedback<br/>Status Revert"]
-    
+
     UWI -->|"Trigger 1: not_started → in_progress"| BM_OP1
     UWI -->|"Trigger 2: in_progress → testing"| BM_OP2
     CPR -->|"Precondition check"| BM_OP2
     MRP -->|"Post-merge cleanup"| BM_OP3
     FWI -->|"Finalization cleanup"| BM_OP3
     HPF -->|"Optional sync"| BM_OP2
-    
+
     subgraph BENEFITS["DRY Benefits"]
         B1["✓ Bug fix in sync<br/>fixes all 5+ consumers"]
         B2["✓ New operation<br/>added once, used everywhere"]
         B3["✓ Consistent<br/>feature/ID-slug naming"]
         B4["✓ Error handling<br/>unified & tested once"]
     end
-    
+
     BM -.->|"enables"| B1
     BM -.->|"enables"| B2
     BM -.->|"enables"| B3
     BM -.->|"enables"| B4
-    
+
     style BM fill:#4caf50,color:#fff,stroke:#2e7d32,stroke-width:3px
     style BM_OP1 fill:#81c784
     style BM_OP2 fill:#81c784
@@ -651,7 +651,7 @@ graph TB
 
 ### Status Management
 
-- **[[update-work-item/SKILL]]** is single source of truth for work item state
+- **[[updating-work-item/SKILL]]** is single source of truth for work item state
   - All status transitions go through this skill
   - All dependent operations (branch, PR) triggered from here
   - No scattered status management
@@ -663,7 +663,7 @@ graph TB
 - [[feature-branch-management/SKILL]]: Only branch operations
 - [[create-pr/SKILL]]: Only PR creation
 - [[handle-pr-feedback/SKILL]]: Only feedback triage and coordination
-- [[update-work-item/SKILL]]: Only work item state management
+- [[updating-work-item/SKILL]]: Only work item state management
 - Each skill owns one responsibility
 
 ### Dependency Inversion
@@ -689,62 +689,62 @@ graph TB
         YOLO["YOLO Mode<br/>Autonomous"]
         COLLAB["Collaborative<br/>Interactive"]
     end
-    
+
     subgraph Atomic["⚛️ Atomic Skills<br/>Single Responsibility"]
-        CWI["create-work-item<br/>Create items"]
-        UWI["update-work-item<br/>Track progress"]
-        FWI["finalize-work-item<br/>Archive items"]
+        CWI["creating-work-item<br/>Create items"]
+        UWI["updating-work-item<br/>Track progress"]
+        FWI["finalizing-work-item<br/>Archive items"]
         BM["feature-branch-management<br/>Git ops"]
         PRT["pull-request-tool<br/>PR ops"]
     end
-    
+
     subgraph Workflow["🔄 Workflow Skills<br/>Compose Atomic Skills"]
         CPR["create-pr<br/>Generate PR"]
         HPF["handle-pr-feedback<br/>Triage feedback"]
         RPC["resolve-pr-comments<br/>Fix comments"]
         MRP["merge-pr<br/>Safe merge"]
     end
-    
+
     subgraph Orchestration["🎯 Orchestration<br/>Full Lifecycle"]
         PPR["process-pr<br/>Full PR workflow"]
     end
-    
+
     GIT --> BM
     GHAPI --> PRT
     YOLO --> CPR
     COLLAB --> HPF
-    
+
     CWI --> UWI
     UWI -->|"Auto-invokes on<br/>status transitions"| BM
     UWI -->|"Auto-invokes on<br/>testing"| CPR
-    
+
     BM --> CPR
     PRT --> CPR
     PRT --> HPF
     RPC --> HPF
     PRT --> MRP
     BM --> MRP
-    
+
     CPR --> PPR
     HPF --> PPR
     RPC --> PPR
     MRP --> PPR
-    
+
     classDef dashedBorder stroke-width:2px,stroke-dasharray:5,5
     class Foundation,Atomic,Workflow,Orchestration dashedBorder
-    
+
     classDef foundationNodes fill:#1976d2,color:#fff
     style Foundation fill:#e3f2fd,stroke:#1976d2,color:#000
     class GIT,GHAPI,YOLO,COLLAB foundationNodes
-    
+
     classDef atomicNodes fill:#388e3c,color:#fff
     style Atomic fill:#f1f8e9,stroke:#388e3c,color:#000
     class CWI,UWI,FWI,BM,PRT atomicNodes
-    
+
     classDef workflowNodes fill:#f57c00,color:#fff
     style Workflow fill:#fff3e0,stroke:#f57c00,color:#000
     class CPR,HPF,RPC,MRP workflowNodes
-    
+
     style Orchestration fill:#ffebee,stroke:#c62828,color:#000
     style PPR fill:#c62828,color:#fff
 ```
@@ -754,16 +754,16 @@ graph TB
 ### Scenario A: Happy Path (No Feedback)
 
 ```ascii-tree
-1. create-work-item #60
+1. creating-work-item #60
    └─ /backlog/60_filter_adapter.md
 
-2. update-work-item #60 in_progress
+2. updating-work-item #60 in_progress
    └─ Auto: feature-branch-management create feature/60-filter-adapter
    └─ Auto: checkout branch
 
 3. [Developer implements for 2 days]
 
-4. update-work-item #60 testing
+4. updating-work-item #60 testing
    └─ Auto: feature-branch-management sync (rebase)
    └─ Auto: create-pr
    └─ Auto: PR #247 created with auto-generated description
@@ -774,7 +774,7 @@ graph TB
    └─ Auto: feature-branch-management cleanup
    └─ Auto: Main branch updated, feature branch deleted
 
-7. finalize-work-item #60
+7. finalizing-work-item #60
    └─ {Auto-attempts): feature-branch-management cleanup (already done)
    └─ Archive: /backlog/archive/60_filter_adapter.md
 
@@ -793,12 +793,12 @@ Done: Item completed, all changes merged, branch cleaned
    └─ Triage feedback
    └─ Classify: Trivial + Major
    └─ User choice: Revert to in_progress for major rework
-   └─ Auto: update-work-item #60 in_progress
+   └─ Auto: updating-work-item #60 in_progress
    └─ Auto: Notify reviewer
 
 7. [Developer reworks FilterAdapter architecture]
 
-8. update-work-item #60 testing (2nd submission)
+8. updating-work-item #60 testing (2nd submission)
    └─ Auto: feature-branch-management sync (rebase)
    └─ Auto: Push new commits
    └─ PR updated automatically (same PR #247)
@@ -808,7 +808,7 @@ Done: Item completed, all changes merged, branch cleaned
 10. merge-pr #247
     └─ Auto: feature-branch-management cleanup
 
-11. finalize-work-item #60
+11. finalizing-work-item #60
     └─ Archive
 
 Done: Item completed after feedback loop
@@ -836,7 +836,7 @@ Done: PR fully processed, merged, cleaned in one command
 ### Visual Comparison of All Three Scenarios
 
 ```mermaid
-graph LR    
+graph LR
     subgraph ScenarioC["🔵 C: Full Automation<br/>process-pr Command"]
         direction LR
         c1["process-pr<br/>yolo"] --> c2["fetch<br/>details"]
@@ -868,15 +868,15 @@ graph LR
     ScenarioA
     ScenarioB
     ScenarioC
-    
+
     style ScenarioA fill:#f1f8e9,stroke:#388e3c,stroke-width:2px,color:#000
     style ScenarioB fill:#fffde7,stroke:#f57f17,stroke-width:2px,color:#000
     style ScenarioC fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
-    
+
     style a7 fill:#c8e6c9,stroke:#388e3c,stroke-width:2px
     style b11 fill:#c8e6c9,stroke:#388e3c,stroke-width:2px
     style c8 fill:#c8e6c9,stroke:#388e3c,stroke-width:2px
-    
+
     style b5 fill:#ffccbc,stroke:#d84315,stroke-width:2px
     style c4 fill:#ffccbc,stroke:#d84315,stroke-width:2px
 ```
@@ -889,7 +889,7 @@ The work management skill suite integrates with PAX's [Continuous Feedback Loop]
 
 #### 1. Work Item Finalization
 
-When [[finalize-work-item]] completes a work item:
+When [[finalizing-work-item]] completes a work item:
 
 1. **Pattern Capture**: [[capture-events]] analyzes episodes from work item's timeframe
 2. **Pattern Detection**: Identifies repeated manual steps, common errors, or workflow gaps
@@ -906,7 +906,7 @@ Feedback Loop detects:
 - Pattern: Batch work item reads without dedicated skill support
 
 creating-skill recommends:
-- Enhance update-work-item with --batch and --csv-input flags
+- Enhance updating-work-item with --batch and --csv-input flags
 - Confidence: 0.85 (High - clear pattern with 5 occurrences)
 
 User approves → skill-creator implements enhancement
@@ -1003,14 +1003,14 @@ Recommendation: Create project-local skill
 
 ### Automatic Proposal Triggers
 
-| Trigger                          | Pattern Threshold | Action                            |
-| -------------------------------- | ----------------- | --------------------------------- |
-| Sequential tool invocations      | 3+ occurrences    | Propose batch mode enhancement    |
-| Repeated PR feedback type        | 3+ PRs            | Propose validation skill          |
-| Error-retry sequences            | 2+ occurrences    | Propose error handling skill      |
-| Manual multi-step workflow       | 5+ occurrences    | Propose orchestration skill       |
-| Project-specific API integration | 1+ occurrence     | Propose project-local skill       |
-| Cross-cutting behavior pattern   | 3+ skills         | Propose aspect creation           |
+| Trigger                          | Pattern Threshold | Action                         |
+| -------------------------------- | ----------------- | ------------------------------ |
+| Sequential tool invocations      | 3+ occurrences    | Propose batch mode enhancement |
+| Repeated PR feedback type        | 3+ PRs            | Propose validation skill       |
+| Error-retry sequences            | 2+ occurrences    | Propose error handling skill   |
+| Manual multi-step workflow       | 5+ occurrences    | Propose orchestration skill    |
+| Project-specific API integration | 1+ occurrence     | Propose project-local skill    |
+| Cross-cutting behavior pattern   | 3+ skills         | Propose aspect creation        |
 
 ### Configuration
 
@@ -1053,8 +1053,8 @@ Enable continuous feedback loop for work management workflows:
 - **Branch Management**: [[feature-branch-management/SKILL]]
 - **Create PR**: [[create-pr/SKILL]]
 - **Handle PR Feedback**: [[handle-pr-feedback/SKILL]]
-- **Update Work Item**: [[update-work-item/SKILL]]
-- **Finalize Work Item**: [[finalize-work-item/SKILL]]
+- **Update Work Item**: [[updating-work-item/SKILL]]
+- **Finalize Work Item**: [[finalizing-work-item/SKILL]]
 - **Merge PR**: [[merge-pr/SKILL]]
 - **Process PR**: [[process-pr/SKILL]]
 - **PR Management Interface**: [[PR_MANAGEMENT_INTERFACE]]
@@ -1075,6 +1075,6 @@ The enhanced skill suite provides:
 
 Users can work at different levels of abstraction:
 
-- **Atomic**: Use individual skills (update-work-item, merge-pr, etc.)
+- **Atomic**: Use individual skills (updating-work-item, merge-pr, etc.)
 - **Workflow**: Use orchestrators (process-pr for full PR automation)
 - **Full Automation**: Let skills auto-trigger via status transitions

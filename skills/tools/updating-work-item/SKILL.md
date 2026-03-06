@@ -1,12 +1,12 @@
 ---
-name: update-work-item
-description: 'Update an existing work item with status changes, effort tracking, test results, and related commits. Use when progressing work, recording test results, or adjusting estimates. Supports: (1) Status transitions (proposed → ready → in-progress → ready-for-review → closed), (2) Feature branch creation and sync, (3) Automatic PR creation on ready-for-review transition, (4) Effort tracking (estimated → actual), (5) Test and commit tracking, (6) Dependency validation (all depends_on items must be closed before closing), (7) Notes with timestamps'
+name: updating-work-item
+description: "Update an existing work item with status changes, effort tracking, test results, and related commits. Use when progressing work, recording test results, or adjusting estimates. Supports: (1) Status transitions (proposed → ready → in-progress → ready-for-review → closed), (2) Feature branch creation and sync, (3) Automatic PR creation on ready-for-review transition, (4) Effort tracking (estimated → actual), (5) Test and commit tracking, (6) Dependency validation (all depends_on items must be closed before closing), (7) Notes with timestamps"
 metadata:
   category: project-management
 license: MIT
 ---
 
-# Update Work Item
+# Updating Work Item
 
 ## Overview
 
@@ -29,8 +29,8 @@ Update a work item when:
 
 Skip updates for:
 
-- Creating new items (use `create-work-item` skill)
-- Finalizing and archiving (use `finalize-work-item` skill)
+- Creating new items (use `creating-work-item` skill)
+- Finalizing and archiving (use `finalizing-work-item` skill)
 - Minor comments (just edit as needed, no skill required)
 
 ## Frontmatter Fields
@@ -74,9 +74,9 @@ completed_date: null # Set when status = closed (YYYY-MM-DD format)
 
 ```yaml
 commits:
-  6d8c044: 'feat(sdk): initial FilterAdapter interface'
-  f00459b: 'feat(filters): implement selectattr and map'
-  a1b2c3d: 'docs: add filter usage examples'
+  6d8c044: "feat(sdk): initial FilterAdapter interface"
+  f00459b: "feat(filters): implement selectattr and map"
+  a1b2c3d: "docs: add filter usage examples"
 ```
 
 Record commit SHAs (7+ character hashes or 40-character full hashes) mapped to their commit messages. Helps trace implementation back to work items.
@@ -92,7 +92,7 @@ git log <short_hash> -n 1 --pretty=format:"%s"
 ```yaml
 test_results:
   - timestamp: 2024-06-01T12:00:00Z
-    note: 'https://github.com/squirrel289/temple/actions/runs/12345678'
+    note: "https://github.com/squirrel289/temple/actions/runs/12345678"
 ```
 
 Record test results with timestamps:
@@ -100,9 +100,9 @@ Record test results with timestamps:
 ```yaml
 test_results:
   - timestamp: 2024-06-01T12:00:00Z
-    note: 'All 47 tests pass, coverage 89%'
+    note: "All 47 tests pass, coverage 89%"
   - timestamp: 2024-06-02T10:00:00Z
-    note: '3 test failures in test_renderer.py (see PR comments)'
+    note: "3 test failures in test_renderer.py (see PR comments)"
 ```
 
 ### Dependencies
@@ -110,8 +110,8 @@ test_results:
 ```yaml
 links:
   depends_on:
-    - '[[wi-054_complete_temple_native.md]]'
-    - '[[wi-043_implement_template_syntax_validation.md]]'
+    - "[[wi-054_complete_temple_native.md]]"
+    - "[[wi-043_implement_template_syntax_validation.md]]"
 ```
 
 Update if new dependencies emerge during implementation. **Critical**: Before closing a work item, verify all items in `links.depends_on` are already `closed`.
@@ -145,8 +145,8 @@ When starting work (changing status from `proposed` or `ready` to `in-progress`)
 
    ```markdown
    ---
-   title: 'Implement FilterAdapter'
-   id: 'wi-060'
+   title: "Implement FilterAdapter"
+   id: "wi-060"
    status: in-progress
    priority: high
    estimated: 20
@@ -162,6 +162,7 @@ When starting work (changing status from `proposed` or `ready` to `in-progress`)
    ```
 
 5. Update `actual` as work progresses:
+
    ```yaml
    actual: 5 # Increment as work progresses, use decimals (e.g., 5.5 for 5h 30m)
    ```
@@ -183,9 +184,9 @@ When work is committed, record the commit SHA and message:
 
 ```yaml
 commits:
-  6d8c044: 'feat(sdk): FilterAdapter interface'
-  f00459b: 'feat(filters): selectattr and map'
-  a1b2c3d: 'docs: add filter usage examples'
+  6d8c044: "feat(sdk): FilterAdapter interface"
+  f00459b: "feat(filters): selectattr and map"
+  a1b2c3d: "docs: add filter usage examples"
 ```
 
 Use short (7-character) or full (40-character) hashes as keys, with commit subject as the value.
@@ -231,13 +232,14 @@ When implementation is done and ready for review, move to ready-for-review:
    - PR URL recorded in work item metadata
 
 5. **Update work item frontmatter**:
+
    ```yaml
    status: ready-for-review
    actual: 18 # Finalize effort
    status_reason: null
    links:
      pull_requests:
-       - 'https://github.com/templjs/templjs/pull/247'
+       - "https://github.com/templjs/templjs/pull/247"
    notes:
      - timestamp: 2024-06-01T12:00:00Z
        note: |
@@ -256,7 +258,7 @@ After running tests:
 status: ready-for-review
 test_results:
   - timestamp: 2024-06-01T12:00:00Z
-    note: 'https://github.com/templjs/templjs/actions/runs/98765432'
+    note: "https://github.com/templjs/templjs/actions/runs/98765432"
   - timestamp: 2024-06-02T08:00:00Z
     note: |
       CI results:
@@ -276,10 +278,10 @@ status: in-progress
 actual: 19
 test_results:
   - timestamp: 2024-06-02T10:00:00Z
-    note: 'Test failures exposed issue with varargs handling. Reworking in feature/wi-060.'
+    note: "Test failures exposed issue with varargs handling. Reworking in feature/wi-060."
 notes:
   - timestamp: 2024-06-02T10:00:00Z
-    note: 'Tests exposed issue with varargs handling. Working on fix.'
+    note: "Tests exposed issue with varargs handling. Working on fix."
 ```
 
 ### 6. Moving to Closed
@@ -294,6 +296,7 @@ When all tests pass, work is approved, and PR is merged:
    - After merge, perform post-merge validation: run CI tests and verify no regressions
 
 3. **Update work item frontmatter**:
+
    ```yaml
    status: closed
    status_reason: success
@@ -301,12 +304,12 @@ When all tests pass, work is approved, and PR is merged:
    completed_date: 2026-02-12
    test_results:
      - timestamp: 2024-06-01T12:00:00Z
-       note: 'https://github.com/templjs/templjs/actions/runs/98765432'
+       note: "https://github.com/templjs/templjs/actions/runs/98765432"
    links:
      pull_requests:
-       - 'https://github.com/templjs/templjs/pull/247'
+       - "https://github.com/templjs/templjs/pull/247"
    commits:
-     a1b2c3d: 'chore: merge PR #247 (FilterAdapter implementation)'
+     a1b2c3d: "chore: merge PR #247 (FilterAdapter implementation)"
    notes:
      - timestamp: 2024-06-02T15:00:00Z
        note: |
@@ -326,7 +329,7 @@ Set `status_reason` to one of:
 - `superseded`: Made moot by another item (reference it via links)
 - `cancelled`: Work stopped before completion (note why in notes)
 
-Leave file in `/backlog/`. The `finalize-work-item` skill handles archiving to `/backlog/archive/`.
+Leave file in `/backlog/`. The `finalizing-work-item` skill handles archiving to `/backlog/archive/`.
 
 ### 7. Adjusting Estimates
 
@@ -350,7 +353,7 @@ estimated: 28
 actual: 14
 notes:
   - timestamp: 2024-06-01T12:00:00Z
-    note: 'Scope significantly expanded. Reverting to proposed for re-estimation.'
+    note: "Scope significantly expanded. Reverting to proposed for re-estimation."
 ```
 
 ### 8. Updating Dependencies
@@ -360,8 +363,8 @@ If new dependencies discovered during work:
 ```yaml
 links:
   depends_on:
-    - '[[wi-054_complete_temple_native.md]]'
-    - '[[wi-044_implement_semantic_validation.md]]' # Added: type checking needed
+    - "[[wi-054_complete_temple_native.md]]"
+    - "[[wi-044_implement_semantic_validation.md]]" # Added: type checking needed
 ```
 
 Update the work item file to reflect these. Document in notes why the dependency was added.
@@ -374,8 +377,8 @@ Update the work item file to reflect these. Document in notes why the dependency
 
 ```yaml
 ---
-title: 'Implement FilterAdapter'
-id: 'wi-060'
+title: "Implement FilterAdapter"
+id: "wi-060"
 status: proposed
 priority: high
 estimated: 20
@@ -384,7 +387,7 @@ completed_date: null
 status_reason: null
 links:
   depends_on:
-    - '[[wi-054_complete_temple_native.md]]'
+    - "[[wi-054_complete_temple_native.md]]"
 ---
 ```
 
@@ -407,14 +410,14 @@ status: ready-for-review
 status_reason: null
 actual: 18
 commits:
-  6d8c044: 'feat(sdk): FilterAdapter interface'
-  f00459b: 'feat(filters): selectattr, map, join, default'
+  6d8c044: "feat(sdk): FilterAdapter interface"
+  f00459b: "feat(filters): selectattr, map, join, default"
 links:
   pull_requests:
-    - 'https://github.com/templjs/templjs/pull/247'
+    - "https://github.com/templjs/templjs/pull/247"
 test_results:
   - timestamp: 2024-06-01T18:00:00Z
-    note: 'https://github.com/templjs/templjs/actions/runs/12345678'
+    note: "https://github.com/templjs/templjs/actions/runs/12345678"
 notes:
   - timestamp: 2024-06-01T18:00:00Z
     note: |
@@ -431,14 +434,14 @@ actual: 22
 completed_date: 2026-02-12
 test_results:
   - timestamp: 2024-06-01T18:00:00Z
-    note: 'https://github.com/templjs/templjs/actions/runs/12345678'
+    note: "https://github.com/templjs/templjs/actions/runs/12345678"
 links:
   pull_requests:
-    - 'https://github.com/templjs/templjs/pull/247'
+    - "https://github.com/templjs/templjs/pull/247"
 commits:
-  6d8c044: 'feat(sdk): FilterAdapter interface'
-  f00459b: 'feat(filters): selectattr, map, join, default'
-  a1b2c3d: 'merge: PR #247 FilterAdapter implementation'
+  6d8c044: "feat(sdk): FilterAdapter interface"
+  f00459b: "feat(filters): selectattr, map, join, default"
+  a1b2c3d: "merge: PR #247 FilterAdapter implementation"
 notes:
   - timestamp: 2024-06-02T12:00:00Z
     note: |
@@ -452,8 +455,8 @@ notes:
 
 ```yaml
 ---
-title: 'Fix elif parsing edge case'
-id: 'wi-059'
+title: "Fix elif parsing edge case"
+id: "wi-059"
 status: in-progress
 estimated: 4
 actual: 1
@@ -467,7 +470,7 @@ status: in-progress
 actual: 3
 test_results:
   - timestamp: 2024-06-01T10:00:00Z
-    note: 'Local: 1 test fails in test_parser.py::test_consecutive_elif'
+    note: "Local: 1 test fails in test_parser.py::test_consecutive_elif"
 notes:
   - timestamp: 2024-06-01T10:00:00Z
     note: |
@@ -483,10 +486,10 @@ status: ready-for-review
 actual: 7
 estimated: 4
 commits:
-  abc1234: 'fix(parser): elif block termination logic'
+  abc1234: "fix(parser): elif block termination logic"
 test_results:
   - timestamp: 2024-06-01T14:00:00Z
-    note: 'https://github.com/templjs/templjs/actions/runs/87654321'
+    note: "https://github.com/templjs/templjs/actions/runs/87654321"
 notes:
   - timestamp: 2024-06-01T14:00:00Z
     note: |
@@ -499,8 +502,8 @@ notes:
 
 ```yaml
 ---
-title: 'Evaluate expression engines'
-id: 'wi-061'
+title: "Evaluate expression engines"
+id: "wi-061"
 status: in-progress
 estimated: 16
 actual: 8
@@ -518,79 +521,6 @@ notes:
 
       Leaning toward option 2 (custom) due to control of type system.
 ---
-```
-
-## Tips & Conventions
-
-### Atomic Updates
-
-Each update should correspond to a logical work milestone:
-
-- End of session: time tracking
-- After tests run: test results
-- After commit: commit hash
-- Status change: full progress summary
-
-Don't update work items excessively—focus on meaningful changes.
-
-### Notes Field
-
-Use `notes` for:
-
-- Progress summary
-- Blockers or issues
-- Scope changes
-- Decision points
-- Follow-up items
-
-Avoid: detailed implementation notes (keep in commit messages instead)
-
-### Time Tracking Accuracy
-
-Record hours regularly:
-
-- At end of each session
-- After significant milestone
-- Final tally when completed
-
-Use decimals for partial hours (e.g., `5.5` for 5 hours 30 minutes).
-
-### Commit Message Integration
-
-Reference work items in commit messages:
-
-```
-feat(filters): implement selectattr and map
-
-Implements core filtering operations for FilterAdapter.
-Supports filtering sequences by attribute value and projection.
-
-Closes wi-60
-See backlog/wi-060_implement_filter_adapter.md
-```
-
-Then update the work item with the commit hash.
-
-### Dependency Validation
-
-Before marking a work item as `closed`:
-
-1. Check the `links.depends_on` section
-2. Verify each referenced work item has `status: closed`
-3. If any `depends_on` items are not closed, leave this item at `ready-for-review` with a note explaining what's blocking closure
-
-Example:
-
-```yaml
-status: ready-for-review
-notes:
-  - timestamp: 2024-06-02T15:00:00Z
-    note: |
-      Implementation complete and tested. Awaiting closure of:
-      - [[wi-054_complete_temple_native.md]] (currently in-progress)
-      - [[wi-043_implement_syntax_validation.md]] (currently ready-for-review)
-
-      Ready to move to closed once dependencies are resolved.
 ```
 
 ## Common Patterns
@@ -670,26 +600,25 @@ Use decimals for partial hours (e.g., `5.5` for 5 hours 30 minutes).
 
 ### Commit Message Integration
 
-Reference work items in commit messages:
+Reference work items in commit messages (align with commitlint rules if used):
 
-```
+```text
 feat(filters): implement selectattr and map
 
 Implements core filtering operations for FilterAdapter.
 Supports filtering sequences by attribute value and projection.
 
-Closes wi-60
-See backlog/wi-060_implement_filter_adapter.md
+Closes [[wi-060_implement_filter_adapter]]
 ```
 
 Then update the work item with the commit hash.
 
 ## Related Skills
 
-- **`create-work-item`**: For creating new work items from scratch
+- **`creating-work-item`**: For creating new work items from scratch
 - **`feature-branch-management`**: Invoked automatically on status transitions (create branch on in-progress, sync on ready-for-review)
 - **`create-pr`**: Invoked automatically when status → ready-for-review (create PR from feature branch)
 - **`handle-pr-feedback`**: For addressing PR review feedback and managing rework
 - **`resolve-pr-comments`**: For addressing specific code review comments
-- **`finalize-work-item`**: For archiving completed work items after merge
+- **`finalizing-work-item`**: For archiving completed work items after merge
 - **`git-commit`**: For recording commits that can be linked in `commits`

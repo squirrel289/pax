@@ -320,4 +320,4 @@ Committed: feat(backlog): add comprehensive dependency graph and enhance validat
 - **Frequency:** Run before each major release, after bulk backlog updates
 - **Duration:** 15-30 minutes for 30-50 work items
 - **Automation:** Phases 1-3 can be scripted; Phases 4-5 require judgment
-- **Complementary Skills:** `update-work-item`, `create-work-item`, `finalize-work-item`
+- **Complementary Skills:** `updating-work-item`, `creating-work-item`, `finalizing-work-item`

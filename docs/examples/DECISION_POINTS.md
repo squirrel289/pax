@@ -112,7 +112,7 @@ metadata:
             action: "resolve-comments"
           - id: major
             label: "Major (significant changes)"
-            action: "update-work-item --mode=revise"
+            action: "updating-work-item --mode=revise"
           - id: blocker
             label: "Blocker (revert required)"
             action: "revert-work-item"
@@ -156,7 +156,7 @@ metadata:
             label: "Custom environment..."
             allow_freeform: true
         resume: "Proceed with deployment to selected environment"
-    
+
     - id: rollback_strategy
       trigger: after-healthcheck-fail
       yolo: "[auto_rollback]"

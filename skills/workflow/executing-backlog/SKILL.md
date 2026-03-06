@@ -142,7 +142,7 @@ Reference `agentic-eval` skill for full evaluation patterns.
 
 - Use `handle-pr-feedback`/`resolve-pr-comments` to close blockers; categorize comments (blocker/major/minor) explicitly in responses.
 - Merge with `merge-pr` skill, which enforces both Test Parity Gate (local tests pass) and guarding-branches checks (mergeability, conflicts, deletions) before merge.
-- Finalize the work item with `finalize-work-item`, recording actual hours, metrics, and cleaning up branches per `feature-branch-management`.
+- Finalize the work item with `finalizing-work-item`, recording actual hours, metrics, and cleaning up branches per `feature-branch-management`.
 
 ## Monitoring & Metrics
 

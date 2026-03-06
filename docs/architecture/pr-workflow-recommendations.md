@@ -87,7 +87,7 @@ This document provides specific recommendations to address architecture issues i
 
 - resolve-pr-comments (used for minor/moderate issues)
 - decision logic (for severity classification)
-- update-work-item skill (for work item status changes on major issues)
+- updating-work-item skill (for work item status changes on major issues)
 - yolo | collaborative mode (via aspect)
 
 **Difference from resolve-pr-comments**:
@@ -359,12 +359,12 @@ process-pr uses merge-pr internally after addressing feedback
 
    1. Work item status = `in_progress` (development phase)
    2. Tests passing locally
-   3. Update: `update-work-item status: testing`
+   3. Update: `updating-work-item status: testing`
    4. Invoke: `create-pr` (auto-creates PR from work item)
    5. PR created, linked back to work item
    6. Transition: Work item status still `testing`, now PR exists
 
-   Then: 7. Handle feedback via `handle-pr-feedback` 8. Finalize: After merge, `finalize-work-item` archives it
+   Then: 7. Handle feedback via `handle-pr-feedback` 8. Finalize: After merge, `finalizing-work-item` archives it
    ```
 
 ---

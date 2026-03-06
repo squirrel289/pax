@@ -55,7 +55,7 @@ Handle PR feedback when:
 Skip this skill for:
 
 - PR just created, awaiting initial review (wait for feedback first)
-- Already-merged PRs (use `finalize-work-item` instead)
+- Already-merged PRs (use `finalizing-work-item` instead)
 - Complex architectural feedback requiring discussion (use collaborative mode and escalate)
 
 ## Feedback Triage System
@@ -64,17 +64,17 @@ Skip this skill for:
 
 Comments are classified by severity and required action:
 
-| Severity | Type | Requires | Auto-Fix | Revert | Example |
-|----------|------|----------|----------|--------|---------|
-| **Trivial** | Typo, formatting, comment | Inline fix | ✅ Yes | ❌ No | Spelling error in variable name |
-| **Minor** | Documentation, test expectations | Code change | ✅ Optional | ❌ No | Add docstring, clarify test |
-| **Moderate** | Logic refinement, optimization | Code change | ❌ Manual | ❌ No | "Consider using map instead of loop" |
-| **Major** | Incorrect approach, design flaw | Significant rework | ❌ Manual | ✅ Yes | "This violates our decorator pattern" |
-| **Blocker** | Architectural, breaking change | Scope change | ❌ Escalate | ✅ Yes | "Doesn't comply with RFC-007" |
+| Severity     | Type                             | Requires           | Auto-Fix    | Revert | Example                               |
+| ------------ | -------------------------------- | ------------------ | ----------- | ------ | ------------------------------------- |
+| **Trivial**  | Typo, formatting, comment        | Inline fix         | ✅ Yes      | ❌ No  | Spelling error in variable name       |
+| **Minor**    | Documentation, test expectations | Code change        | ✅ Optional | ❌ No  | Add docstring, clarify test           |
+| **Moderate** | Logic refinement, optimization   | Code change        | ❌ Manual   | ❌ No  | "Consider using map instead of loop"  |
+| **Major**    | Incorrect approach, design flaw  | Significant rework | ❌ Manual   | ✅ Yes | "This violates our decorator pattern" |
+| **Blocker**  | Architectural, breaking change   | Scope change       | ❌ Escalate | ✅ Yes | "Doesn't comply with RFC-007"         |
 
 ### Decision Tree
 
-```
+```asciiflow
 Comment Received
 ├─ Severity: Trivial or Minor?
 │  └─ YES → resolve-pr-comments (auto-fix or prompt)
@@ -87,7 +87,7 @@ Comment Received
 │  └─ YES → Decision point
 │     ├─ Can refactor without scope change? → Manual fix, keep testing status
 │     └─ Requires scope change? → Revert to in_progress
-│        ├─ update-work-item (testing → in_progress)
+│        ├─ updating-work-item (testing → in_progress)
 │        ├─ feature-branch-management sync (rebase if main changed)
 │        └─ Rescope work in notes
 ```
@@ -97,6 +97,7 @@ Comment Received
 ### Phase 1: Fetch and Analyze
 
 1. **Fetch PR Details**
+
    ```bash
    # Via pull-request-tool: Fetch PR details, reviews, comments
    pr_details = pull-request-tool.fetch(pr_number)
@@ -118,18 +119,21 @@ Comment Received
 
 Make decision based on feedback distribution:
 
-**Option A: Minor Feedback Only**
+#### Option A: Minor Feedback Only
+
 - Proceed with inline fixes via `resolve-pr-comments`
 - Keep work item in `testing` status
 - Update PR with fixes, re-request review
 
-**Option B: Mixed (Minor + Moderate)**
+#### Option B: Mixed (Minor + Moderate)
+
 - Resolve minor items automatically or manually
 - Address moderate items with discussion (collaborative mode)
 - Keep work item in `testing` but notify reviewer of changes
 - Plan for follow-up review round
 
-**Option C: Major/Blocker Feedback**
+#### Option C: Major/Blocker Feedback
+
 - Revert work item to `in_progress`
 - Notify developer of scope change
 - Update work item notes with feedback details
@@ -137,7 +141,7 @@ Make decision based on feedback distribution:
 
 ### Phase 3: Execute Resolution
 
-#### If Minor Feedback (Option A):
+#### If Minor Feedback (Option A)
 
 ```yaml
 # Step 1: Auto-resolve trivial comments
@@ -158,7 +162,7 @@ pull-request-tool request-review pr_number=247
 # (No status change needed)
 ```
 
-#### If Moderate Feedback (Option B):
+#### If Moderate Feedback (Option B)
 
 ```yaml
 # Step 1: Resolve trivial items automatically
@@ -173,7 +177,7 @@ git commit -m "feat: address review feedback and refinements"
 git push origin feature/60-filter-adapter
 
 # Step 4: Update work item with changes
-update-work-item id=60 \
+updating-work-item id=60 \
   status=testing \
   notes="Addressed review feedback: optimized filter logic, improved test coverage"
 
@@ -181,14 +185,14 @@ update-work-item id=60 \
 pull-request-tool request-review pr_number=247
 ```
 
-#### If Major/Blocker Feedback (Option C):
+#### If Major/Blocker Feedback (Option C)
 
 ```yaml
 # Step 1: Notify developer
 # (In collaborative mode, ask permission to revert)
 
 # Step 2: Revert work item to in_progress
-update-work-item id=60 \
+updating-work-item id=60 \
   status=in_progress \
   notes="PR feedback: Design violates decorator pattern (Reviewer: @alice).
          Requires rework. See PR #247 for details.
@@ -214,7 +218,6 @@ After fixes are pushed:
 ```yaml
 # Option: Auto re-request review (if using CI auto-merge)
 pull-request-tool request-review pr_number=247
-
 # Option: Notify team in notes
 # (Work item notes now reflect latest feedback status)
 
@@ -284,12 +287,12 @@ notes:
     user: @john
     note: |
       ## Review Feedback (Round 1)
-      
+
       **Minor Issues Addressed:**
       - Fixed docstring typos in FilterAdapter.map()
       - Added test for edge case with empty sequences
       - Improved error message clarity
-      
+
       **Blocker Feedback (Reverted):**
       - Reviewer raised: "Doesn't follow decorator pattern"
       - Decision: Refactor FilterAdapter to use composition
@@ -314,11 +317,11 @@ GitHub labels can help mark comment severity:
 ```yaml
 # Labels to add to work item or PR:
 labels:
-  - severity/trivial     # Typo, formatting
-  - severity/minor       # Docs, test expectations
-  - severity/moderate    # Logic refinement
-  - severity/major       # Design issue
-  - severity/blocker     # Architectural violation
+  - severity/trivial # Typo, formatting
+  - severity/minor # Docs, test expectations
+  - severity/moderate # Logic refinement
+  - severity/major # Design issue
+  - severity/blocker # Architectural violation
 ```
 
 Reviewers can label their comments. handle-pr-feedback reads these labels for better classification.
@@ -356,7 +359,7 @@ See the dependency matrix in [docs/SKILL_COMPOSITION.md](docs/SKILL_COMPOSITION.
 
 - **`pull-request-tool`**: Fetch PR details, comments, reviews (via PR_MANAGEMENT_INTERFACE)
 - **`resolve-pr-comments`**: Execute comment fixes and resolutions
-- **`update-work-item`**: Revert work item status and record feedback
+- **`updating-work-item`**: Revert work item status and record feedback
 - **`feature-branch-management`**: Sync branch during rework
 - **`process-pr`**: Full PR workflow (includes feedback loop via handle-pr-feedback)
 
@@ -422,6 +425,7 @@ Document in CONTRIBUTING.md:
 
 ```markdown
 Label comments with severity:
+
 - `[trivial]` Typo in variable name
 - `[minor]` Add docstring
 - `[major]` Doesn't follow pattern
@@ -433,7 +437,7 @@ If feedback suggests scope creep, escalate to product/architecture:
 
 ```yaml
 # In collaborative mode:
-> Multiple blockers suggest scope mismatch. 
+> Multiple blockers suggest scope mismatch.
 > Escalate to architecture review? [Y/n]
 ```
 
@@ -459,7 +463,7 @@ notes:
 
 ### Scenario A: One Round of Minor Fixes
 
-```
+```markdown
 1. PR submitted, reviewer approves with minor comments
 2. handle-pr-feedback auto-fixes trivial issues
 3. Changes pushed, reviewer re-requested
@@ -468,7 +472,7 @@ notes:
 
 ### Scenario B: Feedback Leads to Rework
 
-```
+```markdown
 1. PR submitted, reviewer requests major redesign
 2. handle-pr-feedback reverts work item to in_progress
 3. Developer reworks architecture
@@ -479,7 +483,7 @@ notes:
 
 ### Scenario C: Conflicting Feedback
 
-```
+```markdown
 1. PR submitted, reviewers disagree on approach
 2. handle-pr-feedback escalates to discussion (collaborative)
 3. Team discusses in comment thread or sync meeting
@@ -489,6 +493,6 @@ notes:
 
 ## References
 
-- GitHub PR Comments API: https://docs.github.com/en/rest/reference/pulls#comments
-- Review Comments: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-a-pull-request/about-pull-request-reviews
+- GitHub PR Comments API: <https://docs.github.com/en/rest/reference/pulls#comments>
+- Review Comments: <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-a-pull-request/about-pull-request-reviews>
 - PR_MANAGEMENT_INTERFACE: See tools/PR_MANAGEMENT_INTERFACE.md

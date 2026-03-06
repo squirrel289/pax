@@ -198,11 +198,11 @@ git fetch --prune origin
 
 ## Integration Points
 
-- `update-work-item`: invoke `create` on `in-progress`, `sync` on `ready-for-review`
+- `updating-work-item`: invoke `create` on `in-progress`, `sync` on `ready-for-review`
 - `create-pr`: expects synced branch with upstream
 - `handle-pr-feedback`: invoke `sync` after rework
 - `merge-pr`: invoke `cleanup` after successful merge
-- `finalize-work-item`: verify cleanup completed
+- `finalizing-work-item`: verify cleanup completed
 
 ## Failure Modes and Fast Recovery
 

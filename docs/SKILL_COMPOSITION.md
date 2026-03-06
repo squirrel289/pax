@@ -21,6 +21,7 @@ The simplest skills do one thing well:
 
 ```markdown
 Atomic Skills:
+
 - pull-request-tool: Interact with GitHub PRs
 - parallel-execution: Run tasks concurrently
 - yolo: Autonomous execution mode
@@ -63,6 +64,7 @@ Chain skills where each depends on the previous:
 A → B → C → D
 
 Example: Git Workflow
+
 1. Make changes
 2. Commit (needs changes)
 3. Push (needs commit)
@@ -75,10 +77,11 @@ Example: Git Workflow
 Skill: git-workflow
 Composes: sequential-execution
 Steps:
-  1. Validate changes exist
-  2. Commit with message
-  3. Push to remote
-  4. Create PR via pull-request-tool
+
+1. Validate changes exist
+2. Commit with message
+3. Push to remote
+4. Create PR via pull-request-tool
 ```
 
 ### Pattern 2: Parallel Composition
@@ -102,10 +105,11 @@ Example: Codebase Analysis
 Skill: codebase-analysis
 Composes: parallel-execution
 Tasks:
-  - Security analysis (independent)
-  - Performance analysis (independent)
-  - Coverage analysis (independent)
-Synthesis: Combine results after all complete
+
+- Security analysis (independent)
+- Performance analysis (independent)
+- Coverage analysis (independent)
+  Synthesis: Combine results after all complete
 ```
 
 ### Pattern 3: Conditional Composition
@@ -124,11 +128,12 @@ IF risky_changes THEN collaborative ELSE yolo
 ```markdown
 Skill: smart-merge
 Logic:
-  1. Analyze PR (detect risk level)
-  2. IF risk > threshold:
-       Use merge-pr with collaborative mode
-     ELSE:
-       Use merge-pr with yolo mode
+
+1. Analyze PR (detect risk level)
+2. IF risk > threshold:
+   Use merge-pr with collaborative mode
+   ELSE:
+   Use merge-pr with yolo mode
 ```
 
 ### Pattern 4: Nested Composition
@@ -150,13 +155,14 @@ Top-Level Workflow
 ```markdown
 Skill: process-pr
 Composes:
-  - parallel-execution (assessment phase)
-  - resolve-pr-comments (workflow)
-    ├── pull-request-tool
-    └── sequential-execution
-  - merge-pr (workflow)
-    ├── pull-request-tool
-    └── sequential-execution
+
+- parallel-execution (assessment phase)
+- resolve-pr-comments (workflow)
+  ├── pull-request-tool
+  └── sequential-execution
+- merge-pr (workflow)
+  ├── pull-request-tool
+  └── sequential-execution
 ```
 
 ### Pattern 5: Mode Injection (Aspect-Driven)
@@ -167,6 +173,7 @@ Inject interaction mode into workflows:
 Workflow + Aspect + Mode → Behavior
 
 Example:
+
 - process-pr + interaction-modes + yolo → Fully autonomous
 - process-pr + interaction-modes + collaborative → Interactive
 ```
@@ -176,11 +183,12 @@ Example:
 ```markdown
 Skill: any-workflow
 Parameters:
-  - interaction-mode: yolo | collaborative
+
+- interaction-mode: yolo | collaborative
 
 Logic:
-  Interaction handled by the interaction-modes aspect
-  Decision points prompt or auto-execute based on mode
+Interaction handled by the interaction-modes aspect
+Decision points prompt or auto-execute based on mode
 ```
 
 ## Aspects and Decision Points
@@ -226,28 +234,28 @@ Layer 3: Specialized Workflows (Single Domain)
 
 Layer 4: Merge/Cleanup Workflows (Intermediate Orchestration)
 ├── merge-pr (merge with verification + branch cleanup)
-└── finalize-work-item (archive item + branch cleanup)
+└── finalizing-work-item (archive item + branch cleanup)
 
 Layer 5: Work Item Orchestration (Full Lifecycle)
-├── create-work-item (initialize)
-├── update-work-item (progress tracking + auto-invocation of branch/PR ops)
+├── creating-work-item (initialize)
+├── updating-work-item (progress tracking + auto-invocation of branch/PR ops)
 └── process-pr (full PR lifecycle: review → merge)
 ```
 
 ### Skill Dependency Matrix
 
-| Skill | Depends On | Called By |
-| ----- | ---------- | --------- |
-| `feature-branch-management` | Git CLI | update-work-item, merge-pr, finalize-work-item, handle-pr-feedback |
-| `create-pr` | pull-request-tool, feature-branch-management | update-work-item (auto on testing), user (manual) |
-| `pull-request-tool` | GitHub API | create-pr, merge-pr, handle-pr-feedback, resolve-pr-comments, process-pr |
-| `resolve-pr-comments` | pull-request-tool | handle-pr-feedback, process-pr (manual) |
-| `handle-pr-feedback` | pull-request-tool, resolve-pr-comments, update-work-item | process-pr, user (manual) |
-| `merge-pr` | pull-request-tool, feature-branch-management | process-pr, user (manual) |
-| `update-work-item` | feature-branch-management, create-pr | user (manual), handle-pr-feedback (on revert) |
-| `create-work-item` | — | user (manual) |
-| `finalize-work-item` | feature-branch-management | user (manual) |
-| `process-pr` | handle-pr-feedback, merge-pr | user (manual) |
+| Skill                       | Depends On                                                 | Called By                                                                |
+| --------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `feature-branch-management` | Git CLI                                                    | updating-work-item, merge-pr, finalizing-work-item, handle-pr-feedback   |
+| `create-pr`                 | pull-request-tool, feature-branch-management               | updating-work-item (auto on testing), user (manual)                      |
+| `pull-request-tool`         | GitHub API                                                 | create-pr, merge-pr, handle-pr-feedback, resolve-pr-comments, process-pr |
+| `resolve-pr-comments`       | pull-request-tool                                          | handle-pr-feedback, process-pr (manual)                                  |
+| `handle-pr-feedback`        | pull-request-tool, resolve-pr-comments, updating-work-item | process-pr, user (manual)                                                |
+| `merge-pr`                  | pull-request-tool, feature-branch-management               | process-pr, user (manual)                                                |
+| `updating-work-item`        | feature-branch-management, create-pr                       | user (manual), handle-pr-feedback (on revert)                            |
+| `creating-work-item`        | —                                                          | user (manual)                                                            |
+| `finalizing-work-item`      | feature-branch-management                                  | user (manual)                                                            |
+| `process-pr`                | handle-pr-feedback, merge-pr                               | user (manual)                                                            |
 
 ### Full Lifecycle Example
 
@@ -255,13 +263,13 @@ Layer 5: Work Item Orchestration (Full Lifecycle)
 
 ```ascii-tree
 Phase 1: Create Item
-  User invokes: create-work-item
+  User invokes: creating-work-item
     ├─ Work item status: not_started
     ├─ Metadata created (id=60, title, effort)
     └─ Related skills documented
 
 Phase 2: Start Implementation
-  User invokes: update-work-item status=in_progress
+  User invokes: updating-work-item status=in_progress
     ├─ Auto-invokes: feature-branch-management create feature/60-filter-adapter
     ├─ Feature branch checked out locally
     ├─ Work item.feature_branch = "feature/60-filter-adapter"
@@ -270,10 +278,10 @@ Phase 2: Start Implementation
 Phase 3: Implement & Commit
   User makes git commits
     ├─ Work item.related_commits += <latest-sha>
-    └─ (update-work-item tracks progress)
+    └─ (updating-work-item tracks progress)
 
 Phase 4: Ready for Review
-  User invokes: update-work-item status=testing
+  User invokes: updating-work-item status=testing
     ├─ Auto-invokes: feature-branch-management sync --base=main
     │   ├─ Fetches origin/main
     │   └─ Rebases local branch on main
@@ -296,7 +304,7 @@ Phase 5B: Major Feedback (Rework)
   Reviewer requests design change
     ├─ Author invokes: handle-pr-feedback pr_number=123
     │   ├─ Classifies as "Major"
-    │   ├─ Invokes: update-work-item status=in_progress (revert)
+    │   ├─ Invokes: updating-work-item status=in_progress (revert)
     │   │   └─ Back to implementation phase (Phase 3)
     │   ├─ Work item status reverted
     │   └─ Branch still exists for rework
@@ -314,7 +322,7 @@ Phase 6: Merge
     └─ Related skills documented
 
 Phase 7: Finalize
-  User invokes: finalize-work-item work_item=60
+  User invokes: finalizing-work-item work_item=60
     ├─ Archives work item
     ├─ Auto-invokes: feature-branch-management cleanup (if not cleaned)
     ├─ Records completion date
@@ -329,18 +337,18 @@ Phase 7: Finalize
    - Mode parameter flows through all composed skills automatically
 
 2. **Auto-Invocation** (Status Transitions):
-   - `update-work-item` auto-invokes `feature-branch-management create` on `not_started` → `in_progress`
-   - `update-work-item` auto-invokes `feature-branch-management sync` + `create-pr` on `in_progress` → `testing`
+   - `updating-work-item` auto-invokes `feature-branch-management create` on `not_started` → `in_progress`
+   - `updating-work-item` auto-invokes `feature-branch-management sync` + `create-pr` on `in_progress` → `testing`
    - `merge-pr` auto-invokes `feature-branch-management cleanup` on successful merge
    - Eliminates manual coordination steps
 
 3. **Feedback Loops** (Error Handling):
    - `handle-pr-feedback` classifies severity dynamically
-   - Routes to: `resolve-pr-comments` (minor), `update-work-item` revert (major), escalate (blocker)
+   - Routes to: `resolve-pr-comments` (minor), `updating-work-item` revert (major), escalate (blocker)
    - Decision logic encapsulated in single skill
 
 4. **Layered Delegation** (Separation of Concerns):
-   - Layer 5 (update-work-item) doesn't know git details; delegates to Layer 2 (branch-management)
+   - Layer 5 (updating-work-item) doesn't know git details; delegates to Layer 2 (branch-management)
    - Layer 4 (merge-pr) doesn't know PR details; delegates to Layer 2 (pull-request-tool)
    - Each layer has single responsibility
 
@@ -353,10 +361,10 @@ Phase 7: Finalize
 All skills needing branch operations use **single** `feature-branch-management` skill:
 
 ```ascii-tree
-update-work-item    ──┐
+updating-work-item    ──┐
 merge-pr            ──┤──→ feature-branch-management (single source of truth)
-finalize-work-item  ──┘
-handle-pr-feedback  
+finalizing-work-item  ──┘
+handle-pr-feedback
 ```
 
 Benefits:
@@ -371,14 +379,14 @@ Sometimes simpler is better:
 
 ```markdown
 DON'T do this:
-  update-work-item
-    ├─ create-work-item
-    └─ create-pr
-  (Items can't update if not created)
+updating-work-item
+├─ creating-work-item
+└─ create-pr
+(Items can't update if not created)
 
 DO this instead:
-  Each skill is independent + focused
-  Users choose which to invoke when
+Each skill is independent + focused
+Users choose which to invoke when
 ```
 
 ## Building a New Workflow
@@ -391,6 +399,7 @@ Define what the workflow should do:
 Example: automated-release
 
 Requirements:
+
 - Run all tests
 - Build artifacts
 - Update version
@@ -405,6 +414,7 @@ Map to existing skills or create new ones:
 
 ```markdown
 automated-release breakdown:
+
 1. Run tests → Use: test-runner (new skill)
 2. Build artifacts → Use: build-system (new skill)
 3. Update version → Use: version-bumper (new skill)
@@ -421,17 +431,14 @@ Decide on sequential vs parallel:
 automated-release flow:
 
 Phase 1 (Sequential):
-  1. Run tests (must pass before continuing)
+
+1. Run tests (must pass before continuing)
 
 Phase 2 (Parallel):
-  2a. Build artifacts
-  2b. Generate release notes
+2a. Build artifacts
+2b. Generate release notes
 
-Phase 3 (Sequential):
-  3. Update version
-  4. Create git tag
-  5. Push to registry
-  6. Create GitHub release
+Phase 3 (Sequential): 3. Update version 4. Create git tag 5. Push to registry 6. Create GitHub release
 ```
 
 ### Step 4: Choose Interaction Mode
@@ -440,6 +447,7 @@ Select appropriate mode:
 
 ```markdown
 For automated-release:
+
 - Use yolo mode (well-defined, low-risk)
 - Add collaborative option for first-time releases
 ```
@@ -479,14 +487,16 @@ composed-from:
 ```markdown
 Skill: pr-review-pipeline
 Composed from:
-  - parallel-execution (run checks)
-  - code-quality (new skill)
-  - security-scan (new skill)
-  - test-coverage (new skill)
-  - pull-request-tool (post feedback)
-  - collaborative (interaction mode)
+
+- parallel-execution (run checks)
+- code-quality (new skill)
+- security-scan (new skill)
+- test-coverage (new skill)
+- pull-request-tool (post feedback)
+- collaborative (interaction mode)
 
 Flow:
+
 1. Parallel checks:
    - Code quality analysis
    - Security scan
@@ -503,14 +513,16 @@ Flow:
 ```markdown
 Skill: multi-repo-deploy
 Composed from:
-  - parallel-execution (deploy all)
-  - git-operations (clone/pull)
-  - build-system (build each)
-  - deploy-service (new skill)
-  - health-check (new skill)
-  - yolo (autonomous mode)
+
+- parallel-execution (deploy all)
+- git-operations (clone/pull)
+- build-system (build each)
+- deploy-service (new skill)
+- health-check (new skill)
+- yolo (autonomous mode)
 
 Flow:
+
 1. Parallel for each repo:
    - Pull latest
    - Run tests
@@ -529,12 +541,14 @@ Flow:
 ```markdown
 Skill: issue-triage
 Composed from:
-  - gh-issues (new skill)
-  - text-analysis (new skill)
-  - label-classifier (new skill)
-  - yolo (autonomous)
+
+- gh-issues (new skill)
+- text-analysis (new skill)
+- label-classifier (new skill)
+- yolo (autonomous)
 
 Flow:
+
 1. Fetch new issues
 2. For each issue:
    - Analyze content
@@ -628,13 +642,14 @@ Define explicit inputs and outputs:
 ```markdown
 Skill: merge-pr
 Inputs:
-  - pr-number (required)
-  - repository (required)
-  - merge-method (optional)
-Outputs:
-  - merge-status (success/failure)
-  - merge-commit-sha
-  - errors (if any)
+
+- pr-number (required)
+- repository (required)
+- merge-method (optional)
+  Outputs:
+- merge-status (success/failure)
+- merge-commit-sha
+- errors (if any)
 ```
 
 ### ✅ 3. Fail Fast
@@ -644,10 +659,11 @@ Verify prerequisites early:
 ```markdown
 Skill: deploy
 Steps:
-  1. Verify credentials (fail if missing)
-  2. Verify environment exists (fail if not)
-  3. Verify tests pass (fail if not)
-  4. Then deploy
+
+1. Verify credentials (fail if missing)
+2. Verify environment exists (fail if not)
+3. Verify tests pass (fail if not)
+4. Then deploy
 ```
 
 ### ✅ 4. Composable Error Handling
@@ -656,11 +672,8 @@ Errors should propagate cleanly:
 
 ```markdown
 process-pr:
-  If resolve-pr-comments fails:
-    - Log error
-    - Skip to merge if critical
-    - Or abort if blocker
-  Decision based on error type
+If resolve-pr-comments fails: - Log error - Skip to merge if critical - Or abort if blocker
+Decision based on error type
 ```
 
 ### ✅ 5. Document Composition
@@ -669,9 +682,10 @@ Always document what you compose:
 
 ```markdown
 composed-from:
-  - skill-a (for X)
-  - skill-b (for Y)
-  - skill-c (for Z)
+
+- skill-a (for X)
+- skill-b (for Y)
+- skill-c (for Z)
 ```
 
 ## Testing Composed Skills
@@ -682,6 +696,7 @@ Test each skill in isolation:
 
 ```markdown
 Test: pull-request-tool
+
 - Mock GitHub API
 - Verify correct calls made
 - Check error handling
@@ -693,6 +708,7 @@ Test skills working together:
 
 ```markdown
 Test: merge-pr (composes pull-request-tool)
+
 - Test with real/sandbox repo
 - Verify full flow works
 - Check edge cases
@@ -704,6 +720,7 @@ Test complete workflows:
 
 ```markdown
 Test: process-pr (composes multiple workflows)
+
 - Create test PR
 - Run full process
 - Verify PR merged correctly
@@ -719,12 +736,12 @@ Choose skills at runtime:
 ```markdown
 Skill: smart-workflow
 Logic:
-  analyze_context()
-  if needs_security:
-    add security-scan skill
-  if needs_performance:
-    add performance-analysis skill
-  execute(composed_skills)
+analyze_context()
+if needs_security:
+add security-scan skill
+if needs_performance:
+add performance-analysis skill
+execute(composed_skills)
 ```
 
 ### Composition with Feedback Loops
@@ -734,13 +751,14 @@ Skills that iterate:
 ```markdown
 Skill: iterative-fix
 Loop:
-  1. Run tests
-  2. If tests fail:
-     a. Analyze failures
-     b. Attempt fixes
-     c. Goto 1
-  3. If tests pass: Done
-Max iterations: 3
+
+1. Run tests
+2. If tests fail:
+   a. Analyze failures
+   b. Attempt fixes
+   c. Goto 1
+3. If tests pass: Done
+   Max iterations: 3
 ```
 
 ### Composition with Rollback
@@ -750,13 +768,14 @@ Support undo operations:
 ```markdown
 Skill: safe-deploy
 Steps:
-  1. Snapshot current state
-  2. Deploy new version
-  3. Run health checks
-  4. If unhealthy:
-     Rollback to snapshot
-  5. If healthy:
-     Delete snapshot
+
+1. Snapshot current state
+2. Deploy new version
+3. Run health checks
+4. If unhealthy:
+   Rollback to snapshot
+5. If healthy:
+   Delete snapshot
 ```
 
 ## Quick Reference
@@ -790,18 +809,23 @@ composed-from:
 # Your Workflow
 
 ## Purpose
+
 [What problem it solves]
 
 ## Skill Composition
+
 [How skills combine]
 
 ## Workflow Steps
+
 [Detailed flow]
 
 ## Parameters
+
 [Configuration options]
 
 ## Examples
+
 [Real usage]
 ```
 

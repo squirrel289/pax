@@ -29,7 +29,7 @@ flowchart TD
 
     Q1 -->|"Create a PR"| Q2{"Is the feature branch ready?"}
     Q2 -->|"Yes, work item status = testing"| CREATE_PR["→ create-pr<br/>(Workflow)<br/>Auto-populates PR from work item metadata"]
-    Q2 -->|"No, still in progress"| UPDATE_WI["→ update-work-item (in_progress)<br/>Return once ready for testing"]
+    Q2 -->|"No, still in progress"| UPDATE_WI["→ updating-work-item (in_progress)<br/>Return once ready for testing"]
 
     Q1 -->|"View/fetch PR details"| FETCH["→ pull-request-tool<br/>(Tool)<br/>operation: fetch-pr-details<br/>Auto-routes to copilot-pull-request or gh-pr-review"]
 
